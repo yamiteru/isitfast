@@ -1,1 +1,13 @@
-export const add = (...n: number[]) => n.reduce((acc, v) => acc + v, 0);
+import { preset } from "./preset";
+
+const defaultSuite = preset();
+const callibration = defaultSuite({
+	emptySync: () => { /* */ },
+	emptyAsync: async () => { /* */ },
+});
+
+(async () => {
+	for await (const result of callibration()) {
+		console.log(result); 
+  }
+})();

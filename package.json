@@ -18,7 +18,8 @@
     "build": "pnpm clean && ts-node scripts/build.ts && tsc --emitDeclarationOnly --outDir dist",
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm build",
-    "release": "release-it"
+    "release": "release-it",
+		"start": "node --expose-gc -r ts-node/register src/index.ts"
   },
   "license": "MIT",
   "devDependencies": {
