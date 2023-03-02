@@ -5,29 +5,27 @@ import { runBenchmark } from "./runBenchmark";
 import { DeepPartial, Options, Benchmarks } from "./types";
 
 export function preset(partialOptions?: DeepPartial<Options>) {
-	const options = getOptions(partialOptions);
-	const stores = createStores(options);
+  const options = getOptions(partialOptions);
+  const stores = createStores(options);
 
-	return function createSuite<
-		$Benchmarks extends Benchmarks
-	>(
-		benchmarks: $Benchmarks
-	) {
-		return async function* runSuite() {
-			const offsets = await getAllOffsets(stores, options);
+  return function createSuite<$Benchmarks extends Benchmarks>(
+    benchmarks: $Benchmarks,
+  ) {
+    return async function* runSuite() {
+      const offsets = await getAllOffsets(stores, options);
 
-			console.log(offsets);
+      console.log(offsets);
 
-			for(const benchmarkName in benchmarks) {
-				options.general.allowGc && global.gc?.();
+      for (const benchmarkName in benchmarks) {
+        options.general.allowGc && global.gc?.();
 
-				yield await runBenchmark(
-					benchmarks[benchmarkName], 
-					stores,
-					offsets,
-					options
-				);
-			}	
-		}	
-	}
+        yield await runBenchmark(
+          benchmarks[benchmarkName],
+          stores,
+          offsets,
+          options,
+        );
+      }
+    };
+  };
 }
