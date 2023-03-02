@@ -17,6 +17,7 @@ export type Options = {
   general: {
     substractSelf: boolean;
     allowGc: boolean;
+		offsetPercent: number;
   };
 };
 

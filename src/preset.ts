@@ -14,10 +14,14 @@ export function preset(partialOptions?: DeepPartial<Options>) {
     return async function* runSuite() {
       const offsets = await getAllOffsets(stores, options);
 
+			console.log("Overhead");
       console.log(offsets);
 
       for (const benchmarkName in benchmarks) {
         options.general.allowGc && global.gc?.();
+
+				console.log();
+				console.log(benchmarkName);
 
         yield await runBenchmark(
           benchmarks[benchmarkName],

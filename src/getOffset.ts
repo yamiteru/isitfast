@@ -1,23 +1,16 @@
 import { OFFSETS } from "./constants";
-import { getCpuStats } from "./getCpuStats";
-import { getMedian } from "./getMedian";
-import { getMinMax } from "./getMinMax";
-import { getRamStats } from "./getRamStats";
-import { measure } from "./measure";
+import { run } from "./run";
 import { OffsetData, Options, Stores } from "./types";
 
-// TODO: use "run" function to get rid of duplication
-// TODO: run as many times as needed to get to zero
+const KEYS = ["min", "max", "median"];
+const MAX = KEYS.length;
+
 export async function getOffset(
   { type, mode }: OffsetData,
   stores: Stores,
   options: Options,
 ) {
-  const { chunk, main } = stores[mode];
-  const { chunkSize, compareSize, rangePercent } = options[mode];
-  const getStats = mode === "cpu" ? getCpuStats : getRamStats;
-  const fn =
-    type === "async"
+	const fn = type === "async"
       ? async () => {
           /* */
         }
@@ -25,37 +18,38 @@ export async function getOffset(
           /* */
         };
 
-  main.index = -1;
-  chunk.index = -1;
+	const result = {
+		min: 0,
+		max: 0,
+		median: 0
+	};
+		
+	while(true as any) {
+		const offset = await run(fn, mode, stores, OFFSETS, options);
 
-  while (true as any) {
-    if (chunk.index === chunkSize) {
-      main.array[++main.index] = getMedian(chunk.array, chunk.index);
-      chunk.index = -1;
+		let counter = 0;
+		
+		for(let i = 0; i < MAX; ++i) {
+			const key = KEYS[i];
 
-      if (main.index >= compareSize) {
-        const { min, max } = getMinMax(
-          main.array.slice(main.index - compareSize),
-          compareSize,
-        );
+			if(result[key]) {
+				const substracted = offset[key] - result[key]; 
 
-        if (max - (max / 100) * rangePercent <= min) {
-          break;
-        }
-      }
-    }
+				if(substracted <= 0) {
+					result[key] += offset[key] + substracted;
+					counter += 1;
+				} else {
+					result[key] += offset[key];
+				}
+			} else {
+				result[key] += offset[key];
+			}
+		}
 
-    if (main.index === chunkSize) {
-      main.array[0] = getMedian(main.array, main.index);
-      main.index = 0;
-    }
+		if(counter === MAX) {
+			break;
+		}
+	}
 
-    await measure({ fn, mode, store: chunk }, options);
-  }
-
-  return getStats(
-    main,
-    { mode, type: fn instanceof Promise ? "async" : "sync" },
-    OFFSETS,
-  );
+	return result;
 }

@@ -2,10 +2,10 @@ import { preset } from "./preset";
 
 const defaultSuite = preset();
 const callibration = defaultSuite({
-  emptySync: () => {
+	emptyAsync: async () => {
     /* */
   },
-  emptyAsync: async () => {
+  emptySync: () => {
     /* */
   },
 });

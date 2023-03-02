@@ -14,6 +14,7 @@ export const OPTIONS = {
   general: {
     substractSelf: true,
     allowGc: true,
+		offsetPercent: 5,
   },
 } satisfies Options;
 
