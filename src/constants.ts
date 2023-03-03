@@ -1,6 +1,18 @@
-import { Offsets, Options } from "./types";
+import { Offset, Offsets, Options, Store, Stores } from "./types";
 
-export const OPTIONS = {
+export const OFFSET_KEYS = ["min", "max", "median"];
+
+export const OFFSET_MAX = OFFSET_KEYS.length;
+
+export const FN_ASYNC = async () => {
+  /* */
+};
+
+export const FN_SYNC = () => {
+  /* */
+};
+
+export const OPTIONS: Options = {
   cpu: {
     chunkSize: 100,
     compareSize: 10,
@@ -14,33 +26,47 @@ export const OPTIONS = {
   general: {
     substractSelf: true,
     allowGc: true,
-		offsetPercent: 5,
+    offsetPercent: 5,
   },
-} satisfies Options;
+};
 
-export const OFFSETS = {
+export const OFFSET: Offset = {
+  min: 0,
+  max: 0,
+  median: 0,
+};
+
+export const OFFSETS: Offsets = {
   async: {
-    cpu: {
-      min: 0,
-      max: 0,
-      median: 0,
-    },
-    ram: {
-      min: 0,
-      max: 0,
-      median: 0,
-    },
+    cpu: OFFSET,
+    ram: OFFSET,
   },
   sync: {
-    cpu: {
-      min: 0,
-      max: 0,
-      median: 0,
-    },
-    ram: {
-      min: 0,
-      max: 0,
-      median: 0,
-    },
+    cpu: OFFSET,
+    ram: OFFSET,
   },
-} satisfies Offsets;
+};
+
+export const STORE: Store = {
+  array: new Uint32Array(),
+  index: 0,
+};
+
+export const STORES = {
+  cpu: {
+    chunk: STORE,
+    main: STORE,
+  },
+  ram: {
+    chunk: STORE,
+    main: STORE,
+  },
+};
+
+export const GLOBAL: {
+  options: Options;
+  stores: Stores;
+} = {
+  options: OPTIONS,
+  stores: STORES,
+};

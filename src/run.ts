@@ -1,20 +1,18 @@
-import { getCpuStats } from "./getCpuStats";
+import { GLOBAL } from "./constants";
 import { getMedian } from "./getMedian";
 import { getMinMax } from "./getMinMax";
-import { getRamStats } from "./getRamStats";
+import { getStats } from "./getStats";
 import { measure } from "./measure";
-import { Benchmark, OffsetData, Offsets, Options, Stores } from "./types";
+import { removePercent } from "./removePercent";
+import { Benchmark, Mode, Offsets } from "./types";
 
-export async function run(
-  fn: Benchmark,
-  mode: OffsetData["mode"],
-  stores: Stores,
-  offsets: Offsets,
-  options: Options,
-) {
-  const { chunk, main } = stores[mode];
-  const { chunkSize, compareSize, rangePercent } = options[mode];
-  const getStats = mode === "cpu" ? getCpuStats : getRamStats;
+export async function run(benchmark: Benchmark, mode: Mode, offsets: Offsets) {
+  const { chunk, main } = GLOBAL.stores[mode];
+  const { chunkSize, compareSize, rangePercent } = GLOBAL.options[mode];
+  const modeType = {
+    mode,
+    type: benchmark instanceof Promise ? "async" : "sync",
+  } as const;
 
   main.index = -1;
   chunk.index = -1;
@@ -30,7 +28,7 @@ export async function run(
           compareSize,
         );
 
-        if (max - (max / 100) * rangePercent <= min) {
+        if (removePercent(max, rangePercent) <= min) {
           break;
         }
       }
@@ -41,12 +39,8 @@ export async function run(
       main.index = 0;
     }
 
-    await measure({ fn, mode, store: chunk }, options);
+    await measure({ benchmark, ...modeType });
   }
 
-  return getStats(
-    main,
-    { mode, type: fn instanceof Promise ? "async" : "sync" },
-    offsets,
-  );
+  return getStats(modeType, offsets);
 }

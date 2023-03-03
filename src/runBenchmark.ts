@@ -1,14 +1,15 @@
 import { run } from "./run";
-import { Benchmark, Offsets, Options, Stores } from "./types";
+import { Benchmark, Offsets, Results } from "./types";
 
+// TODO: rename to something else
 export async function runBenchmark(
+  name: string,
   benchmark: Benchmark,
-  stores: Stores,
   offsets: Offsets,
-  options: Options,
-) {
+): Promise<Results> {
   return {
-    cpu: await run(benchmark, "cpu", stores, offsets, options),
-    ram: await run(benchmark, "ram", stores, offsets, options),
+    name,
+    cpu: await run(benchmark, "cpu", offsets),
+    ram: await run(benchmark, "ram", offsets),
   };
 }

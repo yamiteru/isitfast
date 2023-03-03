@@ -1,55 +1,44 @@
-import { OFFSETS } from "./constants";
+import {
+  FN_ASYNC,
+  FN_SYNC,
+  OFFSET,
+  OFFSETS,
+  OFFSET_KEYS,
+  OFFSET_MAX,
+} from "./constants";
 import { run } from "./run";
-import { OffsetData, Options, Stores } from "./types";
+import { OffsetData } from "./types";
 
-const KEYS = ["min", "max", "median"];
-const MAX = KEYS.length;
+export async function getOffset({ type, mode }: OffsetData) {
+  const fn = type === "async" ? FN_ASYNC : FN_SYNC;
+  const result = { ...OFFSET };
 
-export async function getOffset(
-  { type, mode }: OffsetData,
-  stores: Stores,
-  options: Options,
-) {
-	const fn = type === "async"
-      ? async () => {
-          /* */
+  while (true as any) {
+    const offset = await run(fn, mode, OFFSETS);
+
+    let counter = 0;
+
+    for (let i = 0; i < OFFSET_MAX; ++i) {
+      const key = OFFSET_KEYS[i];
+
+      if (result[key]) {
+        const substracted = offset[key] - result[key];
+
+        if (substracted <= 0) {
+          result[key] += offset[key] + substracted;
+          counter += 1;
+        } else {
+          result[key] += offset[key];
         }
-      : () => {
-          /* */
-        };
+      } else {
+        result[key] += offset[key];
+      }
+    }
 
-	const result = {
-		min: 0,
-		max: 0,
-		median: 0
-	};
-		
-	while(true as any) {
-		const offset = await run(fn, mode, stores, OFFSETS, options);
+    if (counter === OFFSET_MAX) {
+      break;
+    }
+  }
 
-		let counter = 0;
-		
-		for(let i = 0; i < MAX; ++i) {
-			const key = KEYS[i];
-
-			if(result[key]) {
-				const substracted = offset[key] - result[key]; 
-
-				if(substracted <= 0) {
-					result[key] += offset[key] + substracted;
-					counter += 1;
-				} else {
-					result[key] += offset[key];
-				}
-			} else {
-				result[key] += offset[key];
-			}
-		}
-
-		if(counter === MAX) {
-			break;
-		}
-	}
-
-	return result;
+  return result;
 }

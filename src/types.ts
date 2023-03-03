@@ -17,7 +17,7 @@ export type Options = {
   general: {
     substractSelf: boolean;
     allowGc: boolean;
-		offsetPercent: number;
+    offsetPercent: number;
   };
 };
 
@@ -53,16 +53,18 @@ export type Stores = {
   };
 };
 
+export type Mode = Either<["cpu", "ram"]>;
+
+export type Type = Either<["sync", "async"]>;
+
 export type OffsetData = {
-  type: "sync" | "async";
-  mode: "cpu" | "ram";
+  type: Type;
+  mode: Mode;
 };
 
 export type MeasureData = {
-  fn: Benchmark;
-  mode: OffsetData["mode"];
-  store: Store;
-};
+  benchmark: Benchmark;
+} & OffsetData;
 
 export type Offset = {
   min: number;
@@ -79,4 +81,10 @@ export type Offsets = {
     cpu: Offset;
     ram: Offset;
   };
+};
+
+export type Results = {
+  name: string;
+  cpu: Offset;
+  ram: Offset;
 };

@@ -1,9 +1,10 @@
 import { preset } from "./preset";
+import { printSuite } from "./printSuite";
 
 const defaultSuite = preset();
 const callibration = defaultSuite({
-	emptyAsync: async () => {
-    /* */
+  test: () => {
+    `${Math.random()}`;
   },
   emptySync: () => {
     /* */
@@ -11,7 +12,5 @@ const callibration = defaultSuite({
 });
 
 (async () => {
-  for await (const result of callibration()) {
-    console.log(result);
-  }
+  await printSuite(callibration);
 })();

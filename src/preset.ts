@@ -1,3 +1,4 @@
+import { GLOBAL } from "./constants";
 import { createStores } from "./createStores";
 import { getAllOffsets } from "./getAllOffsets";
 import { getOptions } from "./getOptions";
@@ -12,22 +13,19 @@ export function preset(partialOptions?: DeepPartial<Options>) {
     benchmarks: $Benchmarks,
   ) {
     return async function* runSuite() {
-      const offsets = await getAllOffsets(stores, options);
+      GLOBAL.stores = stores;
+      GLOBAL.options = options;
 
-			console.log("Overhead");
-      console.log(offsets);
+      const offsets = await getAllOffsets();
 
       for (const benchmarkName in benchmarks) {
-        options.general.allowGc && global.gc?.();
-
-				console.log();
-				console.log(benchmarkName);
+        // We GC here so memory from one benchmark doesn't leak to the next one
+        GLOBAL.options.general.allowGc && global.gc?.();
 
         yield await runBenchmark(
+          benchmarkName,
           benchmarks[benchmarkName],
-          stores,
           offsets,
-          options,
         );
       }
     };

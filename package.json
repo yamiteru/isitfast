@@ -5,7 +5,11 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
-  "files": ["dist/*.js", "dist/*.map", "dist/*.ts"],
+  "files": [
+    "dist/*.js",
+    "dist/*.map",
+    "dist/*.ts"
+  ],
   "scripts": {
     "fix:format": "prettier --write \"**/*.ts\"",
     "fix:lint": "eslint --fix --ext .ts .",
@@ -19,7 +23,7 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm build",
     "release": "release-it",
-		"start": "node --expose-gc -r ts-node/register src/index.ts"
+    "start": "node --expose-gc -r ts-node/register src/index.ts"
   },
   "license": "MIT",
   "devDependencies": {

@@ -1,27 +1,15 @@
-import { Options, Stores } from "./types";
+import { createStore } from "./createStore";
+import { Options } from "./types";
 
-// memoize store by options and reuse it if possible
-export function createStores(options: Options): Stores {
+export function createStores(options: Options) {
   return {
     cpu: {
-      chunk: {
-        array: new Uint32Array(new ArrayBuffer(options.cpu.chunkSize * 4)),
-        index: 0,
-      },
-      main: {
-        array: new Uint32Array(new ArrayBuffer(options.cpu.chunkSize * 4)),
-        index: 0,
-      },
+      chunk: createStore("cpu", options),
+      main: createStore("cpu", options),
     },
     ram: {
-      chunk: {
-        array: new Uint32Array(new ArrayBuffer(options.ram.chunkSize * 4)),
-        index: 0,
-      },
-      main: {
-        array: new Uint32Array(new ArrayBuffer(options.ram.chunkSize * 4)),
-        index: 0,
-      },
+      chunk: createStore("ram", options),
+      main: createStore("ram", options),
     },
   };
 }

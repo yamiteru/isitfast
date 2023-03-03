@@ -1,25 +1,24 @@
-import { MeasureData, Options } from "./types";
+import { GLOBAL } from "./constants";
+import { MeasureData } from "./types";
 
-export async function measure(
-  { fn, mode, store }: MeasureData,
-  { general: { allowGc } }: Options,
-) {
-  const isAsync = fn instanceof Promise;
+export async function measure({ benchmark, mode, type }: MeasureData) {
+  const isAsync = type === "async";
+  const store = GLOBAL.stores[mode].chunk;
 
   if (mode === "cpu") {
     const start = process.hrtime.bigint();
 
-    isAsync ? await fn() : fn();
+    isAsync ? await benchmark() : benchmark();
 
     const end = process.hrtime.bigint();
 
     store.array[++store.index] = Math.round(Number(end - start));
   } else {
-    allowGc && global.gc?.();
+    GLOBAL.options.general.allowGc && global.gc?.();
 
     const start = process.memoryUsage().heapUsed;
 
-    isAsync ? await fn() : fn();
+    isAsync ? await benchmark() : benchmark();
 
     const end = process.memoryUsage().heapUsed;
 
