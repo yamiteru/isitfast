@@ -5,16 +5,16 @@ import {
   OFFSETS,
   OFFSET_KEYS,
   OFFSET_MAX,
-} from "./constants";
-import { run } from "./run";
-import { OffsetData } from "./types";
+} from "../constants";
+import { stats } from "../stats";
+import { TypeMode } from "../types";
 
-export async function getOffset({ type, mode }: OffsetData) {
+export async function getOffset({ type, mode }: TypeMode) {
   const fn = type === "async" ? FN_ASYNC : FN_SYNC;
   const result = { ...OFFSET };
 
   while (true as any) {
-    const offset = await run(fn, mode, OFFSETS);
+    const offset = await stats(fn, mode, OFFSETS);
 
     let counter = 0;
 
@@ -22,10 +22,10 @@ export async function getOffset({ type, mode }: OffsetData) {
       const key = OFFSET_KEYS[i];
 
       if (result[key]) {
-        const substracted = offset[key] - result[key];
+        const subtracted = offset[key] - result[key];
 
-        if (substracted <= 0) {
-          result[key] += offset[key] + substracted;
+        if (subtracted <= 0) {
+          result[key] += offset[key] + subtracted;
           counter += 1;
         } else {
           result[key] += offset[key];

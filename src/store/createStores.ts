@@ -1,5 +1,5 @@
 import { createStore } from "./createStore";
-import { Options } from "./types";
+import { Options } from "../types";
 
 export function createStores(options: Options) {
   return {

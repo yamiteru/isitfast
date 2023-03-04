@@ -1,6 +1,6 @@
 import { Offset, Offsets, Options, Store, Stores } from "./types";
 
-export const OFFSET_KEYS = ["min", "max", "median"];
+export const OFFSET_KEYS = ["min", "max", "median"] as const;
 
 export const OFFSET_MAX = OFFSET_KEYS.length;
 
@@ -23,11 +23,13 @@ export const OPTIONS: Options = {
     compareSize: 5,
     rangePercent: 5,
   },
-  general: {
-    substractSelf: true,
-    allowGc: true,
-    offsetPercent: 5,
+  offset: {
+    allow: true,
+    rangePercent: 5
   },
+  gc: {
+    allow: true
+  }
 };
 
 export const OFFSET: Offset = {

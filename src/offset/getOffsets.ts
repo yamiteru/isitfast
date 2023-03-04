@@ -1,7 +1,7 @@
 import { getOffset } from "./getOffset";
-import { Offsets } from "./types";
+import { Offsets } from "../types";
 
-export async function getAllOffsets(): Promise<Offsets> {
+export async function getOffsets(): Promise<Offsets> {
   return {
     async: {
       cpu: await getOffset({ type: "async", mode: "cpu" }),

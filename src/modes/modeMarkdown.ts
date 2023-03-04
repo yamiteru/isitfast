@@ -1,7 +1,7 @@
 import { writeFile } from "fs/promises";
 import { Fn, Results } from "../types";
 
-export async function outputToMarkdown(
+export async function modeMarkdown(
 	suite: Fn<[], AsyncGenerator<Results>>,
 	path: string
 ) {
@@ -11,12 +11,13 @@ export async function outputToMarkdown(
 	let mostKbs = 0;
 
 	console.log("Benchmark started");
+	console.log();
 
 	for await (const result of suite()) {
 		console.log(`-${result.name}`);
 
 		if(result.name.length > longestName) {
-			longestName = result.name.length;	
+			longestName = result.name.length;
 		}
 
 		if(result.ram.median > mostKbs) {
@@ -26,7 +27,9 @@ export async function outputToMarkdown(
     results.push(result);
   }
 
+	console.log();
 	console.log("Benchmark ended");
+	console.log();
 
 	const sorted = results.sort(
     ({ cpu: { median: a } }, { cpu: { median: b } }) => a - b,
@@ -35,7 +38,7 @@ export async function outputToMarkdown(
 	let markdown = "";
 
 	markdown += `| name | op/s | kbs |\n`;
-	markdown += `|---|---|---|\n`;
+	markdown += `|:---|:---|:---|\n`;
 
 	for(let i = 0; i < results.length; ++i) {
 		const result = sorted[i];
@@ -49,6 +52,6 @@ export async function outputToMarkdown(
 	}
 
 	await writeFile(path, markdown);
-	
+
 	console.log(`Results saved to ${path}`);
 }

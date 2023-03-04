@@ -1,46 +1,27 @@
 import { GLOBAL } from "./constants";
-import { getMedian } from "./getMedian";
-import { getMinMax } from "./getMinMax";
-import { getStats } from "./getStats";
-import { measure } from "./measure";
-import { removePercent } from "./removePercent";
-import { Benchmark, Mode, Offsets } from "./types";
+import { RunData } from "./types";
 
-export async function run(benchmark: Benchmark, mode: Mode, offsets: Offsets) {
-  const { chunk, main } = GLOBAL.stores[mode];
-  const { chunkSize, compareSize, rangePercent } = GLOBAL.options[mode];
-  const modeType = {
-    mode,
-    type: benchmark instanceof Promise ? "async" : "sync",
-  } as const;
+export async function run({ benchmark, mode, type }: RunData) {
+  const isAsync = type === "async";
+  const store = GLOBAL.stores[mode].chunk;
 
-  main.index = -1;
-  chunk.index = -1;
+  if (mode === "cpu") {
+    const start = process.hrtime.bigint();
 
-  while (true as any) {
-    if (chunk.index === chunkSize) {
-      main.array[++main.index] = getMedian(chunk.array, chunk.index);
-      chunk.index = -1;
+    isAsync ? await benchmark() : benchmark();
 
-      if (main.index >= compareSize) {
-        const { min, max } = getMinMax(
-          main.array.slice(main.index - compareSize),
-          compareSize,
-        );
+    const end = process.hrtime.bigint();
 
-        if (removePercent(max, rangePercent) <= min) {
-          break;
-        }
-      }
-    }
+    store.array[++store.index] = Math.round(Number(end - start));
+  } else {
+    GLOBAL.options.gc.allow && global.gc?.();
 
-    if (main.index === chunkSize) {
-      main.array[0] = getMedian(main.array, main.index);
-      main.index = 0;
-    }
+    const start = process.memoryUsage().heapUsed;
 
-    await measure({ benchmark, ...modeType });
+    isAsync ? await benchmark() : benchmark();
+
+    const end = process.memoryUsage().heapUsed;
+
+    store.array[++store.index] = Math.round(Number(end - start));
   }
-
-  return getStats(modeType, offsets);
 }

@@ -14,10 +14,12 @@ export type Options = {
     compareSize: number;
     rangePercent: number;
   };
-  general: {
-    substractSelf: boolean;
-    allowGc: boolean;
-    offsetPercent: number;
+  offset: {
+   allow: boolean;
+   rangePercent: number;
+  };
+  gc: {
+    allow: boolean;
   };
 };
 
@@ -57,14 +59,14 @@ export type Mode = Either<["cpu", "ram"]>;
 
 export type Type = Either<["sync", "async"]>;
 
-export type OffsetData = {
+export type TypeMode = {
   type: Type;
   mode: Mode;
 };
 
-export type MeasureData = {
+export type RunData = {
   benchmark: Benchmark;
-} & OffsetData;
+} & TypeMode;
 
 export type Offset = {
   min: number;

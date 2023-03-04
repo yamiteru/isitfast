@@ -1,4 +1,4 @@
-import { Mode, Options } from "./types";
+import { Mode, Options } from "../types";
 
 export function createStore(mode: Mode, options: Options) {
   return {
