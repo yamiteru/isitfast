@@ -1,5 +1,5 @@
+import { outputToMarkdown } from "./output/outputToMarkdown";
 import { preset } from "./preset";
-import { printSuite } from "./printSuite";
 
 const defaultSuite = preset();
 const callibration = defaultSuite({
@@ -12,5 +12,5 @@ const callibration = defaultSuite({
 });
 
 (async () => {
-  await printSuite(callibration);
+  await outputToMarkdown(callibration, "./result.md");
 })();

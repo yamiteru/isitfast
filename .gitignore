@@ -1,6 +1,7 @@
 .DS_Store
 .code
 .idea
+.obsidian
 
 node_modules
 dist
