@@ -25,11 +25,11 @@ export const OPTIONS: Options = {
   },
   offset: {
     allow: true,
-    rangePercent: 5
+    rangePercent: 5,
   },
   gc: {
-    allow: true
-  }
+    allow: true,
+  },
 };
 
 export const OFFSET: Offset = {

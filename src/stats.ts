@@ -1,9 +1,13 @@
 import { GLOBAL } from "./constants";
-import { getMedian, getMinMax, positive, removePercent } from "./utils";
+import { getMedian, getMinMax, positive } from "./utils";
 import { run } from "./run";
 import { Benchmark, Mode, Offsets } from "./types";
 
-export async function stats(benchmark: Benchmark, mode: Mode, offsets: Offsets) {
+export async function stats(
+  benchmark: Benchmark,
+  mode: Mode,
+  offsets: Offsets,
+) {
   const { chunk, main } = GLOBAL.stores[mode];
   const { chunkSize, compareSize, rangePercent } = GLOBAL.options[mode];
   const type = (benchmark as any) instanceof Promise ? "async" : "sync";
@@ -22,7 +26,10 @@ export async function stats(benchmark: Benchmark, mode: Mode, offsets: Offsets) 
           compareSize,
         );
 
-        if (removePercent(max, rangePercent) <= min) {
+        // NOTE: if I'm right it stops collecting stats once the function is hot
+        // but instead we want to reset the index and start collecting from that point
+        // since now we're basing out stats on the noise generated before it's hot
+        if (max - (max / 100) * rangePercent <= min) {
           break;
         }
       }

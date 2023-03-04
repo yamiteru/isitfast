@@ -13,11 +13,11 @@ export function getOptions(partialOptions?: DeepPartial<Options>) {
     },
     offset: {
       ...OPTIONS.offset,
-      ...(partialOptions?.offset || {})
+      ...(partialOptions?.offset || {}),
     },
     gc: {
       ...OPTIONS.gc,
-      ...(partialOptions?.gc || {})
-    }
+      ...(partialOptions?.gc || {}),
+    },
   } satisfies Options;
 }

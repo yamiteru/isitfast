@@ -15,8 +15,8 @@ export type Options = {
     rangePercent: number;
   };
   offset: {
-   allow: boolean;
-   rangePercent: number;
+    allow: boolean;
+    rangePercent: number;
   };
   gc: {
     allow: boolean;

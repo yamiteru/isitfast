@@ -3,8 +3,12 @@ import { modeMarkdown } from "../src/modes";
 
 const defaultSuite = preset();
 const emptyFunctions = defaultSuite({
-  emptyAsync: async () => { /* */ },
-  emptySync: () => { /* */ },
+  emptyAsync: async () => {
+    /* */
+  },
+  emptySync: () => {
+    /* */
+  },
 });
 
 (async () => {

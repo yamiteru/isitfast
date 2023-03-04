@@ -33,3 +33,5 @@ export function preset(partialOptions?: DeepPartial<Options>) {
     };
   };
 }
+
+export const suite = preset();
