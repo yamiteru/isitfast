@@ -1,1 +1,1 @@
-export * from "./modeMarkdown";
+export * from "./terminal";

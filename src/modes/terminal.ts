@@ -1,0 +1,100 @@
+import { sub } from "ueve/async";
+import { Either, Noop } from "elfs";
+import { red, green, bold, gray, blue, cyan } from "chalk";
+import {
+  $suiteStart,
+  $suiteEnd,
+  $benchmarkEnd,
+  $benchmarkStart,
+} from "../events";
+import { Offset } from "../types";
+import { newLine, writeLine } from "../utils";
+
+let suiteStart: Either<[null, Noop]> = null;
+let suiteEnd: Either<[null, Noop]> = null;
+let benchmarkStart: Either<[null, Noop]> = null;
+let benchmarkEnd: Either<[null, Noop]> = null;
+
+export async function useTerminal() {
+  let results: { name: string; cpu: Offset; ram: Offset }[] = [];
+  let longestBenchmarkName = 0;
+
+  suiteStart ??= sub($suiteStart, async ({ suite, benchmarks }) => {
+    results = [];
+    longestBenchmarkName = benchmarks.sort((a, b) => b.length - a.length)[0]
+      .length;
+
+    writeLine(bold.underline(`${suite[1]}:`));
+    newLine();
+  });
+
+  suiteEnd ??= sub($suiteEnd, async () => {
+    newLine();
+    writeLine(
+      `=> Slowest is ${red.bold.underline(
+        results.sort((a, b) => b.cpu.median - a.cpu.median)[0].name.trim(),
+      )}`,
+    );
+    newLine();
+    writeLine(
+      `=> Fastest is ${green.bold.underline(
+        results.sort((a, b) => a.cpu.median - b.cpu.median)[0].name.trim(),
+      )}`,
+    );
+    newLine();
+    newLine();
+  });
+
+  benchmarkStart ??= sub($benchmarkStart, async ({ benchmark }) => {
+    const name = benchmark[1];
+
+    newLine();
+    writeLine(bold(name));
+  });
+
+  benchmarkEnd ??= sub($benchmarkEnd, async ({ benchmark, cpu, ram }) => {
+    const name = benchmark[1].padEnd(longestBenchmarkName);
+
+    const isCpuZero = cpu.median === 0;
+    const ops = (
+      isCpuZero ? 1_000_000_000 : (1_000_000_000 / cpu.median) | 0
+    ).toLocaleString();
+    const cpuMin = (isCpuZero ? 0 : cpu.min / cpu.median)
+      .toPrecision(1)
+      .toLocaleString();
+    const cpuMax = (isCpuZero ? 0 : cpu.median / cpu.max)
+      .toPrecision(1)
+      .toLocaleString();
+    const cpuCycles = cpu.cycles.toLocaleString();
+
+    const isRamZero = ram.median === 0;
+    const mb = (ram.median | 0).toLocaleString();
+    const ramMin = (isRamZero ? 0 : ram.min / ram.median)
+      .toPrecision(1)
+      .toLocaleString();
+    const ramMax = (isRamZero ? 0 : ram.median / ram.max)
+      .toPrecision(1)
+      .toLocaleString();
+    const ramCycles = ram.cycles.toLocaleString();
+
+    results.push({
+      name,
+      cpu,
+      ram,
+    });
+
+    const cpuSecondaryInfo = gray(
+      `[-${cpuMin}, +${cpuMax}]% (${cpuCycles} cycles)`,
+    );
+    const ramSecondaryInfo = gray(
+      `[-${ramMin}, +${ramMax}]% (${ramCycles} cycles)`,
+    );
+
+    writeLine(`${bold(name)} ${blue(ops)} op/s ${cpuSecondaryInfo}`);
+    newLine();
+    writeLine(
+      `${"".padEnd(longestBenchmarkName)} ${cyan(mb)} MB ${ramSecondaryInfo}`,
+    );
+    newLine();
+  });
+}

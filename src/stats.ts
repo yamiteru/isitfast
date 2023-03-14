@@ -28,7 +28,7 @@ export async function stats(
 
         // NOTE: if I'm right it stops collecting stats once the function is hot
         // but instead we want to reset the index and start collecting from that point
-        // since now we're basing out stats on the noise generated before it's hot
+        // since now we're basing our stats on the noise generated before it's hot
         if (max - (max / 100) * rangePercent <= min) {
           break;
         }
@@ -52,5 +52,6 @@ export async function stats(
     median: positive(median - offset.median),
     min: positive(min - offset.min),
     max: positive(max - offset.max),
+    cycles: main.index * chunkSize,
   };
 }

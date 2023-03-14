@@ -1,74 +1,159 @@
-# Benchpress 
+# Benchpress
 
-Benchmarking TS library with V8 warmup and self-denoising for the most accurate results. 
+A modular benchmarking library with V8 warmup and cpu/ram denoising for the most accurate and consistent results.
 
 ## Features
 
-- Waits until V8 optimizations kick in
-- Gets rid of noise caused by the library itself 
-- Uses high resolution time in nanoseconds for more accurate op/s
-- Reuses `UInt32Array`s for storing stat data for less memory noise
-- Manually runs GC for more accurate memory stats
-- Exposes lifecycle events for real-time data (`TODO`)
-- Saves results into a markdown file (with SVG graphs - `TODO`)
-- Shows basic stats and events in a terminal (`TODO`)
-- Runs in interactive mode with all data/events/graphs (`TODO`)
+- Waits until V8 optimizations kick in and benchmarks become less noisy
+- Gets rid of performance noise caused by benchmark wrapper functions 
+- Reuses a couple of `UInt32Array`s to store stats for less memory noise
+- Runs GC before every benchmark and suite for less memory noise 
+- Uses high resolution time in nanoseconds for more accurate cpu results 
+- Exposes lifecycle events listening to data in real-time 
+- Prints colorful benchmark results into a terminal
+- Allows combining different output strategies (terminal/markdown/etc.)
 
-## Example 
+## Installation
+
+```shell
+yarn add benchpress
+```
+
+## Example
 
 ```ts
-// you can pass options into the preset
+import { preset } from "benchpress";
+
+// define suite preset with options 
 const defaultSuite = preset();
 
 // define your suite with benchmarks
-const testBenchmark = defaultSuite({
-	emptyAsync: async () => { /* */ },
-	emptySync: () => { /* */ }
+const testBenchmark = defaultSuite("Test", {
+  emptyAsync: async () => {},
+  emptySync: () => {},
 });
 
-// run all benchmarks and log the results
-for await (const result of testBenchmark()) {
-	console.log(result);
+(async () => {
+	// collect data and print them into a terminal 
+	useTerminal();
+
+	// run all benchmarks and trigger events
+	await testBenchmark();
+})();
+```
+
+## API
+
+### `preset`
+
+Returns a `suite` preset with predefined options.
+
+```ts
+const suite = preset({
+	// options
+});
+```
+
+These are the default options:
+
+```ts
+{
+  cpu: {
+    chunkSize: 100,
+    compareSize: 10,
+    rangePercent: 10,
+  },
+  ram: {
+    chunkSize: 5,
+    compareSize: 5,
+    rangePercent: 5,
+  },
+  offset: {
+    allow: true,
+    rangePercent: 5,
+  },
+  gc: {
+    allow: true,
+  }
 }
 ```
 
-## `TODO` API
+### `suite` 
 
-## Notes
+Returns a function which asynchronously runs all provided benchmarks.
 
-`NOTE` I should probably create a section based on each one of these notes to describe things in more detail. 
+```ts
+const runBenchmarks = suite("Name", {
+	// benchmarks	
+});
+```
 
-- Since we use nanoseconds for measuring how long each function takes to execute and there is `1_000_000_00` nanoseconds in a second then the most op/s a benchmark can get is `1_000_000_000` (in such a case it means the function took <0, 1> nanoseconds to execute)
-- Before any user defined benchmarks are run we run 4 hidden benchmarks (async-cpu, async-ram, sync-cpu, sync-ram) to determine the cost of the wrapper functions used for benchmark definitions and subtract those numbers from all of the user defined benchmarks (so if you benchmark an empty function it should give you 0ns and 0kbs since you're basically benchmarking nothing)
+Since all suites share the same references to internal objects you should never run multiple suites at the same time (not awaiting them). This is how multiple suites should be run:
 
-## Questions
+```ts
+await firstSuite();
+await secondSuite();
+await thirdSuite();
+```
 
-`NOTE` These are currently just my notes so I don't forget.
+### `useTerminal`
 
-- Should I pass a specific name to a suite or require an object with suites as values for all of the modes?
+Listens to events and prints suite and benchmark results into a terminal.
 
-## `TODO` Modes
+```ts
+// subscribe to events
+useTerminal();
 
-`NOTE` These are currently just my notes so I don't forget.
+// run suite which publishes data to the events
+await runBenchmarks();
+```
 
-### Markdown mode
+## Events
 
-- Outputs markdown into a file (folder has to exist beforehand)
-- Data should be in a table with all important data (currently just op/s and kbs)
-- If possible should generate SVG graphs and include them into the markdown file (`TODO`)
+The `suite` by itself doesn't return any data. For consuming suite and benchmarks data you should listen to events. All events are prefixed with `$`.
 
-### `TODO` Static mode
+### `$suiteStart`
 
-- Shows real-time data but can't use keyboard
-- Doesn't show a graph, only the basic info
-- Should be clear what is happening at any given moment to let users know why they're waiting
+```ts
+{ 
+	suite: Name; 
+	benchmarks: string[]; 
+}
+```
 
-### `TODO` Interactive mode
+### `$suiteOffsets`
 
-- Shows real-time data from all benchmark iterations
-- It should have different "screen" per each benchmark
-- I can switch between different screens
-- I should be able to also show all results in one big graph
-- I should be able to restart a benchmark from the TUI
-- The restart data should be merged instead of using the latest (maybe??)
-- The cold part should have different color from the hot results
+```ts
+{
+  suite: Name;
+  offsets: Offsets;
+}
+```
+
+### `$suiteEnd`
+
+```ts
+{ 
+	suite: Name;
+}
+```
+
+### `$benchmarkStart`
+
+```ts
+{ 
+	suite: Name; 
+	benchmark: Name;
+}
+```
+
+### `$benchmarkEnd`
+
+```ts
+{
+  suite: Name;
+  benchmark: Name;
+  cpu: Offset;
+  ram: Offset;
+}
+```

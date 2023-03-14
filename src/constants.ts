@@ -36,6 +36,7 @@ export const OFFSET: Offset = {
   min: 0,
   max: 0,
   median: 0,
+  cycles: 0,
 };
 
 export const OFFSETS: Offsets = {

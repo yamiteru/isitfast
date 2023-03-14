@@ -1,5 +1,7 @@
+import { Either, Fn } from "elfs";
+
 export type Obj<
-  $Input extends string | number | symbol = string,
+  $Input extends Either<[string, number, symbol]> = string,
   $Output = unknown,
 > = Record<$Input, $Output>;
 
@@ -28,12 +30,6 @@ export type DeepPartial<$Object extends Obj<string, Obj>> = Partial<{
     ? Partial<$Object[$Key]>
     : $Object[$Key];
 }>;
-
-export type Fn<$Input extends unknown[], $Output> = (
-  ...props: $Input
-) => $Output;
-
-export type Either<$Options extends unknown[]> = $Options[number];
 
 export type Benchmark = Fn<[], Either<[void, Promise<void>]>>;
 
@@ -72,6 +68,7 @@ export type Offset = {
   min: number;
   max: number;
   median: number;
+  cycles: number;
 };
 
 export type Offsets = {
@@ -90,3 +87,5 @@ export type Results = {
   cpu: Offset;
   ram: Offset;
 };
+
+export type Suite = Fn<[], AsyncGenerator<Results>>;

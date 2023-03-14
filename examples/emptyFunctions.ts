@@ -1,8 +1,8 @@
 import { preset } from "../src";
-import { modeMarkdown } from "../src/modes";
+import { useTerminal } from "../src/modes";
 
 const defaultSuite = preset();
-const emptyFunctions = defaultSuite({
+const emptyFunctions = defaultSuite("Empty functions", {
   emptyAsync: async () => {
     /* */
   },
@@ -12,5 +12,7 @@ const emptyFunctions = defaultSuite({
 });
 
 (async () => {
-  await modeMarkdown(emptyFunctions, "./examples/emptyFunctions.md");
+  useTerminal();
+
+  await emptyFunctions();
 })();
