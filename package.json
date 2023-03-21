@@ -1,7 +1,7 @@
 {
-  "version": "0.0.0",
+  "version": "0.0.1",
   "name": "isitfast",
-	"author": "Miroslav Vršecký <yamiteru@icloud.com>",
+  "author": "Miroslav Vršecký <yamiteru@icloud.com>",
   "description": "A modular benchmarking library with V8 warmup and cpu/ram denoising for the most accurate and consistent results.",
   "license": "MIT",
   "source": "src/index.ts",
@@ -19,7 +19,7 @@
     "dist/*.map",
     "dist/*.ts"
   ],
-	"repository": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/yamiteru/isitfast.git",
     "directory": "src"
