@@ -1,6 +1,8 @@
-# Benchpress
+# Isitfast 
 
 A modular benchmarking library with V8 warmup and cpu/ram denoising for the most accurate and consistent results.
+
+You no longer have to ask yourself `Is it fast?`. Just bench it!
 
 ## Features
 

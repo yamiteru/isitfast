@@ -1,6 +1,9 @@
 {
-  "name": "benchpress",
   "version": "0.0.1",
+  "name": "isitfast",
+	"author": "Miroslav Vršecký <yamiteru@icloud.com>",
+  "description": "A modular benchmarking library with V8 warmup and cpu/ram denoising for the most accurate and consistent results.",
+  "license": "MIT",
   "source": "src/index.ts",
   "main": "dist/index.cjs.js",
   "types": "dist/index.d.ts",
@@ -16,6 +19,23 @@
     "dist/*.map",
     "dist/*.ts"
   ],
+	"repository": {
+    "type": "git",
+    "url": "https://github.com/yamiteru/isitfast.git",
+    "directory": "src"
+  },
+  "keywords": [
+    "benchmark",
+    "performance",
+    "stats",
+    "measure",
+    "javascript",
+    "typescript"
+  ],
+  "bugs": {
+    "url": "https://github.com/yamiteru/isitfast/issues"
+  },
+  "homepage": "https://github.com/yamiteru/isitfast",
   "scripts": {
     "fix:format": "prettier --write \"**/*.ts\"",
     "fix:lint": "eslint --fix --ext .ts .",
@@ -32,7 +52,6 @@
     "example:emptyFunctions": "node --expose-gc -r ts-node/register examples/emptyFunctions.ts",
     "example:arrayLoops": "node --expose-gc -r ts-node/register examples/arrayLoops.ts"
   },
-  "license": "MIT",
   "devDependencies": {
     "@release-it/keep-a-changelog": "3.1.0",
     "@swc/cli": "0.1.62",
