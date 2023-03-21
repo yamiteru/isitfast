@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.0",
   "name": "isitfast",
 	"author": "Miroslav Vršecký <yamiteru@icloud.com>",
   "description": "A modular benchmarking library with V8 warmup and cpu/ram denoising for the most accurate and consistent results.",
