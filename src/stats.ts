@@ -26,9 +26,6 @@ export async function stats(
           compareSize,
         );
 
-        // NOTE: if I'm right it stops collecting stats once the function is hot
-        // but instead we want to reset the index and start collecting from that point
-        // since now we're basing our stats on the noise generated before it's hot
         if (max - (max / 100) * rangePercent <= min) {
           break;
         }
