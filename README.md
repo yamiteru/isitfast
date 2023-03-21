@@ -9,7 +9,7 @@ A modular benchmarking library with V8 warmup and cpu/ram denoising for the most
 - Reuses a couple of `UInt32Array`s to store stats for less memory noise
 - Runs GC before every benchmark and suite for less memory noise 
 - Uses high resolution time in nanoseconds for more accurate cpu results 
-- Exposes lifecycle events listening to data in real-time 
+- Exposes lifecycle events for listening to data in real-time 
 - Prints colorful benchmark results into a terminal
 - Allows combining different output strategies (terminal/markdown/etc.)
 
@@ -18,6 +18,14 @@ A modular benchmarking library with V8 warmup and cpu/ram denoising for the most
 ```shell
 yarn add benchpress
 ```
+
+## How to run
+
+It's recommended to run `benchpress` with `--expose-gc` Node flag in order for the library to be able to run GC and collect more statistically correct memory data.
+
+When used in TypeScript environment you can run it like this `node --expose-gc -r ts-node/register benchmarks/benchmarkName.ts`.
+
+For the most accurate results it's recommended to run benchmark suites in different JS realms by putting them in different files and executing them individually.
 
 ## Example
 
@@ -29,15 +37,15 @@ const defaultSuite = preset();
 
 // define your suite with benchmarks
 const testBenchmark = defaultSuite("Test", {
-  emptyAsync: async () => {},
-  emptySync: () => {},
+	emptyAsync: async () => {},
+	emptySync: () => {},
 });
 
 (async () => {
 	// collect data and print them into a terminal 
 	useTerminal();
 
-	// run all benchmarks and trigger events
+	// run all benchmarks and trigger lifecycle events
 	await testBenchmark();
 })();
 ```
@@ -82,6 +90,8 @@ These are the default options:
 
 Returns a function which asynchronously runs all provided benchmarks.
 
+Usually you get this `suite` function from calling `preset` with options. But if you want just a suite with default options then you can import `suite` function directly from the library.
+
 ```ts
 const runBenchmarks = suite("Name", {
 	// benchmarks	
@@ -112,48 +122,8 @@ await runBenchmarks();
 
 The `suite` by itself doesn't return any data. For consuming suite and benchmarks data you should listen to events. All events are prefixed with `$`.
 
-### `$suiteStart`
-
-```ts
-{ 
-	suite: Name; 
-	benchmarks: string[]; 
-}
-```
-
-### `$suiteOffsets`
-
-```ts
-{
-  suite: Name;
-  offsets: Offsets;
-}
-```
-
-### `$suiteEnd`
-
-```ts
-{ 
-	suite: Name;
-}
-```
-
-### `$benchmarkStart`
-
-```ts
-{ 
-	suite: Name; 
-	benchmark: Name;
-}
-```
-
-### `$benchmarkEnd`
-
-```ts
-{
-  suite: Name;
-  benchmark: Name;
-  cpu: Offset;
-  ram: Offset;
-}
-```
+- `$suiteStart` at the beginning of a suite
+- `$suiteOffsets` after denoise offsets are collected
+- `$suiteEnd` at the end of a suite
+- `$benchmarkStart` at the beginning of a benchmark
+- `$benchmarkEnd` at the end of a benchmark
