@@ -15,9 +15,9 @@
     }
   },
   "files": [
-    "dist/*.js",
-    "dist/*.map",
-    "dist/*.ts"
+    "dist/**/*.js",
+    "dist/**/*.map",
+    "dist/**/*.ts"
   ],
   "repository": {
     "type": "git",
