@@ -68,7 +68,7 @@ export async function useTerminal() {
     const cpuCycles = cpu.cycles.toLocaleString();
 
     const isRamZero = ram.median === 0;
-    const mb = (ram.median | 0).toLocaleString();
+    const kb = (ram.median | 0).toLocaleString();
     const ramMin = (isRamZero ? 0 : ram.min / ram.median)
       .toPrecision(1)
       .toLocaleString();
@@ -93,7 +93,7 @@ export async function useTerminal() {
     writeLine(`${bold(name)} ${blue(ops)} op/s ${cpuSecondaryInfo}`);
     newLine();
     writeLine(
-      `${"".padEnd(longestBenchmarkName)} ${cyan(mb)} MB ${ramSecondaryInfo}`,
+      `${"".padEnd(longestBenchmarkName)} ${cyan(kb)} Kb ${ramSecondaryInfo}`,
     );
     newLine();
   });
