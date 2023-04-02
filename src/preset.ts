@@ -30,7 +30,7 @@ export function preset(partialOptions?: DeepPartial<Options>) {
       GLOBAL.stores = stores;
       GLOBAL.options = options;
 
-      const offsets = await getOffsets();
+      const offsets = await getOffsets(suite);
 
       await pub($suiteOffsets, { suite, offsets });
 
