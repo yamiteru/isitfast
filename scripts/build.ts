@@ -12,7 +12,7 @@ const shared = {
   treeShaking: true,
   outdir: "dist",
   target: ["esnext", "node18.0.0"],
-} as BuildOptions ;
+} as BuildOptions;
 
 (async () => {
   await Promise.all([
