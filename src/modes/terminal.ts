@@ -2,10 +2,10 @@ import { sub } from "ueve/async";
 import { Either, Noop } from "elfs";
 import { red, green, bold, gray, blue, cyan } from "chalk";
 import {
-  $suiteStart,
-  $suiteEnd,
-  $benchmarkEnd,
-  $benchmarkStart,
+  $suiteBefore,
+  $suiteAfter,
+  $benchmarkAfterAll,
+  $benchmarkBeforeAll,
 } from "../events";
 import { Offset } from "../types";
 import { newLine, writeLine } from "../utils";
@@ -19,7 +19,7 @@ export async function useTerminal() {
   let results: { name: string; cpu: Offset; ram: Offset }[] = [];
   let longestBenchmarkName = 0;
 
-  suiteStart ??= sub($suiteStart, async ({ suite, benchmarks }) => {
+  suiteStart ??= sub($suiteBefore, async ({ suite, benchmarks }) => {
     results = [];
     longestBenchmarkName = benchmarks.sort((a, b) => b.length - a.length)[0]
       .length;
@@ -28,7 +28,7 @@ export async function useTerminal() {
     newLine();
   });
 
-  suiteEnd ??= sub($suiteEnd, async () => {
+  suiteEnd ??= sub($suiteAfter, async () => {
     newLine();
     writeLine(
       `=> Slowest is ${red.bold.underline(
@@ -45,14 +45,14 @@ export async function useTerminal() {
     newLine();
   });
 
-  benchmarkStart ??= sub($benchmarkStart, async ({ benchmark }) => {
+  benchmarkStart ??= sub($benchmarkBeforeAll, async ({ benchmark }) => {
     const name = benchmark[1];
 
     newLine();
     writeLine(bold(name));
   });
 
-  benchmarkEnd ??= sub($benchmarkEnd, async ({ benchmark, cpu, ram }) => {
+  benchmarkEnd ??= sub($benchmarkAfterAll, async ({ benchmark, cpu, ram }) => {
     const name = benchmark[1].padEnd(longestBenchmarkName);
 
     const isCpuZero = cpu.median === 0;

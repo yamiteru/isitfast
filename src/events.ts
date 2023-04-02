@@ -3,22 +3,31 @@ import { Offset, Offsets } from "./types";
 
 export type Name = [symbol, string];
 
-// Suite
-export const $suiteStart = eve<{ suite: Name; benchmarks: string[] }>();
+// Before suite gets run
+export const $suiteBefore = eve<{ suite: Name; benchmarks: string[] }>();
 
+// After suite offsets get calculated
 export const $suiteOffsets = eve<{
   suite: Name;
   offsets: Offsets;
 }>();
 
-export const $suiteEnd = eve<{ suite: Name }>();
+// After suite gets run
+export const $suiteAfter = eve<{ suite: Name }>();
 
-// Benchmark
-export const $benchmarkStart = eve<{ suite: Name; benchmark: Name }>();
+// Before benchmark of one type gets run
+export const $benchmarkBeforeAll = eve<{ suite: Name; benchmark: Name }>();
 
-export const $benchmarkEnd = eve<{
+// After benchmark of one type gets run
+export const $benchmarkAfterAll = eve<{
   suite: Name;
   benchmark: Name;
   cpu: Offset;
   ram: Offset;
 }>();
+
+// Before each benchmark of one type gets run
+export const $benchmarkBeforeEach = eve<null>();
+
+// After each benchmark of one type gets run
+export const $benchmarkAfterEach = eve<null>();

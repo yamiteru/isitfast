@@ -5,11 +5,11 @@ import { getOptions } from "./utils";
 import { DeepPartial, Options, Benchmarks } from "./types";
 import { stats } from "./stats";
 import {
-  $benchmarkEnd,
-  $benchmarkStart,
-  $suiteEnd,
+  $benchmarkAfterAll,
+  $benchmarkBeforeAll,
+  $suiteAfter,
   $suiteOffsets,
-  $suiteStart,
+  $suiteBefore,
   Name,
 } from "./events";
 import { pub } from "ueve/async";
@@ -25,7 +25,7 @@ export function preset(partialOptions?: DeepPartial<Options>) {
     const suite = [Symbol(), suiteName] as Name;
 
     return async function runSuite() {
-      await pub($suiteStart, { suite, benchmarks: Object.keys(benchmarks) });
+      await pub($suiteBefore, { suite, benchmarks: Object.keys(benchmarks) });
 
       GLOBAL.stores = stores;
       GLOBAL.options = options;
@@ -37,14 +37,14 @@ export function preset(partialOptions?: DeepPartial<Options>) {
       for (const benchmarkName in benchmarks) {
         const benchmark = [Symbol(), benchmarkName] as Name;
 
-        await pub($benchmarkStart, { suite, benchmark });
+        await pub($benchmarkBeforeAll, { suite, benchmark });
 
         // We GC here so memory from one benchmark doesn't leak to the next one
         GLOBAL.options.gc.allow && global.gc?.();
 
         const fn = benchmarks[benchmarkName];
 
-        await pub($benchmarkEnd, {
+        await pub($benchmarkAfterAll, {
           suite,
           benchmark,
           cpu: await stats(fn, "cpu", offsets),
@@ -52,7 +52,7 @@ export function preset(partialOptions?: DeepPartial<Options>) {
         });
       }
 
-      await pub($suiteEnd, { suite });
+      await pub($suiteAfter, { suite });
     };
   };
 }
