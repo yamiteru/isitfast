@@ -31,3 +31,5 @@ export const $benchmarkBeforeEach = eve<{ benchmark: Name }>();
 
 // After each benchmark of one type gets run
 export const $benchmarkAfterEach = eve<{ benchmark: Name }>();
+
+export { sub, clr, has } from "ueve/async";
