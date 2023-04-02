@@ -1,13 +1,13 @@
-import {pub} from "ueve/async";
+import { pub } from "ueve/async";
 import { GLOBAL } from "./constants";
-import {$benchmarkAfterEach, $benchmarkBeforeEach} from "./events";
+import { $benchmarkAfterEach, $benchmarkBeforeEach, Name } from "./events";
 import { RunData } from "./types";
 
-export async function run({ benchmark, mode, type }: RunData) {
+export async function run(name: Name, { benchmark, mode, type }: RunData) {
   const isAsync = type === "async";
   const store = GLOBAL.stores[mode].chunk;
 
-  pub($benchmarkBeforeEach, null);
+  await pub($benchmarkBeforeEach, { benchmark: name });
 
   if (mode === "cpu") {
     const start = process.hrtime.bigint();
@@ -29,5 +29,5 @@ export async function run({ benchmark, mode, type }: RunData) {
     store.array[++store.index] = Math.round(Number(end - start));
   }
 
-  pub($benchmarkAfterEach, null);
+  await pub($benchmarkAfterEach, { benchmark: name });
 }

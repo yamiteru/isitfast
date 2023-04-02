@@ -47,8 +47,8 @@ export function preset(partialOptions?: DeepPartial<Options>) {
         await pub($benchmarkAfterAll, {
           suite,
           benchmark,
-          cpu: await stats(fn, "cpu", offsets),
-          ram: await stats(fn, "ram", offsets),
+          cpu: await stats(benchmark, fn, "cpu", offsets),
+          ram: await stats(benchmark, fn, "ram", offsets),
         });
       }
 

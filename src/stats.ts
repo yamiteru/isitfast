@@ -2,8 +2,10 @@ import { GLOBAL } from "./constants";
 import { getMedian, getMinMax, positive } from "./utils";
 import { run } from "./run";
 import { Benchmark, Mode, Offsets } from "./types";
+import { Name } from "./events";
 
 export async function stats(
+  name: Name,
   benchmark: Benchmark,
   mode: Mode,
   offsets: Offsets,
@@ -37,7 +39,7 @@ export async function stats(
       main.index = 0;
     }
 
-    await run({ benchmark, mode, type });
+    await run(name, { benchmark, mode, type });
   }
 
   const { array, index } = main;

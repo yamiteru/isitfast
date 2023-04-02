@@ -27,7 +27,7 @@ export const $benchmarkAfterAll = eve<{
 }>();
 
 // Before each benchmark of one type gets run
-export const $benchmarkBeforeEach = eve<null>();
+export const $benchmarkBeforeEach = eve<{ benchmark: Name }>();
 
 // After each benchmark of one type gets run
-export const $benchmarkAfterEach = eve<null>();
+export const $benchmarkAfterEach = eve<{ benchmark: Name }>();
