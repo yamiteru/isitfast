@@ -1,21 +1,23 @@
 # Isitfast
 
-A modular benchmarking library with V8 warmup and cpu/ram denoising for the most accurate and consistent results.
+A modular benchmarking library with V8 warmup and CPU/RAM denoising for the most accurate and consistent results.
 
-You no longer have to ask yourself `Is it fast?`. Just bench it!
+You no longer have to ask yourself, "Is it fast?" Just benchmark it!
 
-## Features
+## Key Features
 
-- Waits until V8 optimizations kick in and benchmarks become less noisy
-- Gets rid of performance noise caused by benchmark wrapper functions
-- Reuses a couple of `UInt32Array`s to store stats for less memory noise
-- Runs GC before every benchmark and suite for less memory noise
-- Uses high resolution time in nanoseconds for more accurate cpu results
-- Exposes lifecycle events for listening to data in real-time
-- Prints colorful benchmark results into a terminal
-- Allows combining different output strategies (terminal/markdown/etc.)
+- Waits until V8 optimizations kick in and benchmarks become less noisy.
+- Eliminates performance noise caused by benchmark wrapper functions.
+- Reuses a couple of UInt32Arrays to store stats for reduced memory noise.
+- Runs GC before every benchmark and suite for reduced memory noise.
+- Uses high-resolution time in nanoseconds for more accurate CPU results.
+- Exposes lifecycle events for real-time data monitoring.
+- Prints colorful benchmark results in the terminal.
+- Allows combining different output strategies (terminal/markdown/etc.).
 
 ## Installation
+
+To install, run the following command in your terminal:
 
 ```shell
 yarn add isitfast
@@ -23,11 +25,11 @@ yarn add isitfast
 
 ## How to run
 
-It's recommended to run `isitfast` with `--expose-gc` Node flag in order for the library to be able to run GC and collect more statistically correct memory data.
+It is recommended to run isitfast with the --expose-gc Node flag to enable the library to run GC and collect more statistically correct memory data.
 
-When used in TypeScript environment you can run it like this `node --expose-gc -r ts-node/register benchmarks/benchmarkName.ts`.
+When used in a TypeScript environment, you can run it like this: node --expose-gc -r ts-node/register benchmarks/benchmarkName.ts.
 
-For the most accurate results it's recommended to run benchmark suites in different JS realms by putting them in different files and executing them individually.
+For the most accurate results, it is recommended to run benchmark suites in different JS realms by putting them in separate files and executing them individually.
 
 ## Example
 
@@ -124,8 +126,10 @@ await runBenchmarks();
 
 The `suite` by itself doesn't return any data. For consuming suite and benchmarks data you should listen to events. All events are prefixed with `$`.
 
-- `$suiteStart` at the beginning of a suite
-- `$suiteOffsets` after denoise offsets are collected
-- `$suiteEnd` at the end of a suite
-- `$benchmarkStart` at the beginning of a benchmark
-- `$benchmarkEnd` at the end of a benchmark
+- `$suiteBefore` Before suite gets run
+- `$suiteOffsets` After suite offsets get calculated
+- `$suiteAfter` After suite gets run
+- `$benchmarkBeforeAll` Before benchmark of one type gets run
+- `$benchmarkBeforeEach` Before each benchmark of one type gets run
+- `$benchmarkAfterEach` After each benchmark of one type gets run
+- `$benchmarkAfterAll` After benchmark of one type gets run
