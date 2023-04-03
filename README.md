@@ -34,7 +34,7 @@ For the most accurate results, it is recommended to run benchmark suites in diff
 ## Example
 
 ```ts
-import { preset } from "isitfast";
+import { preset, useTerminal } from "isitfast";
 
 // define suite preset with options
 const defaultSuite = preset();
