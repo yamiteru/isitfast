@@ -1,7 +1,7 @@
-import { preset } from "../src";
+import { createPreset } from "../src";
 import { useTerminal } from "../src/modes";
 
-const defaultSuite = preset();
+const defaultSuite = createPreset();
 const emptyFunctions = defaultSuite("Empty functions", {
   emptyAsync: async () => {
     /* */

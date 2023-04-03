@@ -1,11 +1,11 @@
-import { preset } from "../src";
+import { createPreset } from "../src";
 import { useTerminal } from "../src/modes";
 
 const LENGTH = 1_000;
 const DATA = [...new Array(LENGTH)].map(() => Math.random() * 10);
 const RESULT = { _: 0 };
 
-const defaultSuite = preset();
+const defaultSuite = createPreset();
 const emptyFunctions = defaultSuite("Array loops", {
   for: () => {
     for (let i = 0; i < LENGTH; ++i) {
