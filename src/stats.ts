@@ -4,18 +4,18 @@ import { run } from "./run";
 import { Benchmark, Mode, Name, Offsets } from "./types";
 
 /**
-  * @internal
-  *
-  * Runs benchmark in a loop until the difference between
-  * the maximum and minimum values of the last N values
-  * is less than the specified percentage.
-  *
-  * @example
-  *
-  * ```ts
-  * await stats(benchmarkName, benchmark, "cpu", offsets);
-  * ```
-* */
+ * @internal
+ *
+ * Runs benchmark in a loop until the difference between
+ * the maximum and minimum values of the last N values
+ * is less than the specified percentage.
+ *
+ * @example
+ *
+ * ```ts
+ * await stats(benchmarkName, benchmark, "cpu", offsets);
+ * ```
+ * */
 export async function stats(
   name: Name,
   benchmark: Benchmark,

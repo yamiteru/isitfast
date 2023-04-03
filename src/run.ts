@@ -4,20 +4,20 @@ import { $benchmarkAfterEach, $benchmarkBeforeEach } from "./events";
 import { Name, RunData } from "./types";
 
 /**
-  * @internal
-  *
-  * Runs cpu-async/cpu-sync/ram-async/ram-sync benchmark
-  * and triggers $benchmarkBeforeAll/$benchmarkAfterAll events.
-  *
-  * @example
-  *
-  * ```ts
-  * await run(benchmarkName, {
-  *   benchmark,
-  *   mode: "cpu",
-  *   type: "async",
-  * });
-* */
+ * @internal
+ *
+ * Runs cpu-async/cpu-sync/ram-async/ram-sync benchmark
+ * and triggers $benchmarkBeforeAll/$benchmarkAfterAll events.
+ *
+ * @example
+ *
+ * ```ts
+ * await run(benchmarkName, {
+ *   benchmark,
+ *   mode: "cpu",
+ *   type: "async",
+ * });
+ * */
 export async function run(name: Name, { benchmark, mode, type }: RunData) {
   const isAsync = type === "async";
   const store = GLOBAL.stores[mode].chunk;

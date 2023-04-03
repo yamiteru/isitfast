@@ -1,9 +1,4 @@
-import {
-  FN_ASYNC,
-  FN_SYNC,
-  OFFSET,
-  OFFSETS,
-} from "../constants";
+import { FN_ASYNC, FN_SYNC, OFFSET, OFFSETS } from "../constants";
 import { stats } from "../stats";
 import { Name, TypeMode } from "../types";
 
