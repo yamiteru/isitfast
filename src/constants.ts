@@ -5,10 +5,12 @@ export const FN_ASYNC = async () => {
   /* */
 };
 
+// Empty sync function used to determine the overhead of sync functions
 export const FN_SYNC = () => {
   /* */
 };
 
+// Default options used in `preset`
 export const OPTIONS: Options = {
   cpu: {
     chunkSize: 100,
@@ -29,6 +31,7 @@ export const OPTIONS: Options = {
   },
 };
 
+// Default offset
 export const OFFSET: Offset = {
   min: 0,
   max: 0,
@@ -36,6 +39,7 @@ export const OFFSET: Offset = {
   cycles: 0,
 };
 
+// Default offsets
 export const OFFSETS: Offsets = {
   async: {
     cpu: OFFSET,
@@ -47,11 +51,13 @@ export const OFFSETS: Offsets = {
   },
 };
 
+// Default store
 export const STORE: Store = {
   array: new Uint32Array(),
   index: 0,
 };
 
+// Default stores
 export const STORES = {
   cpu: {
     chunk: STORE,
@@ -63,6 +69,7 @@ export const STORES = {
   },
 };
 
+// Global constants shared between all suites
 export const GLOBAL: {
   options: Options;
   stores: Stores;
