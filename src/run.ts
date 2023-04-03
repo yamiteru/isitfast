@@ -1,7 +1,7 @@
 import { pub } from "ueve/async";
 import { GLOBAL } from "./constants";
-import { $benchmarkAfterEach, $benchmarkBeforeEach, Name } from "./events";
-import { RunData } from "./types";
+import { $benchmarkAfterEach, $benchmarkBeforeEach } from "./events";
+import { Name, RunData } from "./types";
 
 export async function run(name: Name, { benchmark, mode, type }: RunData) {
   const isAsync = type === "async";

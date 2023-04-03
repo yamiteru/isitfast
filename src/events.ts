@@ -1,7 +1,5 @@
 import { eve } from "ueve/async";
-import { Offset, Offsets } from "./types";
-
-export type Name = [symbol, string];
+import { Name, Offset, Offsets } from "./types";
 
 // Before suite gets run
 export const $suiteBefore = eve<{ suite: Name; benchmarks: string[] }>();

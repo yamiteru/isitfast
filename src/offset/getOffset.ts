@@ -4,9 +4,8 @@ import {
   OFFSET,
   OFFSETS,
 } from "../constants";
-import { Name } from "../events";
 import { stats } from "../stats";
-import { TypeMode } from "../types";
+import { Name, TypeMode } from "../types";
 
 const OFFSET_KEYS = ["min", "max", "median"] as const;
 const OFFSET_MAX = OFFSET_KEYS.length;
