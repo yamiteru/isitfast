@@ -3,12 +3,13 @@ import {
   FN_SYNC,
   OFFSET,
   OFFSETS,
-  OFFSET_KEYS,
-  OFFSET_MAX,
 } from "../constants";
 import { Name } from "../events";
 import { stats } from "../stats";
 import { TypeMode } from "../types";
+
+const OFFSET_KEYS = ["min", "max", "median"] as const;
+const OFFSET_MAX = OFFSET_KEYS.length;
 
 export async function getOffset(name: Name, { type, mode }: TypeMode) {
   const fn = type === "async" ? FN_ASYNC : FN_SYNC;
