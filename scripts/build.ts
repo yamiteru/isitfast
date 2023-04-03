@@ -14,18 +14,16 @@ const shared = {
   target: ["esnext", "node18.0.0"],
 } as BuildOptions;
 
-(async () => {
-  await Promise.all([
-    build({
-      ...shared,
-      format: "esm",
-      outExtension: { ".js": ".esm.js" },
-      splitting: true,
-    }),
-    build({
-      ...shared,
-      format: "cjs",
-      outExtension: { ".js": ".cjs.js" },
-    }),
-  ]);
-})();
+Promise.all([
+  build({
+    ...shared,
+    format: "esm",
+    outExtension: { ".js": ".mjs" },
+    splitting: true,
+  }),
+  build({
+    ...shared,
+    format: "cjs",
+    outExtension: { ".js": ".cjs.js" },
+  }),
+]);

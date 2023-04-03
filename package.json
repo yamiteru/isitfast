@@ -10,12 +10,13 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.esm.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.cjs.js"
     }
   },
   "files": [
     "dist/**/*.js",
+    "dist/**/*.mjs",
     "dist/**/*.map",
     "dist/**/*.ts"
   ],
