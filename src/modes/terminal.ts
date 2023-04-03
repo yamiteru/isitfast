@@ -98,11 +98,14 @@ export async function useTerminal() {
     const cpuSecondaryInfo = gray(
       `[-${cpuMin}, +${cpuMax}]% (${cpuCycles} cycles)`,
     );
+    const cpuTime = gray(`(${cpu.median < 1_000_000
+      ? `${cpu.median.toLocaleString()} ns`
+      : `${(cpu.median / 1_000_000).toPrecision(3)} ms`})`);
     const ramSecondaryInfo = gray(
       `[-${ramMin}, +${ramMax}]% (${ramCycles} cycles)`,
     );
 
-    writeLine(`${bold(name)} ${blue(ops)} op/s ${cpuSecondaryInfo}`);
+    writeLine(`${bold(name)} ${blue(ops)} op/s ${cpuTime} ${cpuSecondaryInfo}`);
     newLine();
     writeLine(
       `${"".padEnd(longestBenchmarkName)} ${cyan(kb)} Kb ${ramSecondaryInfo}`,
