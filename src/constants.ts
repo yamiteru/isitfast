@@ -1,9 +1,6 @@
 import { Offset, Offsets, Options, Store, Stores } from "./types";
 
-export const OFFSET_KEYS = ["min", "max", "median"] as const;
-
-export const OFFSET_MAX = OFFSET_KEYS.length;
-
+// Empty async function used to determine the overhead of async functions
 export const FN_ASYNC = async () => {
   /* */
 };
