@@ -47,7 +47,7 @@ const testBenchmark = defaultSuite("Test", {
 
 (async () => {
   // collect data and print them into a terminal
-  useTerminal();
+  await useTerminal();
 
   // run all benchmarks and trigger lifecycle events
   await testBenchmark();
@@ -116,7 +116,7 @@ Listens to events and prints suite and benchmark results into a terminal.
 
 ```ts
 // subscribe to events
-useTerminal();
+await useTerminal();
 
 // run suite which publishes data to the events
 await runBenchmarks();
