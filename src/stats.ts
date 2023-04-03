@@ -1,8 +1,7 @@
 import { GLOBAL } from "./constants";
 import { getMedian, getMinMax, positive } from "./utils";
 import { run } from "./run";
-import { Benchmark, Mode, Offsets } from "./types";
-import { Name } from "./events";
+import { Benchmark, Mode, Name, Offsets } from "./types";
 
 export async function stats(
   name: Name,

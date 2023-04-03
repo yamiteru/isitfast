@@ -1,6 +1,5 @@
 import { getOffset } from "./getOffset";
-import { Offsets } from "../types";
-import { Name } from "../events";
+import { Name, Offsets } from "../types";
 
 export async function getOffsets(name: Name): Promise<Offsets> {
   return {

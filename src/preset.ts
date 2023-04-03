@@ -2,7 +2,7 @@ import { GLOBAL } from "./constants";
 import { createStores } from "./store";
 import { getOffsets } from "./offset";
 import { getOptions } from "./utils";
-import { DeepPartial, Options, Benchmarks } from "./types";
+import { DeepPartial, Options, Benchmarks, Name } from "./types";
 import { stats } from "./stats";
 import {
   $benchmarkAfterAll,
@@ -10,7 +10,6 @@ import {
   $suiteAfter,
   $suiteOffsets,
   $suiteBefore,
-  Name,
 } from "./events";
 import { pub } from "ueve/async";
 
