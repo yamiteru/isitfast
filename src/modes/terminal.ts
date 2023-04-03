@@ -16,17 +16,17 @@ let benchmarkStart: Either<[null, Noop]> = null;
 let benchmarkEnd: Either<[null, Noop]> = null;
 
 /**
-  * Listens to events and prints suite and benchmark results into a terminal.
-  *
-  * @example
-  * ```ts
-  * // subscribe to events
-  * await useTerminal();
-  *
-  * // run suite which publishes data to the events
-  * await runBenchmarks();
-  * ```
-* */
+ * Listens to events and prints suite and benchmark results into a terminal.
+ *
+ * @example
+ * ```ts
+ * // subscribe to events
+ * await useTerminal();
+ *
+ * // run suite which publishes data to the events
+ * await runBenchmarks();
+ * ```
+ * */
 export async function useTerminal() {
   let results: { name: string; cpu: Offset; ram: Offset }[] = [];
   let longestBenchmarkName = 0;
@@ -98,9 +98,13 @@ export async function useTerminal() {
     const cpuSecondaryInfo = gray(
       `[-${cpuMin}, +${cpuMax}]% (${cpuCycles} cycles)`,
     );
-    const cpuTime = gray(`(${cpu.median < 1_000_000
-      ? `${cpu.median.toLocaleString()} ns`
-      : `${(cpu.median / 1_000_000).toPrecision(3)} ms`})`);
+    const cpuTime = gray(
+      `(${
+        cpu.median < 1_000_000
+          ? `${cpu.median.toLocaleString()} ns`
+          : `${(cpu.median / 1_000_000).toPrecision(3)} ms`
+      })`,
+    );
     const ramSecondaryInfo = gray(
       `[-${ramMin}, +${ramMax}]% (${ramCycles} cycles)`,
     );
