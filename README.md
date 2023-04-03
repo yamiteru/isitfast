@@ -56,9 +56,9 @@ const testBenchmark = defaultSuite("Test", {
 
 ## API
 
-### `preset`
+### `createPreset`
 
-Returns a `suite` preset with predefined options.
+Creates a suite preset with the provided options.
 
 ```ts
 const suite = preset({
@@ -90,14 +90,14 @@ These are the default options:
 }
 ```
 
-### `suite`
+### `createSuite`
 
-Returns a function which asynchronously runs all provided benchmarks.
+Creates a named suite with an object of benchmarks.
 
 Usually you get this `suite` function from calling `preset` with options. But if you want just a suite with default options then you can import `suite` function directly from the library.
 
 ```ts
-const runBenchmarks = suite("Name", {
+const firstSuite = suite("Name", {
   // benchmarks
 });
 ```
@@ -108,6 +108,14 @@ Since all suites share the same references to internal objects you should never 
 await firstSuite();
 await secondSuite();
 await thirdSuite();
+```
+
+### `runSuite`
+
+Collects stats for the previously defined benchmarks and triggers lifecycle events with the appropriate data.
+
+```ts
+await firstSuite();
 ```
 
 ### `useTerminal`
@@ -125,6 +133,10 @@ await runBenchmarks();
 ## Events
 
 The `suite` by itself doesn't return any data. For consuming suite and benchmarks data you should listen to events. All events are prefixed with `$`.
+
+Behind the scenes `isitfast` uses `ueve` to create, subscribe to and publish into events.
+
+You can easily import `sub`/`clr`/`has` event functions from `isitfast`. They're just re-exported functions from `ueve`.
 
 - `$suiteBefore` Before suite gets run
 - `$suiteOffsets` After suite offsets get calculated
