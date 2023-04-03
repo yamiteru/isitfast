@@ -15,6 +15,18 @@ let suiteEnd: Either<[null, Noop]> = null;
 let benchmarkStart: Either<[null, Noop]> = null;
 let benchmarkEnd: Either<[null, Noop]> = null;
 
+/**
+  * Listens to events and prints suite and benchmark results into a terminal.
+  *
+  * @example
+  * ```ts
+  * // subscribe to events
+  * await useTerminal();
+  *
+  * // run suite which publishes data to the events
+  * await runBenchmarks();
+  * ```
+* */
 export async function useTerminal() {
   let results: { name: string; cpu: Offset; ram: Offset }[] = [];
   let longestBenchmarkName = 0;
