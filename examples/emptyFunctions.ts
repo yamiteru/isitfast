@@ -1,18 +1,16 @@
-import { createPreset } from "../src";
+import { suite } from "../src";
 import { useTerminal } from "../src/modes";
 
-const defaultSuite = createPreset();
-const emptyFunctions = defaultSuite("Empty functions", {
-  emptyAsync: async () => {
+const emptyFunctions = suite("Empty functions")
+  .add("empty async", async () => {
     /* */
-  },
-  emptySync: () => {
+  })
+  .add("empty sync", () => {
     /* */
-  },
-});
+  });
 
 (async () => {
   useTerminal();
 
-  await emptyFunctions();
+  await emptyFunctions.run();
 })();
