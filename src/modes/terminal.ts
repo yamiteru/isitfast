@@ -1,5 +1,4 @@
 import { sub } from "ueve/async";
-import { Either, Noop } from "elfs";
 import { red, green, bold, gray, blue, cyan } from "chalk";
 import {
   $suiteBefore,
@@ -9,11 +8,7 @@ import {
 } from "../events";
 import { Offset } from "../types";
 import { newLine, writeLine } from "../utils";
-
-let suiteStart: Either<[null, Noop]> = null;
-let suiteEnd: Either<[null, Noop]> = null;
-let benchmarkStart: Either<[null, Noop]> = null;
-let benchmarkEnd: Either<[null, Noop]> = null;
+import { MS_IN_SECOND, TIME_UNIT, UNITS_IN_SECOND } from "../constants";
 
 /**
  * Listens to events and prints suite and benchmark results into a terminal.
@@ -21,26 +16,26 @@ let benchmarkEnd: Either<[null, Noop]> = null;
  * @example
  * ```ts
  * // subscribe to events
- * await useTerminal();
+ * useTerminal();
  *
  * // run suite which publishes data to the events
- * await runBenchmarks();
+ * await testSuite.run();
  * ```
  * */
 export async function useTerminal() {
   let results: { name: string; cpu: Offset; ram: Offset }[] = [];
   let longestBenchmarkName = 0;
 
-  suiteStart ??= sub($suiteBefore, async ({ suite, benchmarks }) => {
+  sub($suiteBefore, async ({ suiteName, benchmarkNames }) => {
     results = [];
-    longestBenchmarkName = benchmarks.sort((a, b) => b.length - a.length)[0]
+    longestBenchmarkName = benchmarkNames.sort((a, b) => b.length - a.length)[0]
       .length;
 
-    writeLine(bold.underline(`${suite[1]}:`));
+    writeLine(bold.underline(`${suiteName}:`));
     newLine();
   });
 
-  suiteEnd ??= sub($suiteAfter, async () => {
+  sub($suiteAfter, async () => {
     newLine();
     writeLine(
       `=> Slowest is ${red.bold.underline(
@@ -57,36 +52,22 @@ export async function useTerminal() {
     newLine();
   });
 
-  benchmarkStart ??= sub($benchmarkBeforeAll, async ({ benchmark }) => {
-    const name = benchmark[1];
-
+  sub($benchmarkBeforeAll, async ({ benchmarkName }) => {
     newLine();
-    writeLine(bold(name));
+    writeLine(bold(benchmarkName));
   });
 
-  benchmarkEnd ??= sub($benchmarkAfterAll, async ({ benchmark, cpu, ram }) => {
-    const name = benchmark[1].padEnd(longestBenchmarkName);
+  sub($benchmarkAfterAll, async ({ benchmarkName, cpu, ram }) => {
+    const name = benchmarkName.padEnd(longestBenchmarkName);
 
-    const isCpuZero = cpu.median === 0;
     const ops = (
-      isCpuZero ? 1_000_000_000 : (1_000_000_000 / cpu.median) | 0
+      cpu.median === 0 ? Infinity : UNITS_IN_SECOND / cpu.median
     ).toLocaleString();
-    const cpuMin = (isCpuZero ? 0 : cpu.min / cpu.median)
-      .toPrecision(1)
-      .toLocaleString();
-    const cpuMax = (isCpuZero ? 0 : cpu.median / cpu.max)
-      .toPrecision(1)
-      .toLocaleString();
+    const cpuDeviation = cpu.deviation.toPrecision(1).toLocaleString();
     const cpuCycles = cpu.cycles.toLocaleString();
 
-    const isRamZero = ram.median === 0;
     const kb = (ram.median | 0).toLocaleString();
-    const ramMin = (isRamZero ? 0 : ram.min / ram.median)
-      .toPrecision(1)
-      .toLocaleString();
-    const ramMax = (isRamZero ? 0 : ram.median / ram.max)
-      .toPrecision(1)
-      .toLocaleString();
+    const ramDeviation = ram.deviation.toPrecision(1).toLocaleString();
     const ramCycles = ram.cycles.toLocaleString();
 
     results.push({
@@ -95,24 +76,20 @@ export async function useTerminal() {
       ram,
     });
 
-    const cpuSecondaryInfo = gray(
-      `[-${cpuMin}, +${cpuMax}]% (${cpuCycles} cycles)`,
-    );
+    const cpuSecondaryInfo = gray(`±${cpuDeviation}% x${cpuCycles}`);
     const cpuTime = gray(
       `(${
-        cpu.median < 1_000_000
+        TIME_UNIT === "ns" && cpu.median < 1_000_000
           ? `${cpu.median.toLocaleString()} ns`
-          : `${(cpu.median / 1_000_000).toPrecision(3)} ms`
+          : `${(cpu.median / MS_IN_SECOND).toPrecision(3)} ms`
       })`,
     );
-    const ramSecondaryInfo = gray(
-      `[-${ramMin}, +${ramMax}]% (${ramCycles} cycles)`,
-    );
+    const ramSecondaryInfo = gray(`±${ramDeviation}% x${ramCycles}`);
 
     writeLine(`${bold(name)} ${blue(ops)} op/s ${cpuTime} ${cpuSecondaryInfo}`);
     newLine();
     writeLine(
-      `${"".padEnd(longestBenchmarkName)} ${cyan(kb)} Kb ${ramSecondaryInfo}`,
+      `${"".padEnd(longestBenchmarkName)} ${cyan(kb)} kB ${ramSecondaryInfo}`,
     );
     newLine();
   });

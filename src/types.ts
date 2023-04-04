@@ -62,7 +62,7 @@ export type DeepPartial<$Object extends Rec<string, Rec>> = Partial<{
 }>;
 
 // Benchmark function
-export type Benchmark = Fn<[], Either<[void, Promise<void>]>>;
+export type Benchmark<$Data = any> = Fn<[$Data], Either<[void, Promise<void>]>>;
 
 // Object containing all benchmark functions
 export type Benchmarks = Record<string, Benchmark>;
@@ -103,9 +103,8 @@ export type RunData = {
 
 // Offset data
 export type Offset = {
-  min: number;
-  max: number;
   median: number;
+  deviation: number;
   cycles: number;
 };
 

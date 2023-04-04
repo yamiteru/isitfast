@@ -1,33 +1,45 @@
 import { eve } from "ueve/async";
-import { Name, Offset, Offsets } from "./types";
+import { Offset, Offsets } from "./types";
 
 // Before suite gets run
-export const $suiteBefore = eve<{ suite: Name; benchmarks: string[] }>();
+export const $suiteBefore = eve<{
+  suiteName: string;
+  benchmarkNames: string[];
+}>();
 
 // After suite offsets get calculated
 export const $suiteOffsets = eve<{
-  suite: Name;
+  suiteName: string;
   offsets: Offsets;
 }>();
 
 // After suite gets run
-export const $suiteAfter = eve<{ suite: Name }>();
+export const $suiteAfter = eve<{ suiteName: string }>();
 
 // Before benchmark of one type gets run
-export const $benchmarkBeforeAll = eve<{ suite: Name; benchmark: Name }>();
+export const $benchmarkBeforeAll = eve<{
+  suiteName: string;
+  benchmarkName: string;
+}>();
 
 // After benchmark of one type gets run
 export const $benchmarkAfterAll = eve<{
-  suite: Name;
-  benchmark: Name;
+  suiteName: string;
+  benchmarkName: string;
   cpu: Offset;
   ram: Offset;
 }>();
 
 // Before each benchmark of one type gets run
-export const $benchmarkBeforeEach = eve<{ benchmark: Name }>();
+export const $benchmarkBeforeEach = eve<{
+  suiteName: string;
+  benchmarkName: string;
+}>();
 
 // After each benchmark of one type gets run
-export const $benchmarkAfterEach = eve<{ benchmark: Name }>();
+export const $benchmarkAfterEach = eve<{
+  suiteName: string;
+  benchmarkName: string;
+}>();
 
 export { sub, clr, has } from "ueve/async";

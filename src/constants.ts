@@ -14,17 +14,17 @@ export const FN_SYNC = () => {
 export const OPTIONS: Options = {
   cpu: {
     chunkSize: 100,
-    compareSize: 10,
-    rangePercent: 10,
+    compareSize: 25,
+    rangePercent: 1,
   },
   ram: {
     chunkSize: 5,
     compareSize: 5,
-    rangePercent: 5,
+    rangePercent: 1,
   },
   offset: {
     allow: true,
-    rangePercent: 5,
+    rangePercent: 1,
   },
   gc: {
     allow: true,
@@ -33,9 +33,8 @@ export const OPTIONS: Options = {
 
 // Default offset
 export const OFFSET: Offset = {
-  min: 0,
-  max: 0,
   median: 0,
+  deviation: 0,
   cycles: 0,
 };
 
@@ -77,3 +76,13 @@ export const GLOBAL: {
   options: OPTIONS,
   stores: STORES,
 };
+
+export const IS_NODE = typeof process !== "undefined";
+
+export const TIME_UNIT = IS_NODE ? "ns" : "ms";
+
+export const NS_IN_SECOND = 1_000_000_000;
+
+export const MS_IN_SECOND = 1_000;
+
+export const UNITS_IN_SECOND = IS_NODE ? NS_IN_SECOND : MS_IN_SECOND;
