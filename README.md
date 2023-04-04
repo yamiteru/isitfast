@@ -12,7 +12,7 @@ You no longer have to ask yourself, "Is it fast?" Just benchmark it!
 - Runs GC before every benchmark and suite for reduced memory noise.
 - Uses high-resolution time in nanoseconds for more accurate CPU results.
 - Exposes lifecycle events for real-time data monitoring.
-- Prints colorful benchmark results in the terminal.
+- Prints colorful benchmark results in the terminal (verbose/compact).
 - Allows combining different output strategies (terminal/markdown/etc.).
 
 ## Installation
@@ -34,34 +34,36 @@ For the most accurate results, it is recommended to run benchmark suites in diff
 ## Example
 
 ```ts
-import { createPreset, useTerminal } from "isitfast";
-
-// define suite preset with options
-const defaultSuite = createPreset();
+import { suite, useTerminal } from "isitfast";
 
 // define your suite with benchmarks
-const testBenchmark = defaultSuite("Test", {
-  emptyAsync: async () => {},
-  emptySync: () => {},
-});
+const testBenchmark = suite("Test")
+  .add("emptyAsync", async () => {})
+  .add("emptySync", () => {});
 
 (async () => {
   // collect data and print them into a terminal
-  await useTerminal();
+  useTerminal();
 
   // run all benchmarks and trigger lifecycle events
-  await testBenchmark();
+  await testBenchmark.run();
 })();
 ```
 
-## API
+---
 
-### `createPreset`
+# API
 
-Creates a suite preset with the provided options.
+## Suite
+
+You can create a `Suite` with by calling either `suite(name: string, options?: DeepPartial<Options>)` or `new Suite(name: string, options?: DeepPartial<Options>)`.
 
 ```ts
-const suite = createPreset({
+const testOne = suite("Test One", {
+  // options
+});
+
+const testTwo = new Suite("Test Two", {
   // options
 });
 ```
@@ -72,17 +74,17 @@ These are the default options:
 {
   cpu: {
     chunkSize: 100,
-    compareSize: 10,
-    rangePercent: 10,
+    compareSize: 25,
+    rangePercent: 1,
   },
   ram: {
     chunkSize: 5,
     compareSize: 5,
-    rangePercent: 5,
+    rangePercent: 1,
   },
   offset: {
     allow: true,
-    rangePercent: 5,
+    rangePercent: 1,
   },
   gc: {
     allow: true,
@@ -90,53 +92,39 @@ These are the default options:
 }
 ```
 
-### `createSuite`
-
-Creates a named suite with an object of benchmarks.
-
-Usually you get this `suite` function from calling `preset` with options. But if you want just a suite with default options then you can import `suite` function directly from the library.
-
-```ts
-const firstSuite = suite("Name", {
-  // benchmarks
-});
-```
-
-Since all suites share the same references to internal objects you should never run multiple suites at the same time (not awaiting them). This is how multiple suites should be run:
-
-```ts
-await firstSuite();
-await secondSuite();
-await thirdSuite();
-```
-
-### `runSuite`
-
-Collects stats for the previously defined benchmarks and triggers lifecycle events with the appropriate data.
-
-```ts
-await firstSuite();
-```
+## Modes
 
 ### `useTerminal`
 
-Listens to events and prints suite and benchmark results into a terminal.
+Listens to events and prints verbose suite and benchmark results into a terminal.
 
 ```ts
 // subscribe to events
-await useTerminal();
+useTerminal();
 
 // run suite which publishes data to the events
-await runBenchmarks();
+await runBenchmarks.run();
+```
+
+### `useTerminalCompact`
+
+Listens to events and prints compact suite and benchmark results into a terminal.
+
+```ts
+// subscribe to events
+useTerminalCompact();
+
+// run suite which publishes data to the events
+await runBenchmarks.run();
 ```
 
 ## Events
 
-The `suite` by itself doesn't return any data. For consuming suite and benchmarks data you should listen to events. All events are prefixed with `$`.
+The `Suite` by itself doesn't return any data. For consuming suite and benchmarks data you should listen to events. All events are prefixed with `$`.
 
-Behind the scenes `isitfast` uses `ueve` to create, subscribe to and publish into events.
+Behind the scenes `isitfast` uses [μEve](https://github.com/yamiteru/ueve) to create, subscribe to and publish into events.
 
-You can easily import `sub`/`clr`/`has` event functions from `isitfast`. They're just re-exported functions from `ueve`.
+You can easily import `sub`/`clr`/`has` event functions from `isitfast`. They're just re-exported functions from `μEve`.
 
 - `$suiteBefore` Before suite gets run
 - `$suiteOffsets` After suite offsets get calculated
