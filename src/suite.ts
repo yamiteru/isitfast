@@ -8,14 +8,10 @@ import {
   Options,
   Stores,
   Type,
-  Offset,
+  Benchmarks,
+  Events,
 } from "./types";
-import { getMedian } from "./utils/getMedian";
-import { getOptions } from "./utils/getOptions";
-import { positive } from "./utils/positive";
-import { getChunkDeviation } from "./utils/getChunkDeviation";
-import { now } from "./utils/now";
-import { collectGarbage } from "./utils/collectGarbage";
+import { getMedian, clampToZero, getOptions, getChunkDeviation   , now, collectGarbage  } from "./utils";
 import { pub } from "ueve/async";
 import {
   $benchmarkAfterAll,
@@ -26,30 +22,8 @@ import {
   $suiteBefore,
 } from "./events";
 
-type Events = Partial<{
-  beforeOne: Fn<[], Promise<void>>;
-  afterOne: Fn<[], Promise<void>>;
-  beforeAll: Fn<[], Promise<void>>;
-  afterAll: Fn<
-    [
-      {
-        cpu: Offset;
-        ram: Offset;
-      },
-    ],
-    Promise<void>
-  >;
-}>;
-
-type Benchmarks<$Data> = Record<
-  string,
-  {
-    benchmark: Benchmark<$Data>;
-    events: Events;
-  }
->;
-
 class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
+  private _name: string;
   private _options: Options;
   private _setup: Fn<[], $Data>;
   private _before: Fn<[$Data], Promise<void>>;
@@ -59,9 +33,8 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
   private _offsets: Offsets;
   private _stores: Stores;
 
-  public name: string;
-
   constructor(name: string, options?: DeepPartial<Options>) {
+    this._name = name;
     this._options = getOptions(options);
     this._setup = () => null as $Data;
     this._before = FN_ASYNC;
@@ -79,8 +52,6 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
         main: this._createStore("ram"),
       },
     };
-
-    this.name = name;
   }
 
   public setup<$Type extends $Data>(setup: Fn<[], $Type>) {
@@ -89,7 +60,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
     return this as unknown as Suite<$Type, $Benchmarks>;
   }
 
-  public before(before: Fn<[$Data], Promise<void>>) {
+  public before(before: Fn<[], Promise<void>>) {
     this._before = before;
 
     return this;
@@ -126,7 +97,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
 
     await this._before(this._data);
     await pub($suiteBefore, {
-      suiteName: this.name,
+      suiteName: this._name,
       benchmarkNames: Object.keys(this._benchmarks),
     });
 
@@ -144,7 +115,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
     for (const name in this._benchmarks) {
       await this._benchmarks[name]?.events?.beforeAll?.();
       await pub($benchmarkBeforeAll, {
-        suiteName: this.name,
+        suiteName: this._name,
         benchmarkName: name,
       });
 
@@ -160,7 +131,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
         ram,
       });
       await pub($benchmarkAfterAll, {
-        suiteName: this.name,
+        suiteName: this._name,
         benchmarkName: name,
         cpu,
         ram,
@@ -168,7 +139,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
     }
 
     await this._after(this._data);
-    await pub($suiteAfter, { suiteName: this.name });
+    await pub($suiteAfter, { suiteName: this._name });
   }
 
   private async _getOffset(type: Type, mode: Mode) {
@@ -243,7 +214,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
 
     const { array, index } = main;
     const offset = offsets[type][mode];
-    const median = positive(getMedian(array, index) - offset.median);
+    const median = clampToZero(getMedian(array, index) - offset.median);
     const cycles = main.index * chunkSize;
     const deviation = getChunkDeviation(median, array, index - compareSize);
 
@@ -265,7 +236,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
 
     await this._benchmarks[name]?.events?.beforeOne?.();
     await pub($benchmarkBeforeEach, {
-      suiteName: this.name,
+      suiteName: this._name,
       benchmarkName: name,
     });
 
@@ -281,7 +252,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
 
       await this._benchmarks[name]?.events?.afterOne?.();
       await pub($benchmarkAfterEach, {
-        suiteName: this.name,
+        suiteName: this._name,
         benchmarkName: name,
       });
     } else {
@@ -298,7 +269,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
 
       await this._benchmarks[name]?.events?.afterOne?.();
       await pub($benchmarkAfterEach, {
-        suiteName: this.name,
+        suiteName: this._name,
         benchmarkName: name,
       });
     }

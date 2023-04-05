@@ -1,11 +1,16 @@
 import { Either, Fn } from "elfs";
 
-// Record wrapper that provides default types
-// Mainly used to make the code more readable (especially in generics)
-export type Rec<
-  $Input extends Either<[string, number, symbol]> = string,
-  $Output = unknown,
-> = Record<$Input, $Output>;
+export type NumberArray =
+  | Uint8Array
+  | Uint8ClampedArray
+  | Int8Array
+  | Uint16Array
+  | Int16Array
+  | Uint32Array
+  | Int32Array
+  | Float32Array
+  | Float64Array
+  | number[];
 
 // Option object used in `preset` to configure the suite
 export type Options = {
@@ -55,8 +60,8 @@ export type Options = {
 };
 
 // Recursively make all properties of an object optional
-export type DeepPartial<$Object extends Rec<string, Rec>> = Partial<{
-  [$Key in keyof $Object]: $Object[$Key] extends Rec
+export type DeepPartial<$Object extends Record<string, Record<string, unknown>>> = Partial<{
+  [$Key in keyof $Object]: $Object[$Key] extends Record<string, unknown>
     ? Partial<$Object[$Key]>
     : $Object[$Key];
 }>;
@@ -64,8 +69,28 @@ export type DeepPartial<$Object extends Rec<string, Rec>> = Partial<{
 // Benchmark function
 export type Benchmark<$Data = any> = Fn<[$Data], Either<[void, Promise<void>]>>;
 
-// Object containing all benchmark functions
-export type Benchmarks = Record<string, Benchmark>;
+export type Events = Partial<{
+  beforeOne: Fn<[], Promise<void>>;
+  afterOne: Fn<[], Promise<void>>;
+  beforeAll: Fn<[], Promise<void>>;
+  afterAll: Fn<
+    [
+      {
+        cpu: Offset;
+        ram: Offset;
+      },
+    ],
+    Promise<void>
+  >;
+}>;
+
+export type Benchmarks<$Data> = Record<
+  string,
+  {
+    benchmark: Benchmark<$Data>;
+    events: Events;
+  }
+>;
 
 // Store used to collect data
 export type Store = {
@@ -91,16 +116,6 @@ export type Mode = Either<["cpu", "ram"]>;
 // Offset type
 export type Type = Either<["sync", "async"]>;
 
-// Offset type and mode
-export type TypeMode = {
-  type: Type;
-  mode: Mode;
-};
-
-export type RunData = {
-  benchmark: Benchmark;
-} & TypeMode;
-
 // Offset data
 export type Offset = {
   median: number;
@@ -119,16 +134,3 @@ export type Offsets = {
     ram: Offset;
   };
 };
-
-// Results data
-export type Results = {
-  name: string;
-  cpu: Offset;
-  ram: Offset;
-};
-
-// Suite function
-export type Suite = Fn<[], AsyncGenerator<Results>>;
-
-// Tuple of Suite/Benchmark symbol and name
-export type Name = [symbol, string];

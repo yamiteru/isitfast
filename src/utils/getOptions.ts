@@ -1,23 +1,23 @@
 import { OPTIONS } from "../constants";
 import { DeepPartial, Options } from "../types";
 
-export function getOptions(partialOptions?: DeepPartial<Options>) {
+export function getOptions(options?: DeepPartial<Options>) {
   return {
     cpu: {
       ...OPTIONS.cpu,
-      ...(partialOptions?.cpu || {}),
+      ...(options?.cpu || {}),
     },
     ram: {
       ...OPTIONS.ram,
-      ...(partialOptions?.ram || {}),
+      ...(options?.ram || {}),
     },
     offset: {
       ...OPTIONS.offset,
-      ...(partialOptions?.offset || {}),
+      ...(options?.offset || {}),
     },
     gc: {
       ...OPTIONS.gc,
-      ...(partialOptions?.gc || {}),
+      ...(options?.gc || {}),
     },
   } satisfies Options;
 }
