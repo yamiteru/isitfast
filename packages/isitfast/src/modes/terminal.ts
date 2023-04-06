@@ -60,13 +60,13 @@ export async function useTerminal() {
   sub($benchmarkAfterAll, async ({ benchmarkName, cpu, ram }) => {
     const name = benchmarkName.padEnd(longestBenchmarkName);
 
-    const ops = (
-      cpu.median === 0 ? Infinity : UNITS_IN_SECOND / cpu.median
+    const ops = Math.round(
+      cpu.median === 0 ? Infinity : UNITS_IN_SECOND / cpu.median,
     ).toLocaleString();
     const cpuDeviation = cpu.deviation.toPrecision(1).toLocaleString();
     const cpuCycles = cpu.cycles.toLocaleString();
 
-    const kb = (ram.median | 0).toLocaleString();
+    const bytes = (ram.median | 0).toLocaleString();
     const ramDeviation = ram.deviation.toPrecision(1).toLocaleString();
     const ramCycles = ram.cycles.toLocaleString();
 
@@ -89,7 +89,9 @@ export async function useTerminal() {
     writeLine(`${bold(name)} ${blue(ops)} op/s ${cpuTime} ${cpuSecondaryInfo}`);
     newLine();
     writeLine(
-      `${"".padEnd(longestBenchmarkName)} ${cyan(kb)} kB ${ramSecondaryInfo}`,
+      `${"".padEnd(longestBenchmarkName)} ${cyan(
+        bytes,
+      )} bytes ${ramSecondaryInfo}`,
     );
     newLine();
   });
