@@ -37,8 +37,8 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
   private _name: string;
   private _options: Options;
   private _setup: Fn<[], $Data>;
-  private _before: Fn<[$Data], Promise<void>>;
-  private _after: Fn<[$Data], Promise<void>>;
+  private _onSuiteStart: Fn<[$Data], Promise<void>>;
+  private _onSuiteEnd: Fn<[$Data], Promise<void>>;
   private _data: $Data;
   private _benchmarks: $Benchmarks;
   private _offsets: Offsets;
@@ -49,8 +49,8 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
     this._name = name;
     this._options = getOptions(options);
     this._setup = () => null as $Data;
-    this._before = FN_ASYNC;
-    this._after = FN_ASYNC;
+    this._onSuiteStart = FN_ASYNC;
+    this._onSuiteEnd = FN_ASYNC;
     this._data = this._setup();
     this._benchmarks = {} as $Benchmarks;
     this._offsets = OFFSETS;
@@ -66,7 +66,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
       },
     };
 
-    this._collectGarbage= this._options.gc.allow
+    this._collectGarbage = this._options.gc.allow
       ? IS_NODE
         ? () => global?.gc?.()
         : () => window?.gc?.()
@@ -82,21 +82,31 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
   }
 
   private async $suiteStart() {
-    this._before(this._data);
-    await pub($suiteStart, { suiteName: this._name, benchmarkNames: Object.keys(this._benchmarks) });
+    await this._onSuiteStart(this._data);
+    await pub($suiteStart, {
+      suiteName: this._name,
+      benchmarkNames: Object.keys(this._benchmarks),
+    });
   }
 
   private async $suiteEnd() {
-    this._after(this._data);
+    await this._onSuiteEnd(this._data);
     await pub($suiteEnd, { suiteName: this._name });
   }
 
   private async $benchmarkStart(name: string) {
+    await this._benchmarks[name]?.events?.onBenchmarkStart?.();
     await pub($benchmarkStart, { suiteName: this._name, benchmarkName: name });
   }
 
   private async $benchmarkEnd(name: string, cpu: Offset, ram: Offset) {
-    await pub($benchmarkEnd, { suiteName: this._name, benchmarkName: name, cpu, ram });
+    await this._benchmarks[name]?.events?.onBenchmarkEnd?.({ cpu, ram });
+    await pub($benchmarkEnd, {
+      suiteName: this._name,
+      benchmarkName: name,
+      cpu,
+      ram,
+    });
   }
 
   private async $offsetStart(name: string) {
@@ -108,28 +118,37 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
   }
 
   private async $iterationStart(name: string, mode: Mode, type: Type) {
-    await pub($iterationStart, { suiteName: this._name, benchmarkName: name, mode, type });
+    await this._benchmarks[name]?.events?.onIterationStart?.();
+    await pub($iterationStart, {
+      suiteName: this._name,
+      benchmarkName: name,
+      mode,
+      type,
+    });
   }
 
   private async $iterationEnd(name: string, mode: Mode, type: Type) {
-    await pub($iterationEnd, { suiteName: this._name, benchmarkName: name, mode, type });
+    await this._benchmarks[name]?.events?.onIterationEnd?.();
+    await pub($iterationEnd, {
+      suiteName: this._name,
+      benchmarkName: name,
+      mode,
+      type,
+    });
   }
 
   public setup<$Type extends $Data>(setup: Fn<[], $Type>) {
     this._setup = setup;
-
     return this as unknown as Suite<$Type, $Benchmarks>;
   }
 
-  public before(before: Fn<[], Promise<void>>) {
-    this._before = before;
-
+  public onSuiteStart(fn: Fn<[], Promise<void>>) {
+    this._onSuiteStart = fn;
     return this;
   }
 
-  public after(after: Fn<[$Data], Promise<void>>) {
-    this._after = after;
-
+  public onSuiteEnd(fn: Fn<[$Data], Promise<void>>) {
+    this._onSuiteEnd = fn;
     return this;
   }
 
@@ -192,12 +211,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
     const result = { ...OFFSET };
 
     while (true as any) {
-      const offset = await this._stats(
-        name,
-        fn,
-        mode,
-        OFFSETS,
-      );
+      const offset = await this._stats(name, fn, mode, OFFSETS);
 
       if (result.median) {
         const subtracted = offset.median - result.median;
