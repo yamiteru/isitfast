@@ -1,45 +1,56 @@
 import { eve } from "ueve/async";
-import { Offset, Offsets } from "./types";
+import { Mode, Offset, Type } from "./types";
 
-// Before suite gets run
-export const $suiteBefore = eve<{
+export const $suiteStart = eve<{
   suiteName: string;
   benchmarkNames: string[];
 }>();
 
-// After suite offsets get calculated
-export const $suiteOffsets = eve<{
+export const $suiteEnd = eve<{ suiteName: string }>();
+
+export const $offsetStart = eve<{
   suiteName: string;
-  offsets: Offsets;
+  offsetName: string;
 }>();
 
-// After suite gets run
-export const $suiteAfter = eve<{ suiteName: string }>();
+export const $offsetEnd = eve<{
+  suiteName: string;
+  offsetName: string;
+  offset: Offset;
+}>();
 
-// Before benchmark of one type gets run
-export const $benchmarkBeforeAll = eve<{
+export const $benchmarkStart = eve<{
   suiteName: string;
   benchmarkName: string;
 }>();
 
-// After benchmark of one type gets run
-export const $benchmarkAfterAll = eve<{
+export const $benchmarkEnd = eve<{
   suiteName: string;
   benchmarkName: string;
   cpu: Offset;
   ram: Offset;
 }>();
 
-// Before each benchmark of one type gets run
-export const $benchmarkBeforeEach = eve<{
+export const $garbageStart = eve<{
   suiteName: string;
-  benchmarkName: string;
 }>();
 
-// After each benchmark of one type gets run
-export const $benchmarkAfterEach = eve<{
+export const $garbageEnd = eve<{
+  suiteName: string;
+}>();
+
+export const $iterationStart = eve<{
   suiteName: string;
   benchmarkName: string;
+  mode: Mode;
+  type: Type;
+}>();
+
+export const $iterationEnd = eve<{
+  suiteName: string;
+  benchmarkName: string;
+  mode: Mode;
+  type: Type;
 }>();
 
 export { sub, clr, has } from "ueve/async";

@@ -1,5 +1,4 @@
 import { Fn } from "elfs";
-import { Mode } from "fs";
 import { FN_ASYNC, FN_SYNC, IS_NODE, OFFSET, OFFSETS } from "./constants";
 import {
   Benchmark,
@@ -10,6 +9,8 @@ import {
   Type,
   Benchmarks,
   Events,
+  Offset,
+  Mode,
 } from "./types";
 import {
   getMedian,
@@ -20,12 +21,16 @@ import {
 } from "./utils";
 import { pub } from "ueve/async";
 import {
-  $benchmarkAfterAll,
-  $benchmarkAfterEach,
-  $benchmarkBeforeAll,
-  $benchmarkBeforeEach,
-  $suiteAfter,
-  $suiteBefore,
+  $benchmarkEnd,
+  $benchmarkStart,
+  $garbageEnd,
+  $garbageStart,
+  $iterationEnd,
+  $iterationStart,
+  $offsetEnd,
+  $offsetStart,
+  $suiteEnd,
+  $suiteStart,
 } from "./events";
 
 class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
@@ -61,11 +66,53 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
       },
     };
 
-    this._collectGarbage = this._options.gc.allow
+    this._collectGarbage= this._options.gc.allow
       ? IS_NODE
         ? () => global?.gc?.()
         : () => window?.gc?.()
       : FN_SYNC;
+  }
+
+  private async $collectGarbage() {
+    await pub($garbageStart, { suiteName: this._name });
+
+    this._collectGarbage();
+
+    await pub($garbageEnd, { suiteName: this._name });
+  }
+
+  private async $suiteStart() {
+    this._before(this._data);
+    await pub($suiteStart, { suiteName: this._name, benchmarkNames: Object.keys(this._benchmarks) });
+  }
+
+  private async $suiteEnd() {
+    this._after(this._data);
+    await pub($suiteEnd, { suiteName: this._name });
+  }
+
+  private async $benchmarkStart(name: string) {
+    await pub($benchmarkStart, { suiteName: this._name, benchmarkName: name });
+  }
+
+  private async $benchmarkEnd(name: string, cpu: Offset, ram: Offset) {
+    await pub($benchmarkEnd, { suiteName: this._name, benchmarkName: name, cpu, ram });
+  }
+
+  private async $offsetStart(name: string) {
+    await pub($offsetStart, { suiteName: this._name, offsetName: name });
+  }
+
+  private async $offsetEnd(name: string, offset: Offset) {
+    await pub($offsetEnd, { suiteName: this._name, offsetName: name, offset });
+  }
+
+  private async $iterationStart(name: string, mode: Mode, type: Type) {
+    await pub($iterationStart, { suiteName: this._name, benchmarkName: name, mode, type });
+  }
+
+  private async $iterationEnd(name: string, mode: Mode, type: Type) {
+    await pub($iterationEnd, { suiteName: this._name, benchmarkName: name, mode, type });
   }
 
   public setup<$Type extends $Data>(setup: Fn<[], $Type>) {
@@ -109,11 +156,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
   public async run() {
     this._data = this._setup();
 
-    await this._before(this._data);
-    await pub($suiteBefore, {
-      suiteName: this._name,
-      benchmarkNames: Object.keys(this._benchmarks),
-    });
+    await this.$suiteStart();
 
     this._offsets = {
       async: {
@@ -127,42 +170,30 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
     };
 
     for (const name in this._benchmarks) {
-      await this._benchmarks[name]?.events?.beforeAll?.();
-      await pub($benchmarkBeforeAll, {
-        suiteName: this._name,
-        benchmarkName: name,
-      });
-
-      // We GC here so memory from one benchmark doesn't leak to the next one
-      this._collectGarbage();
+      await this.$benchmarkStart(name);
+      await this.$collectGarbage();
 
       const fn = this._benchmarks[name].benchmark;
       const cpu = await this._stats(name, fn, "cpu", this._offsets);
       const ram = await this._stats(name, fn, "ram", this._offsets);
 
-      await this._benchmarks[name]?.events?.afterAll?.({
-        cpu,
-        ram,
-      });
-      await pub($benchmarkAfterAll, {
-        suiteName: this._name,
-        benchmarkName: name,
-        cpu,
-        ram,
-      });
+      await this.$benchmarkEnd(name, cpu, ram);
     }
 
-    await this._after(this._data);
-    await pub($suiteAfter, { suiteName: this._name });
+    await this.$suiteEnd();
   }
 
   private async _getOffset(type: Type, mode: Mode) {
+    const name = `offset-${type}-${mode}`;
+
+    await this.$offsetStart(name);
+
     const fn = type === "async" ? FN_ASYNC : FN_SYNC;
     const result = { ...OFFSET };
 
     while (true as any) {
       const offset = await this._stats(
-        `offset-${type}-${mode}`,
+        name,
         fn,
         mode,
         OFFSETS,
@@ -181,6 +212,8 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
         result.median += offset.median;
       }
     }
+
+    await this.$offsetEnd(name, result);
 
     return result;
   }
@@ -248,11 +281,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
     const isAsync = type === "async";
     const store = this._stores[mode].chunk;
 
-    await this._benchmarks[name]?.events?.beforeOne?.();
-    await pub($benchmarkBeforeEach, {
-      suiteName: this._name,
-      benchmarkName: name,
-    });
+    await this.$iterationStart(name, mode, type);
 
     if (mode === "cpu") {
       const start = now();
@@ -264,13 +293,9 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
 
       store.array[++store.index] = data;
 
-      await this._benchmarks[name]?.events?.afterOne?.();
-      await pub($benchmarkAfterEach, {
-        suiteName: this._name,
-        benchmarkName: name,
-      });
+      await this.$iterationEnd(name, mode, type);
     } else {
-      this._collectGarbage();
+      await this.$collectGarbage();
 
       const start = process.memoryUsage().heapUsed;
 
@@ -281,11 +306,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
 
       store.array[++store.index] = data;
 
-      await this._benchmarks[name]?.events?.afterOne?.();
-      await pub($benchmarkAfterEach, {
-        suiteName: this._name,
-        benchmarkName: name,
-      });
+      await this.$iterationEnd(name, mode, type);
     }
   }
 
