@@ -1,4 +1,4 @@
-import { Offset, Offsets, Options, Store, Stores } from "./types";
+import { Offset, Offsets, Options, Store } from "./types";
 
 // Empty async function used to determine the overhead of async functions
 export const FN_ASYNC = async () => {
@@ -68,17 +68,9 @@ export const STORES = {
   },
 };
 
-// Global constants shared between all suites
-export const GLOBAL: {
-  options: Options;
-  stores: Stores;
-} = {
-  options: OPTIONS,
-  stores: STORES,
-};
-
 export const IS_NODE = typeof process !== "undefined";
 
+// Node.js uses nanoseconds, browsers use milliseconds
 export const TIME_UNIT = IS_NODE ? "ns" : "ms";
 
 export const NS_IN_SECOND = 1_000_000_000;
