@@ -1,7 +1,7 @@
 import { sub } from "ueve/async";
 import { bold, gray, blue, cyan } from "chalk";
 import { MS_IN_SECOND, TIME_UNIT, UNITS_IN_SECOND } from "../constants";
-import { $benchmarkAfterAll } from "../events";
+import { $benchmarkEnd } from "../events";
 
 /**
  * Listens to events and prints suite and benchmark results into a terminal.
@@ -16,7 +16,7 @@ import { $benchmarkAfterAll } from "../events";
  * ```
  * */
 export function useTerminalCompact() {
-  sub($benchmarkAfterAll, async ({ benchmarkName, cpu, ram }) => {
+  sub($benchmarkEnd, async ({ benchmarkName, cpu, ram }) => {
     const ops = Math.round(
       cpu.median === 0 ? Infinity : Math.round(UNITS_IN_SECOND / cpu.median),
     ).toLocaleString();
