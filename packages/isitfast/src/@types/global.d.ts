@@ -6,7 +6,7 @@ declare global {
     };
 
     /** The currently active segment of JS heap, in bytes. */
-    measureUserAgentSpecificMemory: () => { bytes: number }
+    measureUserAgentSpecificMemory: () => { bytes: number };
   }
 }
 
