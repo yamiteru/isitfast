@@ -1,4 +1,4 @@
-import {NumberArray} from "../types";
+import { NumberArray } from "../types";
 
 export function getMedian(array: NumberArray, length: number) {
   return array

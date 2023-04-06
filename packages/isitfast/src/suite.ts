@@ -11,7 +11,14 @@ import {
   Benchmarks,
   Events,
 } from "./types";
-import { getMedian, clampToZero, getOptions, getChunkDeviation   , now, collectGarbage  } from "./utils";
+import {
+  getMedian,
+  clampToZero,
+  getOptions,
+  getChunkDeviation,
+  now,
+  collectGarbage,
+} from "./utils";
 import { pub } from "ueve/async";
 import {
   $benchmarkAfterAll,
