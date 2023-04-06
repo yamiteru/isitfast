@@ -17,12 +17,12 @@ import { $benchmarkAfterAll } from "../events";
  * */
 export function useTerminalCompact() {
   sub($benchmarkAfterAll, async ({ benchmarkName, cpu, ram }) => {
-    const ops = (
-      cpu.median === 0 ? Infinity : Math.round(UNITS_IN_SECOND / cpu.median)
+    const ops = Math.round(
+      cpu.median === 0 ? Infinity : Math.round(UNITS_IN_SECOND / cpu.median),
     ).toLocaleString();
     const cpuDeviation = cpu.deviation.toPrecision(1).toLocaleString();
     const cpuCycles = cpu.cycles.toLocaleString();
-    const kb = Math.round(ram.median).toLocaleString();
+    const bytes = Math.round(ram.median).toLocaleString();
     const ramDeviation = ram.deviation.toPrecision(1).toLocaleString();
     const ramCycles = ram.cycles.toLocaleString();
     const cpuSecondaryInfo = gray(`±${cpuDeviation}% x${cpuCycles}`);
@@ -39,8 +39,8 @@ export function useTerminalCompact() {
       `${bold(benchmarkName)} ${blue(
         ops,
       )} op/s ${cpuTime} ${cpuSecondaryInfo} | ${cyan(
-        kb,
-      )} kB ${ramSecondaryInfo}`,
+        bytes,
+      )} bytes ${ramSecondaryInfo}`,
     );
   });
 }
