@@ -1,10 +1,10 @@
 import { sub } from "ueve/async";
 import { red, green, bold, gray, blue, cyan } from "chalk";
 import {
-  $suiteBefore,
-  $suiteAfter,
-  $benchmarkAfterAll,
-  $benchmarkBeforeAll,
+  $suiteStart,
+  $suiteEnd,
+  $benchmarkStart,
+  $benchmarkEnd,
 } from "../events";
 import { Offset } from "../types";
 import { newLine, writeLine } from "../utils";
@@ -26,7 +26,7 @@ export async function useTerminal() {
   let results: { name: string; cpu: Offset; ram: Offset }[] = [];
   let longestBenchmarkName = 0;
 
-  sub($suiteBefore, async ({ suiteName, benchmarkNames }) => {
+  sub($suiteStart, async ({ suiteName, benchmarkNames }) => {
     results = [];
     longestBenchmarkName = benchmarkNames.sort((a, b) => b.length - a.length)[0]
       .length;
@@ -35,7 +35,7 @@ export async function useTerminal() {
     newLine();
   });
 
-  sub($suiteAfter, async () => {
+  sub($suiteEnd, async () => {
     newLine();
     writeLine(
       `=> Slowest is ${red.bold.underline(
@@ -52,12 +52,12 @@ export async function useTerminal() {
     newLine();
   });
 
-  sub($benchmarkBeforeAll, async ({ benchmarkName }) => {
+  sub($benchmarkStart, async ({ benchmarkName }) => {
     newLine();
     writeLine(bold(benchmarkName));
   });
 
-  sub($benchmarkAfterAll, async ({ benchmarkName, cpu, ram }) => {
+  sub($benchmarkEnd, async ({ benchmarkName, cpu, ram }) => {
     const name = benchmarkName.padEnd(longestBenchmarkName);
 
     const ops = Math.round(
