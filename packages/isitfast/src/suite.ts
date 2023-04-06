@@ -1,6 +1,6 @@
 import { Fn } from "elfs";
 import { Mode } from "fs";
-import { FN_ASYNC, FN_SYNC, OFFSET, OFFSETS } from "./constants";
+import { FN_ASYNC, FN_SYNC, IS_NODE, OFFSET, OFFSETS } from "./constants";
 import {
   Benchmark,
   DeepPartial,
@@ -17,7 +17,6 @@ import {
   getOptions,
   getChunkDeviation,
   now,
-  collectGarbage,
 } from "./utils";
 import { pub } from "ueve/async";
 import {
@@ -39,6 +38,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
   private _benchmarks: $Benchmarks;
   private _offsets: Offsets;
   private _stores: Stores;
+  private _collectGarbage: Fn<[], void>;
 
   constructor(name: string, options?: DeepPartial<Options>) {
     this._name = name;
@@ -49,6 +49,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
     this._data = this._setup();
     this._benchmarks = {} as $Benchmarks;
     this._offsets = OFFSETS;
+
     this._stores = {
       cpu: {
         chunk: this._createStore("cpu"),
@@ -59,6 +60,12 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
         main: this._createStore("ram"),
       },
     };
+
+    this._collectGarbage = this._options.gc.allow
+      ? IS_NODE
+        ? () => global?.gc?.()
+        : () => window?.gc?.()
+      : FN_SYNC;
   }
 
   public setup<$Type extends $Data>(setup: Fn<[], $Type>) {
@@ -127,7 +134,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
       });
 
       // We GC here so memory from one benchmark doesn't leak to the next one
-      collectGarbage();
+      this._collectGarbage();
 
       const fn = this._benchmarks[name].benchmark;
       const cpu = await this._stats(name, fn, "cpu", this._offsets);
@@ -263,7 +270,7 @@ class Suite<$Data, $Benchmarks extends Benchmarks<$Data>> {
         benchmarkName: name,
       });
     } else {
-      collectGarbage();
+      this._collectGarbage();
 
       const start = process.memoryUsage().heapUsed;
 
