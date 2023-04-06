@@ -60,7 +60,9 @@ export type Options = {
 };
 
 // Recursively make all properties of an object optional
-export type DeepPartial<$Object extends Record<string, Record<string, unknown>>> = Partial<{
+export type DeepPartial<
+  $Object extends Record<string, Record<string, unknown>>,
+> = Partial<{
   [$Key in keyof $Object]: $Object[$Key] extends Record<string, unknown>
     ? Partial<$Object[$Key]>
     : $Object[$Key];
