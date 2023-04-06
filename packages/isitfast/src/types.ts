@@ -72,10 +72,10 @@ export type DeepPartial<
 export type Benchmark<$Data = any> = Fn<[$Data], Either<[void, Promise<void>]>>;
 
 export type Events = Partial<{
-  beforeOne: Fn<[], Promise<void>>;
-  afterOne: Fn<[], Promise<void>>;
-  beforeAll: Fn<[], Promise<void>>;
-  afterAll: Fn<
+  onIterationStart: Fn<[], Promise<void>>;
+  onIterationEnd: Fn<[], Promise<void>>;
+  onBenchmarkStart: Fn<[], Promise<void>>;
+  onBenchmarkEnd: Fn<
     [
       {
         cpu: Offset;
