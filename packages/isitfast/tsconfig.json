@@ -1,10 +1,15 @@
 {
-    "extends": "./tsconfig.base.json",
-    "compilerOptions": {
-        "module": "CommonJS"
-    },
+  "compilerOptions": {
+    "strict": true,
+    "module": "CommonJS",
+    "target": "ESNext",
+    "moduleResolution": "nodenext",
+    "esModuleInterop": true,
+    "declaration": true,
+    "resolveJsonModule": true,
+    "noImplicitAny": false,
     "typeRoots": ["./@types", "./node_modules/@types"]
-    "include": [
-        "src/**/*"
-    ]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }
