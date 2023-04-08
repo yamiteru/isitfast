@@ -1,4 +1,4 @@
-import { STATE } from "../constants";
+import { OFFSETS, STATE } from "../constants";
 import {
   suiteStart,
   benchmarkStart,
@@ -15,7 +15,7 @@ export async function run<$This extends SuiteAny>(this: $This) {
 
   await suiteStart();
 
-  STATE.offsets = {
+  STATE.offsets = STATE.options.offset.allow ? {
     async: {
       cpu: await getOffset("async", "cpu"),
       ram: await getOffset("async", "ram"),
@@ -24,7 +24,7 @@ export async function run<$This extends SuiteAny>(this: $This) {
       cpu: await getOffset("sync", "cpu"),
       ram: await getOffset("sync", "ram"),
     },
-  };
+  }: OFFSETS;
 
   for (const name in STATE.benchmarks) {
     await benchmarkStart(name);

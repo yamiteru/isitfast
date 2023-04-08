@@ -7,7 +7,6 @@ import {
   Events,
   DeepPartial,
   Options,
-  BenchamrkName,
 } from "./types";
 import { getOptions } from "./utils";
 
@@ -17,7 +16,7 @@ export class Suite<$Data, $Benchmarks extends string[] = []> {
   ) => Suite<$$Data, $Benchmarks>;
 
   public add: <$Name extends string>(
-    name: BenchamrkName<$Benchmarks, $Name>,
+    name: $Name,
     benchmark: Benchmark<$Data>,
     events?: Events,
   ) => Suite<$Data, [...$Benchmarks, $Name]>;

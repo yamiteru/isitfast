@@ -29,16 +29,17 @@ export const OPTIONS: Options = {
   cpu: {
     chunkSize: 100,
     compareSize: 25,
-    rangePercent: 1,
+    deviationPercent: 1,
   },
   ram: {
     chunkSize: 5,
     compareSize: 5,
-    rangePercent: 1,
+    deviationPercent: 1,
   },
   offset: {
+    koefficient: 1,
     allow: true,
-    rangePercent: 1,
+    deviationPercent: 1,
   },
   gc: {
     allow: true,
