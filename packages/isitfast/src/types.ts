@@ -20,14 +20,14 @@ export type Options = {
     // Number of iterations in one chunk
     // The higher the number the more accurate the benchmark is but the longer it takes to complete
     chunkSize: number;
-    // Number of chunks to compare with each other using `rangePercent`
+    // Number of chunks to compare with each other using `deviationPercent`
     // If this number is too high then the benchmark might never stabilize
     // It should never be higher than `chunkSize`
     compareSize: number;
     // Range of how much the last `compareSize` chunks can deviate from each other
-    // If the data deviates more than `rangePercent` then the benchmark keeps collecting data until it is within the range
+    // If the data deviates more than `deviationPercent` then the benchmark keeps collecting data until it is within the range
     // If this number is too low then the benchmark might never stabilize
-    rangePercent: number;
+    deviationPercent: number;
   };
   // Ram options used to collect kb
   // Memory data is collected separately from cpu data because GC takes a lot of time
@@ -36,22 +36,24 @@ export type Options = {
     // Number of iterations in one chunk
     // The higher the number the more accurate the benchmark is but the longer it takes to complete
     chunkSize: number;
-    // Number of chunks to compare with each other using `rangePercent`
+    // Number of chunks to compare with each other using `deviationPercent`
     // If this number is too high then the benchmark might never stabilize
     // It should never be higher than `chunkSize`
     compareSize: number;
     // Range of how much the last `compareSize` chunks can deviate from each other
-    // If the data deviates more than `rangePercent` then the benchmark keeps collecting data until it is within the range
+    // If the data deviates more than `deviationPercent` then the benchmark keeps collecting data until it is within the range
     // If this number is too low then the benchmark might never stabilize
-    rangePercent: number;
+    deviationPercent: number;
   };
   // Offset options used to determine the overhead of async/sync functions
   offset: {
+    // Koefficient used to multiple offset results
+    koefficient: number;
     // Allow offset collection
     allow: boolean;
     // Range of how much can offsets of one type deviate from each other
     // Until the offsets are within the range the benchmark keeps recollecting offsets
-    rangePercent: number;
+    deviationPercent: number;
   };
   // Garbage collector options
   gc: {
@@ -137,19 +139,6 @@ export type Offsets = {
     ram: Offset;
   };
 };
-
-export type Includes<$Array extends readonly any[], $Item> = {
-  [P in $Array[number]]: true;
-}[$Item] extends true
-  ? true
-  : false;
-
-export type BenchamrkName<
-  $Benchmarks extends string[],
-  $Name extends string,
-> = Includes<$Benchmarks, $Name> extends false
-  ? $Name
-  : `Benchmark "${$Name}" already exists`;
 
 export type SuiteAny = Suite<any, any>;
 
