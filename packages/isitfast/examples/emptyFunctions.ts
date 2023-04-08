@@ -1,7 +1,7 @@
-import { suite } from "../src";
+import { Suite } from "../src";
 import { useTerminal } from "../src/modes";
 
-const emptyFunctions = suite("Empty functions")
+const emptyFunctions = new Suite("Empty functions")
   .add("empty async", async () => {
     /* */
   })

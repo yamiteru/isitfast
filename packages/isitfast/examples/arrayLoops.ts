@@ -1,11 +1,11 @@
 import { useTerminal } from "../src";
-import { suite } from "../src";
+import { Suite } from "../src";
 
 const LENGTH = 1_000;
 const DATA = [...new Array(LENGTH)].map(() => Math.random() * 10);
 const RESULT = { _: 0 };
 
-const emptyFunctions = suite("Array loops")
+const emptyFunctions = new Suite("Array loops")
   .add("for", () => {
     for (let i = 0; i < LENGTH; ++i) {
       RESULT._ = DATA[i];
