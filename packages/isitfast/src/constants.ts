@@ -1,4 +1,18 @@
-import { Offset, Offsets, Options, Store } from "./types";
+import { Fn } from "elfs";
+import { Benchmarks, Offset, Offsets, Options, Store, Stores } from "./types";
+
+export const STATE: {
+  name: string;
+  options: Options;
+  benchmarks: Benchmarks<any>;
+  setup: Fn<[], any>;
+  onSuiteStart: Fn<[any], Promise<void>>;
+  onSuiteEnd: Fn<[any], Promise<void>>;
+  data: any;
+  offsets: Offsets;
+  stores: Stores;
+  collectGarbage: Fn<[], void>;
+} = {} as never;
 
 // Empty async function used to determine the overhead of async functions
 export const FN_ASYNC = async () => {

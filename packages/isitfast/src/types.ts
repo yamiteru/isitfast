@@ -1,4 +1,5 @@
 import { Either, Fn } from "elfs";
+import { Suite } from "./suite";
 
 export type NumberArray =
   | Uint8Array
@@ -136,3 +137,28 @@ export type Offsets = {
     ram: Offset;
   };
 };
+
+export type Includes<$Array extends readonly any[], $Item> = {
+  [P in $Array[number]]: true;
+}[$Item] extends true
+  ? true
+  : false;
+
+export type BenchamrkName<
+  $Benchmarks extends string[],
+  $Name extends string,
+> = Includes<$Benchmarks, $Name> extends false
+  ? $Name
+  : `Benchmark "${$Name}" already exists`;
+
+export type SuiteAny = Suite<any, any>;
+
+export type SuiteInferData<$Suite extends SuiteAny> = $Suite extends Suite<
+  infer $Data,
+  any
+>
+  ? $Data
+  : never;
+
+export type SuiteInferBenchmarks<$Suite extends SuiteAny> =
+  $Suite extends Suite<any, infer $Benchmarks> ? $Benchmarks : never;
