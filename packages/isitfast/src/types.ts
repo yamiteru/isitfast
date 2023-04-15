@@ -139,6 +139,12 @@ export type Offset = {
     };
   };
   histogram: {
+    "0.001": number;
+    "0.01": number;
+    "0.1": number;
+    "1": number;
+    "2.5": number;
+    "25": number;
     "50": number;
     "75": number;
     "90": number;
