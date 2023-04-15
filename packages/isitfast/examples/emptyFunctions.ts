@@ -1,16 +1,14 @@
 import { Suite } from "../src";
-import { useTerminal } from "../src/modes";
+import { useTerminalCompact } from "../src/modes";
 
 const emptyFunctions = new Suite("Empty functions")
-  .add("empty async", async () => {
+  .add("empty async", async function () {
     /* */
   })
-  .add("empty sync", () => {
+  .add("empty sync", function () {
     /* */
   });
 
-(async () => {
-  useTerminal();
+useTerminalCompact();
 
-  await emptyFunctions.run();
-})();
+emptyFunctions.run();

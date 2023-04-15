@@ -1,27 +1,26 @@
-import { FN_ASYNC, FN_SYNC, OFFSET, OFFSETS, STATE } from "../constants";
-import { Type, Mode } from "../types";
-import { offsetStart, offsetEnd } from "./events";
-import { stats } from "./stats";
+import { STATE } from "../constants";
+import { Mode, Offset } from "../types";
+import { deviations } from "../utils/deviations";
+import { histogram } from "../utils/histogram";
 
-export async function getOffset(type: Type, mode: Mode) {
-  const name = `offset-${type}-${mode}`;
-  const fn = type === "async" ? FN_ASYNC : FN_SYNC;
+export function getOffset(mode: Mode): Offset {
+  const store = STATE.stores[mode];
+  const { chunkSize } = STATE.options[mode];
+  const slice = store.array.slice(0, chunkSize - store.offset);
+  const { min, max, mean, median, variance, standard, medianAbsolute, meanAbsolute } = deviations(slice);
 
-  await offsetStart(name);
-
-  let result = { ...OFFSET };
-
-  while (true as any) {
-    result = await stats(name, fn, mode, OFFSETS);
-
-    console.log(name, result.deviation, STATE.options[mode].deviationPercent);
-
-    if(result.deviation <= STATE.options[mode].deviationPercent) {
-      break;
-    }
-  }
-
-  await offsetEnd(name, result);
-
-  return result;
+  return {
+    min,
+    max,
+    mean,
+    median,
+    variance,
+    deviation: {
+      standard,
+      medianAbsolute,
+      meanAbsolute
+    },
+    histogram: histogram(slice),
+    iterations: store.count * chunkSize,
+  };
 }

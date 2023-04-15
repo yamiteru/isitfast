@@ -12,7 +12,7 @@ import {
   $iterationStart,
   $iterationEnd,
 } from "../events";
-import { Offset, Mode, Type } from "../types";
+import { Offset, Mode } from "../types";
 
 export async function collectGarbage() {
   await pub($garbageStart, { suiteName: STATE.name });
@@ -42,13 +42,18 @@ export async function benchmarkStart(name: string) {
   await pub($benchmarkStart, { suiteName: STATE.name, benchmarkName: name });
 }
 
-export async function benchmarkEnd(name: string, cpu: Offset, ram: Offset) {
-  await STATE.benchmarks[name]?.events?.onBenchmarkEnd?.({ cpu, ram });
+export async function benchmarkEnd(
+  name: string,
+  data: {
+    cpu: Offset;
+    ram: Offset;
+  },
+) {
+  await STATE.benchmarks[name]?.events?.onBenchmarkEnd?.(data);
   await pub($benchmarkEnd, {
     suiteName: STATE.name,
     benchmarkName: name,
-    cpu,
-    ram,
+    data,
   });
 }
 
@@ -60,22 +65,27 @@ export async function offsetEnd(name: string, offset: Offset) {
   await pub($offsetEnd, { suiteName: STATE.name, offsetName: name, offset });
 }
 
-export async function iterationStart(name: string, mode: Mode, type: Type) {
+export async function iterationStart(name: string, mode: Mode) {
   await STATE.benchmarks[name]?.events?.onIterationStart?.();
   await pub($iterationStart, {
     suiteName: STATE.name,
     benchmarkName: name,
     mode,
-    type,
   });
 }
 
-export async function iterationEnd(name: string, mode: Mode, type: Type) {
+export async function iterationEnd(
+  name: string,
+  mode: Mode,
+  data: number,
+  isGCFluke: boolean,
+) {
   await STATE.benchmarks[name]?.events?.onIterationEnd?.();
   await pub($iterationEnd, {
     suiteName: STATE.name,
     benchmarkName: name,
     mode,
-    type,
+    data,
+    isGCFluke,
   });
 }
