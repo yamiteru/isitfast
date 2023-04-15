@@ -76,7 +76,7 @@ export const OFFSET: Offset = {
     standard: {
       value: 0,
       percent: 0,
-      error: 0
+      error: 0,
     },
     medianAbsolute: {
       value: 0,
@@ -85,7 +85,7 @@ export const OFFSET: Offset = {
     meanAbsolute: {
       value: 0,
       percent: 0,
-    }
+    },
   },
   histogram: {
     "50": 0,

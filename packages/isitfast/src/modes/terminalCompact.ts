@@ -19,12 +19,16 @@ export function useTerminalCompact() {
   let firstOffset = true;
 
   sub($offsetEnd, async ({ offsetName, offset }) => {
-    if(firstOffset) {
+    if (firstOffset) {
       console.log(gray("---"));
       firstOffset = false;
     }
 
-    console.log(`${bold(offsetName)} ${offset.median} ${offsetName.includes("ram") ? "bytes": TIME_UNIT}`);
+    console.log(
+      `${bold(offsetName)} ${offset.median} ${
+        offsetName.includes("ram") ? "bytes" : TIME_UNIT
+      }`,
+    );
   });
 
   sub($benchmarkEnd, async ({ benchmarkName, data: { cpu, ram } }) => {

@@ -7,7 +7,7 @@ import {
   variance as getVariance,
 } from "../utils";
 import { collectGarbage, iterationEnd, iterationStart } from "./events";
-import {getOffset} from "./getOffset";
+import { getOffset } from "./getOffset";
 import { isNumberGCFluke } from "./isNumberGCFluke";
 
 export async function collect(
