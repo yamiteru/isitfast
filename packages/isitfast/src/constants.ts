@@ -1,5 +1,15 @@
-import { Fn } from "elfs";
-import { Benchmarks, Offset, Offsets, Options, Store, Stores } from "./types";
+import { Either, Fn } from "elfs";
+import {
+  Benchmarks,
+  Mode,
+  Offset,
+  OffsetMin,
+  Offsets,
+  Options,
+  Store,
+  Stores,
+  Type,
+} from "./types";
 
 export const STATE: {
   name: string;
@@ -12,6 +22,7 @@ export const STATE: {
   offsets: Offsets;
   stores: Stores;
   collectGarbage: Fn<[], void>;
+  min: Record<Type, Record<Mode, Either<[null, number]>>>;
 } = {} as never;
 
 // Empty async function used to determine the overhead of async functions
@@ -24,22 +35,30 @@ export const FN_SYNC = () => {
   /* */
 };
 
+export const OFFSET_MIN: OffsetMin = {
+  async: {
+    cpu: null,
+    ram: null,
+  },
+  sync: {
+    cpu: null,
+    ram: null,
+  },
+};
+
 // Default options used in `preset`
 export const OPTIONS: Options = {
   cpu: {
-    chunkSize: 100,
-    compareSize: 25,
+    chunkSize: 1_000,
     deviationPercent: 1,
   },
   ram: {
-    chunkSize: 5,
-    compareSize: 5,
+    chunkSize: 10,
     deviationPercent: 1,
   },
   offset: {
     koefficient: 1,
     allow: true,
-    deviationPercent: 1,
   },
   gc: {
     allow: true,
@@ -48,9 +67,37 @@ export const OPTIONS: Options = {
 
 // Default offset
 export const OFFSET: Offset = {
+  min: 0,
+  max: 0,
+  mean: 0,
   median: 0,
-  deviation: 0,
-  cycles: 0,
+  variance: 0,
+  deviation: {
+    standard: {
+      value: 0,
+      percent: 0,
+      error: 0
+    },
+    medianAbsolute: {
+      value: 0,
+      percent: 0,
+    },
+    meanAbsolute: {
+      value: 0,
+      percent: 0,
+    }
+  },
+  histogram: {
+    "50": 0,
+    "75": 0,
+    "90": 0,
+    "97.5": 0,
+    "99": 0,
+    "99.9": 0,
+    "99.99": 0,
+    "99.999": 0,
+  },
+  iterations: 0,
 };
 
 // Default offsets
@@ -69,6 +116,8 @@ export const OFFSETS: Offsets = {
 export const STORE: Store = {
   array: new Uint32Array(),
   index: 0,
+  offset: 0,
+  count: 0,
 };
 
 // Default stores

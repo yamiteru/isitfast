@@ -1,34 +1,32 @@
-import { useTerminal } from "../src";
+import { useTerminalCompact } from "../src";
 import { Suite } from "../src";
 
-const LENGTH = 1_000;
-const DATA = [...new Array(LENGTH)].map(() => Math.random() * 10);
-const RESULT = { _: 0 };
-
 const emptyFunctions = new Suite("Array loops")
-  .add("for", () => {
-    for (let i = 0; i < LENGTH; ++i) {
-      RESULT._ = DATA[i];
+  .setup(() => ({
+    result: { _: 0 },
+    data: [...new Array(1_000)].map(() => Math.random() * 10),
+  }))
+  .add("for", ({ result, data }) => {
+    for (let i = 0; i < data.length; ++i) {
+      result._ = data[i];
     }
   })
-  .add("while", () => {
+  .add("while", ({ result, data }) => {
     let i = -1;
 
-    while (++i < LENGTH) {
-      RESULT._ = DATA[i];
+    while (++i < data.length) {
+      result._ = data[i];
     }
   })
-  .add("forOf", () => {
-    for (const v of DATA) {
-      RESULT._ = v;
+  .add("forOf", ({ result, data }) => {
+    for (const v of data) {
+      result._ = v;
     }
   })
-  .add("forEach", () => {
-    DATA.forEach((v) => (RESULT._ = v));
+  .add("forEach", ({ result, data }) => {
+    data.forEach((v) => (result._ = v));
   });
 
-(async () => {
-  useTerminal();
+useTerminalCompact();
 
-  await emptyFunctions.run();
-})();
+emptyFunctions.run();

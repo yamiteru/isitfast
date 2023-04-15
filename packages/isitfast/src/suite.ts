@@ -1,13 +1,8 @@
 import { Fn } from "elfs";
-import { STATE, FN_ASYNC, OFFSETS } from "./constants";
+import { STATE, FN_ASYNC, OFFSETS, OFFSET_MIN } from "./constants";
 import { createStores, getGarbageCollectorFunction } from "./private";
 import { add, onSuiteEnd, onSuiteStart, run, setup } from "./public";
-import {
-  Benchmark,
-  Events,
-  DeepPartial,
-  Options,
-} from "./types";
+import { Benchmark, Events, DeepPartial, Options } from "./types";
 import { getOptions } from "./utils";
 
 export class Suite<$Data, $Benchmarks extends string[] = []> {
@@ -39,6 +34,7 @@ export class Suite<$Data, $Benchmarks extends string[] = []> {
     STATE.offsets = OFFSETS;
     STATE.stores = createStores();
     STATE.collectGarbage = getGarbageCollectorFunction();
+    STATE.min = OFFSET_MIN;
 
     // Methods
     this.add = add;

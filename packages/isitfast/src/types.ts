@@ -20,10 +20,6 @@ export type Options = {
     // Number of iterations in one chunk
     // The higher the number the more accurate the benchmark is but the longer it takes to complete
     chunkSize: number;
-    // Number of chunks to compare with each other using `deviationPercent`
-    // If this number is too high then the benchmark might never stabilize
-    // It should never be higher than `chunkSize`
-    compareSize: number;
     // Range of how much the last `compareSize` chunks can deviate from each other
     // If the data deviates more than `deviationPercent` then the benchmark keeps collecting data until it is within the range
     // If this number is too low then the benchmark might never stabilize
@@ -36,10 +32,6 @@ export type Options = {
     // Number of iterations in one chunk
     // The higher the number the more accurate the benchmark is but the longer it takes to complete
     chunkSize: number;
-    // Number of chunks to compare with each other using `deviationPercent`
-    // If this number is too high then the benchmark might never stabilize
-    // It should never be higher than `chunkSize`
-    compareSize: number;
     // Range of how much the last `compareSize` chunks can deviate from each other
     // If the data deviates more than `deviationPercent` then the benchmark keeps collecting data until it is within the range
     // If this number is too low then the benchmark might never stabilize
@@ -51,9 +43,6 @@ export type Options = {
     koefficient: number;
     // Allow offset collection
     allow: boolean;
-    // Range of how much can offsets of one type deviate from each other
-    // Until the offsets are within the range the benchmark keeps recollecting offsets
-    deviationPercent: number;
   };
   // Garbage collector options
   gc: {
@@ -72,7 +61,20 @@ export type DeepPartial<
 }>;
 
 // Benchmark function
-export type Benchmark<$Data = any> = Fn<[$Data], Either<[void, Promise<void>]>>;
+export type Benchmark<$Data = any> = Fn<[$Data], Either<[Promise<void>, void]>>;
+
+// Compiled benchmark function
+export type BenchmarkCompiled<$Benchmark extends Benchmark> = Fn<
+  [
+    {
+      start: Fn<[], Promise<void>>;
+      end: Fn<[], Promise<void>>;
+      collectGarbage: Fn<[], Promise<void>>;
+      set: Fn<[number], void>;
+    },
+  ],
+  $Benchmark
+>;
 
 export type Events = Partial<{
   onIterationStart: Fn<[], Promise<void>>;
@@ -101,31 +103,52 @@ export type Benchmarks<$Data> = Record<
 export type Store = {
   array: Uint32Array;
   index: number;
+  offset: number;
+  count: number;
 };
 
 // Stores used to collect cpu and ram data
 export type Stores = {
-  cpu: {
-    chunk: Store;
-    main: Store;
-  };
-  ram: {
-    chunk: Store;
-    main: Store;
-  };
+  cpu: Store;
+  ram: Store;
 };
 
 // Offset mode
 export type Mode = Either<["cpu", "ram"]>;
 
-// Offset type
-export type Type = Either<["sync", "async"]>;
-
 // Offset data
 export type Offset = {
+  min: number;
+  max: number;
+  mean: number;
   median: number;
-  deviation: number;
-  cycles: number;
+  variance: number;
+  deviation: {
+    standard: {
+      value: number;
+      percent: number;
+      error: number;
+    };
+    medianAbsolute: {
+      value: number;
+      percent: number;
+    };
+    meanAbsolute: {
+      value: number;
+      percent: number;
+    };
+  };
+  histogram: {
+    "50": number;
+    "75": number;
+    "90": number;
+    "97.5": number;
+    "99": number;
+    "99.9": number;
+    "99.99": number;
+    "99.999": number;
+  };
+  iterations: number;
 };
 
 // Offsets data
@@ -139,6 +162,10 @@ export type Offsets = {
     ram: Offset;
   };
 };
+
+export type Type = Either<["async", "sync"]>;
+
+export type OffsetMin = Record<Type, Record<Mode, Either<[number, null]>>>;
 
 export type SuiteAny = Suite<any, any>;
 

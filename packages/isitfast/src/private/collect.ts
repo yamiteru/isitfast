@@ -1,42 +1,89 @@
-import { STATE } from "../constants";
+import { Fn } from "elfs";
+import { FN_ASYNC, STATE } from "../constants";
 import { Benchmark, Mode, Type } from "../types";
-import { now } from "../utils/now";
-import { iterationStart, iterationEnd, collectGarbage } from "./events";
+import {
+  median as getMedian,
+  standardDeviation as getStandardDeviation,
+  variance as getVariance,
+} from "../utils";
+import { collectGarbage, iterationEnd, iterationStart } from "./events";
+import {getOffset} from "./getOffset";
+import { isNumberGCFluke } from "./isNumberGCFluke";
 
 export async function collect(
   name: string,
   benchmark: Benchmark,
   mode: Mode,
   type: Type,
+  min: number,
 ) {
+  const store = STATE.stores[mode];
+  const { chunkSize, deviationPercent } = STATE.options[mode];
   const isAsync = type === "async";
-  const store = STATE.stores[mode].chunk;
+  const isCpu = mode === "cpu";
+  const garbage = isCpu ? FN_ASYNC : collectGarbage;
+  const collect = (
+    isCpu ? process.hrtime.bigint : () => process.memoryUsage().heapUsed
+  ) as Fn<[], number>;
 
-  await iterationStart(name, mode, type);
+  store.index = 0;
+  store.offset = 0;
+  store.count = 0;
 
-  if (mode === "cpu") {
-    const start = now();
+  while (true as any) {
+    if (store.index + store.offset === chunkSize) {
+      if (store.count !== 0) {
+        const array = store.array.slice(0, chunkSize - store.offset).sort();
+        const median = getMedian(array);
+        const standardDeviation =
+          getStandardDeviation(getVariance(array)) / median;
 
-    isAsync ? await benchmark(STATE.data) : benchmark(STATE.data);
+        if (
+          (median < min && standardDeviation <= deviationPercent) ||
+          (mode === "ram" && median === min)
+        ) {
+          break;
+        }
+      }
 
-    const end = now();
-    const data = Math.round(Number(end - start));
+      store.index = 0;
+      store.offset = 0;
+      store.count += 1;
+    }
 
-    store.array[++store.index] = data;
+    await iterationStart(name, mode);
+    await garbage();
 
-    await iterationEnd(name, mode, type);
-  } else {
-    await collectGarbage();
+    let data: number;
 
-    const start = process.memoryUsage().heapUsed;
+    if (isAsync) {
+      const start = collect();
 
-    isAsync ? await benchmark(STATE.data) : benchmark(STATE.data);
+      await benchmark(STATE.data);
 
-    const end = process.memoryUsage().heapUsed;
-    const data = Math.round(Number(end - start));
+      const end = collect();
 
-    store.array[++store.index] = data;
+      data = Math.round(Number(end - start));
+    } else {
+      const start = collect();
 
-    await iterationEnd(name, mode, type);
+      benchmark(STATE.data);
+
+      const end = collect();
+
+      data = Math.round(Number(end - start));
+    }
+
+    const isGCFluke = isNumberGCFluke(store.array, store.index, data);
+
+    await iterationEnd(name, mode, data, isGCFluke);
+
+    if (isGCFluke) {
+      store.offset++;
+    } else {
+      store.array[store.index++] = data;
+    }
   }
+
+  return getOffset(mode);
 }

@@ -34,20 +34,18 @@ For the most accurate results, it is recommended to run benchmark suites in diff
 ## Example
 
 ```ts
-import { suite, useTerminal } from "isitfast";
+import { Suite, useTerminal } from "isitfast";
 
 // define your suite with benchmarks
-const testBenchmark = suite("Test")
+const testBenchmark = new Suite("Test")
   .add("emptyAsync", async () => {})
   .add("emptySync", () => {});
 
-(async () => {
-  // collect data and print them into a terminal
-  useTerminal();
+// collect data and print them into a terminal
+useTerminal();
 
-  // run all benchmarks and trigger lifecycle events
-  await testBenchmark.run();
-})();
+// run all benchmarks and trigger lifecycle events
+testBenchmark.run();
 ```
 
 ---
@@ -56,13 +54,7 @@ const testBenchmark = suite("Test")
 
 ## Suite
 
-You can create a `Suite` with by calling either `suite(name: string, options?: DeepPartial<Options>)` or `new Suite(name: string, options?: DeepPartial<Options>)`.
-
 ```ts
-const testOne = suite("Test One", {
-  // options
-});
-
 const testTwo = new Suite("Test Two", {
   // options
 });
@@ -73,13 +65,11 @@ These are the default options:
 ```ts
 {
   cpu: {
-    chunkSize: 100,
-    compareSize: 25,
+    chunkSize: 1_000,
     deviationPercent: 1,
   },
   ram: {
     chunkSize: 5,
-    compareSize: 5,
     deviationPercent: 1,
   },
   offset: {
@@ -103,7 +93,7 @@ Listens to events and prints verbose suite and benchmark results into a terminal
 useTerminal();
 
 // run suite which publishes data to the events
-await runBenchmarks.run();
+runBenchmarks.run();
 ```
 
 ### `useTerminalCompact`
@@ -115,7 +105,7 @@ Listens to events and prints compact suite and benchmark results into a terminal
 useTerminalCompact();
 
 // run suite which publishes data to the events
-await runBenchmarks.run();
+runBenchmarks.run();
 ```
 
 ## Events
@@ -125,11 +115,3 @@ The `Suite` by itself doesn't return any data. For consuming suite and benchmark
 Behind the scenes `isitfast` uses [μEve](https://github.com/yamiteru/ueve) to create, subscribe to and publish into events.
 
 You can easily import `sub`/`clr`/`has` event functions from `isitfast`. They're just re-exported functions from `μEve`.
-
-- `$suiteBefore` Before suite gets run
-- `$suiteOffsets` After suite offsets get calculated
-- `$suiteAfter` After suite gets run
-- `$benchmarkBeforeAll` Before benchmark of one type gets run
-- `$benchmarkBeforeEach` Before each benchmark of one type gets run
-- `$benchmarkAfterEach` After each benchmark of one type gets run
-- `$benchmarkAfterAll` After benchmark of one type gets run

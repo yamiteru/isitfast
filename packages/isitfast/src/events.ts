@@ -1,5 +1,5 @@
 import { eve } from "ueve/async";
-import { Mode, Offset, Type } from "./types";
+import { Mode, Offset } from "./types";
 
 export const $suiteStart = eve<{
   suiteName: string;
@@ -27,8 +27,10 @@ export const $benchmarkStart = eve<{
 export const $benchmarkEnd = eve<{
   suiteName: string;
   benchmarkName: string;
-  cpu: Offset;
-  ram: Offset;
+  data: {
+    cpu: Offset;
+    ram: Offset;
+  };
 }>();
 
 export const $garbageStart = eve<{
@@ -43,14 +45,14 @@ export const $iterationStart = eve<{
   suiteName: string;
   benchmarkName: string;
   mode: Mode;
-  type: Type;
 }>();
 
 export const $iterationEnd = eve<{
   suiteName: string;
   benchmarkName: string;
   mode: Mode;
-  type: Type;
+  data: number;
+  isGCFluke: boolean;
 }>();
 
 export { sub, clr, has } from "ueve/async";
