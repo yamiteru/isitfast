@@ -30,13 +30,17 @@ export async function useTerminal() {
 
   sub($offsetEnd, async ({ offsetName, offset }) => {
     setTimeout(() => {
-      if(firstOffset) {
+      if (firstOffset) {
         console.log(gray("---"));
         console.log();
         firstOffset = false;
       }
 
-      console.log(`${bold(offsetName)} ${offset.median} ${offsetName.includes("ram") ? "bytes": TIME_UNIT}`);
+      console.log(
+        `${bold(offsetName)} ${offset.median} ${
+          offsetName.includes("ram") ? "bytes" : TIME_UNIT
+        }`,
+      );
     }, 10);
   });
 

@@ -26,7 +26,7 @@ export function deviations(array: Uint32Array) {
     standard: {
       value: standard,
       percent: standard / median,
-      error: standard / Math.sqrt(length)
+      error: standard / Math.sqrt(length),
     },
     medianAbsolute: {
       value: medianAbsolute,
