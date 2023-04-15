@@ -44,8 +44,6 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm build",
     "example:emptyFunctions": "node --expose-gc -r ts-node/register examples/emptyFunctions.ts",
-    "example:test": "node --expose-gc -r ts-node/register examples/test.ts",
-    "example:test2": "node --expose-gc -r ts-node/register examples/test2.ts",
     "example:arrayLoops": "node --expose-gc -r ts-node/register examples/arrayLoops.ts"
   },
   "devDependencies": {
