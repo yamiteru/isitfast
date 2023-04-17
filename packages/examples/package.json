@@ -1,0 +1,17 @@
+{
+  "type": "module",
+  "name": "@isitfast/examples",
+  "scripts": {
+    "arrayLoops": "node --loader ts-node/esm src/arrayLoops.ts",
+    "emptyFunctions": "node --loader ts-node/esm src/emptyFunctions.ts"
+  },
+  "dependencies": {
+    "@isitfast/modes": "workspace:*",
+    "@isitfast/suite": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "18.15.5",
+    "ts-node": "10.9.1",
+    "typescript": "next"
+  }
+}

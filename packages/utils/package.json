@@ -1,0 +1,12 @@
+{
+  "version": "0.0.0",
+  "type": "module",
+  "name": "@isitfast/utils",
+  "main": "src/index.ts",
+  "devDependencies": {
+    "@isitfast/types": "workspace:*"
+  },
+  "dependencies": {
+    "@isitfast/constants": "workspace:*"
+  }
+}

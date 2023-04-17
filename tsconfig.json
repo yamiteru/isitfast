@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "module": "node16",
+    "target": "ESNext",
+    "moduleResolution": "node16",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "declaration": true,
+    "noImplicitAny": true,
+    "typeRoots": ["./packages/types/@types", "./node_modules/@types"]
+  },
+  "include": ["packages/**/src/**/*"],
+  "exclude": ["node_modules", "packages/**/node_modules"]
+}
