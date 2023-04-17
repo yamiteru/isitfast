@@ -8,11 +8,12 @@ export async function collectBenchmarks() {
   const benchmarks = STATE.benchmarks;
 
   for (const name in benchmarks) {
-    await benchmarkStart(name);
-    await collectGarbage();
-
     const fn = benchmarks[name].benchmark;
     const type = isAsync(fn) ? "async" : "sync";
+
+    await benchmarkStart(name, type);
+    await collectGarbage();
+
     const data = {
       cpu: await collect(name, fn, "cpu", type, Infinity),
       ram: await collect(name, fn, "ram", type, Infinity),
@@ -20,6 +21,6 @@ export async function collectBenchmarks() {
 
     setMin(type, data);
 
-    await benchmarkEnd(name, data);
+    await benchmarkEnd(name, type, data);
   }
 }

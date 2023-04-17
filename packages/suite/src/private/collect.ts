@@ -46,7 +46,7 @@ export async function collect(
       store.count += 1;
     }
 
-    await iterationStart(name, mode);
+    await iterationStart(name, type, mode);
     await garbage();
 
     let data: number;
@@ -71,7 +71,7 @@ export async function collect(
 
     const isGCFluke = isNumberGCFluke(store.array, store.index, data);
 
-    await iterationEnd(name, mode, data, isGCFluke);
+    await iterationEnd(name, type, mode, data, isGCFluke);
 
     if (isGCFluke) {
       store.offset++;

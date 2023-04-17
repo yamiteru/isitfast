@@ -7,22 +7,25 @@ export async function collectOffsets() {
   const min = STATE.min;
 
   for (const type in min) {
-    for (const mode in min[type as Type]) {
-      const name = `__${type}-${mode}__`;
-      const value = min[type as Type][mode as Mode];
+    const _type = type as Type;
+
+    for (const mode in min[_type]) {
+      const _mode = mode as Mode;
+      const name = `__${_type}-${_mode}__`;
+      const value = min[_type][_mode];
 
       if (value !== null) {
-        await offsetStart(name);
+        await offsetStart(name, _type, _mode);
 
         const data = await collect(
           name,
           type === "async" ? FN_ASYNC : FN_SYNC,
-          mode as Mode,
-          type as Type,
+          _mode,
+          _type,
           value,
         );
 
-        await offsetEnd(name, data);
+        await offsetEnd(name, _type, _mode, data);
       }
     }
   }
