@@ -1,36 +1,58 @@
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useCallback, useEffect, useRef, useState } from "react";
 import { sub } from "ueve/async";
-import {$benchmarkEnd, $benchmarkStart, $suiteEnd, $suiteStart} from "@isitfast/events";
-import {Either, Offset, SuiteAny} from "@isitfast/types";
+import {$benchmarkEnd, $benchmarkStart, $offsetEnd, $offsetStart, $suiteEnd, $suiteStart} from "@isitfast/events";
+import {Either, Offset, SuiteAny, Type} from "@isitfast/types";
 import { Box, render, Text } from "ink";
+import {Loading} from "../components/Loading.js";
 
 type Props = { suite: SuiteAny };
 
 export const TerminalVerbose: FunctionComponent<Props> = ({ suite }) => {
-  const [suiteName, setSuiteName] = useState<Either<[string, null]>>(null);
-  const [benchmarks, setBenchmarks] = useState<{ name: string, data?: { cpu: Offset; ram: Offset; } }[]>([]);
-  const [, setEnd] = useState(false);
+  const [, _] = useState({});
+  const _suiteName = useRef<Either<[string, null]>>(null);
+  const _benchmarks = useRef<Record<string, { type: Type, data?: { cpu: Offset, ram: Offset } }>>({});
+  const _benchmarkNames = useRef<string[]>([]);
+  const _offsets = useRef<Record<string, Either<[Offset, null]>>>({} as never);
+  const _offsetNames = useRef<string[]>([]);
+  const _longestBenchmarkName = useRef<number>(0);
+  // TODO: get rid of this and use a proper state management solution
+  const forceRender = useCallback(() => _({}), []);
 
   useEffect(() => {
     const unsubs = [
-      sub($suiteStart, async ({ suiteName }) => {
-        setSuiteName(suiteName);
+      sub($suiteStart, async ({ suiteName, benchmarkNames }) => {
+        _suiteName.current = suiteName;
+        _longestBenchmarkName.current = Math.max(...benchmarkNames.map((v) => v.length));
+
+        forceRender();
       }),
       sub($suiteEnd, async () => {
-        setEnd(true);
+        forceRender();
       }),
-      sub($benchmarkStart, async ({ benchmarkName }) => {
-        setBenchmarks((v) => [...v, { name: benchmarkName}]);
-      }),
-      sub($benchmarkEnd, async ({ data }) => {
-        setBenchmarks((v) => {
-          const last = v[v.length - 1];
+      sub($benchmarkStart, async ({ benchmarkName, type }) => {
+        _benchmarks.current[benchmarkName] = { type };
+        _benchmarkNames.current.push(benchmarkName);
 
-          if(last) last.data = data;
-
-          return v;
-        });
+        forceRender();
       }),
+      sub($benchmarkEnd, async ({ benchmarkName, data }) => {
+        _benchmarks.current[benchmarkName].data = data;
+
+        forceRender();
+      }),
+      sub($offsetStart, async ({ type, mode }) => {
+        const name = `${type}-${mode}`;
+        _offsets.current[name] = null;
+        _offsetNames.current.push(name);
+
+        forceRender();
+      }),
+      sub($offsetEnd, async ({ type, mode, offset }) => {
+        const name = `${type}-${mode}`;
+        _offsets.current[name] = offset;
+
+        forceRender();
+      })
     ];
 
     suite.run();
@@ -42,15 +64,40 @@ export const TerminalVerbose: FunctionComponent<Props> = ({ suite }) => {
 
   return (
     <Box flexDirection="column">
-      <Text bold={true} color="whiteBright">{suiteName}</Text>
-
+      <Text bold={true} color="white">
+        {_suiteName.current}
+      </Text>
 
       <Box flexDirection="column" marginTop={1}>
-        {benchmarks.map(({ name, data }) => (
-          <Text key={name}>
-            {name} - {data?.cpu.median}({data?.cpu.iterations}) - {data?.ram.median}({data?.ram.iterations})
-          </Text>)
-        )}
+        {_benchmarkNames.current.map((name) => {
+          const { type, data } = _benchmarks.current[name];
+          const paddedName = name.padEnd(_longestBenchmarkName.current);
+          const offsetCpu = _offsets.current[`${type}-cpu`]?.median || 0
+          const offsetRam = _offsets.current[`${type}-ram`]?.median || 0
+          const isLoading = data === undefined;
+          const cpuRaw = data?.cpu.median || 0;
+          const ramRaw = data?.ram.median || 0;
+          const cpu = cpuRaw - offsetCpu;
+          const ram = ramRaw - offsetRam;
+
+          return (
+            <Text key={name}>
+              {paddedName} {isLoading ? <Loading />: `${cpu} | ${ram}`}
+            </Text>
+          );
+        })}
+      </Box>
+
+      <Box flexDirection="column" marginTop={1}>
+        {_offsetNames.current.map((name) => {
+          const [type, mode] = name.split("-");
+          const offset = _offsets.current[name];
+          const isLoading = offset === null;
+
+          return (
+            <Text key={name}>{type} {mode} {isLoading ? <Loading />: offset.median}</Text>
+          );
+        })}
       </Box>
     </Box>
   );
