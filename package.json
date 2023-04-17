@@ -1,12 +1,11 @@
 {
   "name": "isitfast",
-  "version": "0.0.0",
-  "private": true,
+  "type": "module",
+  "version": "0.0.8",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "build": "turbo run build",
     "fix:format": "prettier --write \"**/*.ts\"",
     "fix:lint": "eslint --fix --ext .ts .",
     "fix": "pnpm fix:lint && pnpm fix:format",
@@ -15,6 +14,7 @@
     "check": "pnpm check:lint && pnpm check:format"
   },
   "devDependencies": {
+    "@types/node": "18.15.5",
     "@typescript-eslint/eslint-plugin": "5.56.0",
     "@typescript-eslint/parser": "5.56.0",
     "eslint": "8.37.0",
