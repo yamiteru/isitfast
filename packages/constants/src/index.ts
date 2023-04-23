@@ -1,30 +1,36 @@
 import {
-  Benchmarks,
   Mode,
-  Offset,
-  OffsetMin,
-  Offsets,
-  Options,
-  Store,
-  Stores,
+  BenchmarkResult,
   Type,
   Fn,
-  Either
+  Either,
+  BenchmarkResults,
 } from "@isitfast/types";
 
-export const STATE: {
-  name: string;
-  options: Options;
-  benchmarks: Benchmarks<any>;
-  setup: Fn<[], any>;
-  onSuiteStart: Fn<[any], Promise<void>>;
-  onSuiteEnd: Fn<[any], Promise<void>>;
+export const CHUNK_SIZE = 10;
+export const SAMPLE_SIZE = 5;
+export const DEVIATION_MAX = 1;
+export const BENCHMARK_TIMEOUT = 10_000;
+export const COMPARE_SIZE = 3;
+export const MATCH_NUMBER = SAMPLE_SIZE;
+export const ARRAY_CHUNK = new Uint32Array(CHUNK_SIZE*2);
+export const ARRAY_BEFORE = new Uint32Array(COMPARE_SIZE);
+export const ARRAY_AFTER = new Uint32Array(COMPARE_SIZE + 1);
+
+export const CURRENT: Partial<{
+  suiteName:string;
+  benchmarkName:string;
+  benchmarkNames: string[];
+  onSuiteStart: Fn<[], Promise<void>>;
+  onSuiteEnd: Fn<[], Promise<void>>;
+  onBenchmarkStart: Fn<[Either<[string, undefined]>], Either<[Promise<void>, undefined]>>;
+  onBenchmarkEnd: Fn<[Either<[string, undefined]>, BenchmarkResults], Either<[Promise<void>, undefined]>>;
+  onIterationStart: Fn<[Either<[string, undefined]>], Either<[Promise<void>, undefined]>>;
+  onIterationEnd: Fn<[Either<[string, undefined]>, number, boolean], Either<[Promise<void>, undefined]>>;
+  type: Type;
+  mode: Mode;
   data: any;
-  offsets: Offsets;
-  stores: Stores;
-  collectGarbage: Fn<[], void>;
-  min: Record<Type, Record<Mode, Either<[null, number]>>>;
-} = {} as never;
+}> = {};
 
 // Empty async function used to determine the overhead of async functions
 export const FN_ASYNC = async () => {
@@ -36,38 +42,8 @@ export const FN_SYNC = () => {
   /* */
 };
 
-export const OFFSET_MIN: OffsetMin = {
-  async: {
-    cpu: null,
-    ram: null,
-  },
-  sync: {
-    cpu: null,
-    ram: null,
-  },
-};
-
-// Default options used in `preset`
-export const OPTIONS: Options = {
-  cpu: {
-    chunkSize: 2_000,
-    deviationPercent: 1,
-  },
-  ram: {
-    chunkSize: 10,
-    deviationPercent: 1,
-  },
-  offset: {
-    koefficient: 1,
-    allow: true,
-  },
-  gc: {
-    allow: true,
-  },
-};
-
 // Default offset
-export const OFFSET: Offset = {
+export const OFFSET: BenchmarkResult = {
   min: 0,
   max: 0,
   mean: 0,
@@ -107,41 +83,8 @@ export const OFFSET: Offset = {
   iterations: 0,
 };
 
-// Default offsets
-export const OFFSETS: Offsets = {
-  async: {
-    cpu: OFFSET,
-    ram: OFFSET,
-  },
-  sync: {
-    cpu: OFFSET,
-    ram: OFFSET,
-  },
-};
-
-// Default store
-export const STORE: Store = {
-  array: new Uint32Array(),
-  index: 0,
-  offset: 0,
-  count: 0,
-};
-
-// Default stores
-export const STORES = {
-  cpu: {
-    chunk: STORE,
-    main: STORE,
-  },
-  ram: {
-    chunk: STORE,
-    main: STORE,
-  },
-};
-
 export const IS_NODE = typeof process !== "undefined";
 
-// Node.js uses nanoseconds, browsers use milliseconds
 export const TIME_UNIT = IS_NODE ? "ns" : "ms";
 
 export const NS_IN_SECOND = 1_000_000_000;
