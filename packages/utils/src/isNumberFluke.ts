@@ -1,25 +1,21 @@
-import {COMPARE_SIZE, ARRAY_BEFORE, ARRAY_AFTER} from "@isitfast/constants";
-import {median} from "./median.js";
-import {variance} from "./variance.js";
-import {standardDeviation} from "./standardDeviation.js";
+import { COMPARE_SIZE, ARRAY_BEFORE, ARRAY_AFTER } from "@isitfast/constants";
+import { median } from "./median.js";
+import { variance } from "./variance.js";
+import { standardDeviation } from "./standardDeviation.js";
 
 export function isNumberFluke(
   array: Uint32Array,
   index: number,
   number: number,
 ) {
-  if(number === 0) {
+  if (number === 0) {
     return true;
   }
 
   if (index >= COMPARE_SIZE) {
     const isOverArrayLength = index > array.length;
-    const ceil = isOverArrayLength
-      ? array.length
-      : index;
-    const slice = isOverArrayLength
-      ? array
-      : array.slice(0, index);
+    const ceil = isOverArrayLength ? array.length : index;
+    const slice = isOverArrayLength ? array : array.slice(0, index);
 
     for (let i = ceil - COMPARE_SIZE, j = 0; i < ceil; i++, j++) {
       ARRAY_BEFORE[j] = slice[i];

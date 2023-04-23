@@ -1,8 +1,20 @@
-import {CURRENT} from "@isitfast/constants";
-import {BenchmarkResult, BenchmarkResults, Mode, Type} from "@isitfast/types";
+import { CURRENT } from "@isitfast/constants";
+import { BenchmarkResult, BenchmarkResults, Mode, Type } from "@isitfast/types";
 import { pub } from "ueve/async";
-import {$garbageStart, $garbageEnd, $suiteStart, $suiteEnd, $benchmarkStart, $benchmarkEnd, $offsetStart, $offsetEnd, $iterationStart, $iterationEnd, $sample} from "@isitfast/events";
-import {gc} from "@isitfast/utils";
+import {
+  $garbageStart,
+  $garbageEnd,
+  $suiteStart,
+  $suiteEnd,
+  $benchmarkStart,
+  $benchmarkEnd,
+  $offsetStart,
+  $offsetEnd,
+  $iterationStart,
+  $iterationEnd,
+  $sample,
+} from "@isitfast/events";
+import { gc } from "@isitfast/utils";
 
 export async function collectGarbage() {
   await pub($garbageStart, { suiteName: CURRENT.suiteName });
@@ -32,11 +44,11 @@ export async function benchmarkStart() {
   await pub($benchmarkStart, {
     suiteName: CURRENT.suiteName,
     benchmarkName: CURRENT.benchmarkName,
-    type: CURRENT.type
+    type: CURRENT.type,
   });
 }
 
-export async function benchmarkEnd({data}: {data: BenchmarkResults}) {
+export async function benchmarkEnd({ data }: { data: BenchmarkResults }) {
   await CURRENT.onBenchmarkEnd?.(CURRENT.benchmarkName, data);
   await pub($benchmarkEnd, {
     suiteName: CURRENT.suiteName,
@@ -46,12 +58,41 @@ export async function benchmarkEnd({data}: {data: BenchmarkResults}) {
   });
 }
 
-export async function offsetStart({name, type, mode}: {name: string, type: Type, mode: Mode}) {
-  await pub($offsetStart, { suiteName: CURRENT.suiteName, offsetName: name, type, mode });
+export async function offsetStart({
+  name,
+  type,
+  mode,
+}: {
+  name: string;
+  type: Type;
+  mode: Mode;
+}) {
+  await pub($offsetStart, {
+    suiteName: CURRENT.suiteName,
+    offsetName: name,
+    type,
+    mode,
+  });
 }
 
-export async function offsetEnd({name, type, mode, offset}: {name: string, type: Type, mode: Mode, offset: BenchmarkResult}) {
-  await pub($offsetEnd, { suiteName: CURRENT.suiteName, offsetName: name, type, mode, offset });
+export async function offsetEnd({
+  name,
+  type,
+  mode,
+  offset,
+}: {
+  name: string;
+  type: Type;
+  mode: Mode;
+  offset: BenchmarkResult;
+}) {
+  await pub($offsetEnd, {
+    suiteName: CURRENT.suiteName,
+    offsetName: name,
+    type,
+    mode,
+    offset,
+  });
 }
 
 export async function iterationStart() {
@@ -64,7 +105,10 @@ export async function iterationStart() {
   });
 }
 
-export async function iterationEnd({data, isFluke}: {
+export async function iterationEnd({
+  data,
+  isFluke,
+}: {
   data: number;
   isFluke: boolean;
 }) {
@@ -79,9 +123,7 @@ export async function iterationEnd({data, isFluke}: {
   });
 }
 
-export async function sample({offset}: {
-  offset: BenchmarkResult
-}) {
+export async function sample({ offset }: { offset: BenchmarkResult }) {
   await pub($sample, {
     suiteName: CURRENT.suiteName,
     benchmarkName: CURRENT.benchmarkName,

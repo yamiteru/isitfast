@@ -8,11 +8,11 @@ export type SuiteStart = {
 
 export const $suiteStart = eve<SuiteStart>();
 
-export type SuiteEnd ={ suiteName?: string };
+export type SuiteEnd = { suiteName?: string };
 
 export const $suiteEnd = eve<SuiteEnd>();
 
-export type OffsetStart ={
+export type OffsetStart = {
   suiteName?: string;
   offsetName: string;
   type: Type;
@@ -31,7 +31,7 @@ export type OffsetEnd = {
 
 export const $offsetEnd = eve<OffsetEnd>();
 
-export type BenchmarkStart ={
+export type BenchmarkStart = {
   suiteName?: string;
   benchmarkName?: string;
   type?: Type;
@@ -69,7 +69,7 @@ export type IterationStart = {
 
 export const $iterationStart = eve<IterationStart>();
 
-export type IterationEnd ={
+export type IterationEnd = {
   suiteName?: string;
   benchmarkName?: string;
   type?: Type;
