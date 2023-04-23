@@ -1,7 +1,13 @@
 import { CURRENT, FN_ASYNC } from "@isitfast/constants";
-import { BenchmarkFunction, BenchmarkEvents, Fn, Either, BenchmarkResults } from "@isitfast/types";
-import {benchmark} from "./utils/benchmark.js";
-import {suiteEnd, suiteStart} from "./utils/events.js";
+import {
+  BenchmarkFunction,
+  BenchmarkEvents,
+  Fn,
+  Either,
+  BenchmarkResults,
+} from "@isitfast/types";
+import { benchmark } from "./utils/benchmark.js";
+import { suiteEnd, suiteStart } from "./utils/events.js";
 
 export { benchmark } from "./utils/benchmark.js";
 
@@ -10,10 +16,13 @@ export class Suite<$Data, $BenchmarkNames extends string[] = []> {
   private dataFunction: Fn<[], $Data>;
   private onSuiteStartFunction: Fn<[], Promise<void>>;
   private onSuiteEndFunction: Fn<[], Promise<void>>;
-  private benchmarkFunctions: Record<$BenchmarkNames[number], {
-    benchmark: BenchmarkFunction;
-    events: BenchmarkEvents;
-  }>;
+  private benchmarkFunctions: Record<
+    $BenchmarkNames[number],
+    {
+      benchmark: BenchmarkFunction;
+      events: BenchmarkEvents;
+    }
+  >;
   private benchmarkNames: $BenchmarkNames;
 
   constructor(name: string) {
@@ -54,15 +63,33 @@ export class Suite<$Data, $BenchmarkNames extends string[] = []> {
     return this as unknown as Suite<$Data, [...$BenchmarkNames, $Name]>;
   }
 
-
   public async run() {
     CURRENT.suiteName = this.name;
     CURRENT.onSuiteStart = this.onSuiteStartFunction;
     CURRENT.onSuiteEnd = this.onSuiteEndFunction;
-    CURRENT.onBenchmarkStart = (benchmarkName: Either<[string, undefined]>) => this.benchmarkFunctions?.[benchmarkName as $BenchmarkNames[number]].events.onBenchmarkStart?.();
-    CURRENT.onBenchmarkEnd = (benchmarkName: Either<[string, undefined]>, data: BenchmarkResults) => this.benchmarkFunctions?.[benchmarkName as $BenchmarkNames[number]].events.onBenchmarkEnd?.(data);
-    CURRENT.onIterationStart = (benchmarkName: Either<[string, undefined]>) => this.benchmarkFunctions?.[benchmarkName as $BenchmarkNames[number]].events.onIterationStart?.();
-    CURRENT.onIterationEnd = (benchmarkName: Either<[string, undefined]>, data: number, isGCFluke: boolean) => this.benchmarkFunctions?.[benchmarkName as $BenchmarkNames[number]].events.onIterationEnd?.(data, isGCFluke);
+    CURRENT.onBenchmarkStart = (benchmarkName: Either<[string, undefined]>) =>
+      this.benchmarkFunctions?.[
+        benchmarkName as $BenchmarkNames[number]
+      ].events.onBenchmarkStart?.();
+    CURRENT.onBenchmarkEnd = (
+      benchmarkName: Either<[string, undefined]>,
+      data: BenchmarkResults,
+    ) =>
+      this.benchmarkFunctions?.[
+        benchmarkName as $BenchmarkNames[number]
+      ].events.onBenchmarkEnd?.(data);
+    CURRENT.onIterationStart = (benchmarkName: Either<[string, undefined]>) =>
+      this.benchmarkFunctions?.[
+        benchmarkName as $BenchmarkNames[number]
+      ].events.onIterationStart?.();
+    CURRENT.onIterationEnd = (
+      benchmarkName: Either<[string, undefined]>,
+      data: number,
+      isGCFluke: boolean,
+    ) =>
+      this.benchmarkFunctions?.[
+        benchmarkName as $BenchmarkNames[number]
+      ].events.onIterationEnd?.(data, isGCFluke);
     CURRENT.data = this.dataFunction();
 
     await suiteStart();

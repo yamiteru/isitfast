@@ -13,20 +13,32 @@ export const DEVIATION_MAX = 1;
 export const BENCHMARK_TIMEOUT = 10_000;
 export const COMPARE_SIZE = 3;
 export const MATCH_NUMBER = SAMPLE_SIZE;
-export const ARRAY_CHUNK = new Uint32Array(CHUNK_SIZE*2);
+export const ARRAY_CHUNK = new Uint32Array(CHUNK_SIZE * 2);
 export const ARRAY_BEFORE = new Uint32Array(COMPARE_SIZE);
 export const ARRAY_AFTER = new Uint32Array(COMPARE_SIZE + 1);
 
 export const CURRENT: Partial<{
-  suiteName:string;
-  benchmarkName:string;
+  suiteName: string;
+  benchmarkName: string;
   benchmarkNames: string[];
   onSuiteStart: Fn<[], Promise<void>>;
   onSuiteEnd: Fn<[], Promise<void>>;
-  onBenchmarkStart: Fn<[Either<[string, undefined]>], Either<[Promise<void>, undefined]>>;
-  onBenchmarkEnd: Fn<[Either<[string, undefined]>, BenchmarkResults], Either<[Promise<void>, undefined]>>;
-  onIterationStart: Fn<[Either<[string, undefined]>], Either<[Promise<void>, undefined]>>;
-  onIterationEnd: Fn<[Either<[string, undefined]>, number, boolean], Either<[Promise<void>, undefined]>>;
+  onBenchmarkStart: Fn<
+    [Either<[string, undefined]>],
+    Either<[Promise<void>, undefined]>
+  >;
+  onBenchmarkEnd: Fn<
+    [Either<[string, undefined]>, BenchmarkResults],
+    Either<[Promise<void>, undefined]>
+  >;
+  onIterationStart: Fn<
+    [Either<[string, undefined]>],
+    Either<[Promise<void>, undefined]>
+  >;
+  onIterationEnd: Fn<
+    [Either<[string, undefined]>, number, boolean],
+    Either<[Promise<void>, undefined]>
+  >;
   type: Type;
   mode: Mode;
   data: any;
@@ -81,6 +93,7 @@ export const OFFSET: BenchmarkResult = {
     "99.999": 0,
   },
   iterations: 0,
+  elapsed: 0,
 };
 
 export const IS_NODE = typeof process !== "undefined";

@@ -1,8 +1,11 @@
 import { BenchmarkResult } from "@isitfast/types";
-import {deviations} from "./deviations.js";
-import {histogram} from "./histogram.js";
+import { deviations } from "./deviations.js";
+import { histogram } from "./histogram.js";
 
-export function getOffset(chunk: Uint32Array, iterations: number): BenchmarkResult {
+export function getOffset(
+  chunk: Uint32Array,
+  iterations: number,
+): BenchmarkResult {
   const {
     min,
     max,
@@ -27,5 +30,6 @@ export function getOffset(chunk: Uint32Array, iterations: number): BenchmarkResu
     },
     histogram: histogram(chunk),
     iterations,
+    elapsed: 0,
   };
 }

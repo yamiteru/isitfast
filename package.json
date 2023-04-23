@@ -22,7 +22,7 @@
     "husky": "8.0.3",
     "prettier": "2.8.7",
     "turbo": "1.8.8",
-    "typescript": "next"
+    "typescript": "4.9.5"
   },
   "engines": {
     "node": ">=16.0.0"

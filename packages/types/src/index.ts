@@ -4,7 +4,10 @@ export type Fn<$Input extends unknown[], $Output> = (
   ...props: $Input
 ) => $Output;
 
-export type BenchmarkFunction<$Data = any> = Fn<[$Data], Either<[Promise<void>, Promise<unknown>, void, unknown]>>;
+export type BenchmarkFunction<$Data = any> = Fn<
+  [$Data],
+  Either<[Promise<void>, Promise<unknown>, void, unknown]>
+>;
 
 export type BenchmarkEvents = Partial<{
   onIterationStart: Fn<[], Promise<void>>;
