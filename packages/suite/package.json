@@ -11,6 +11,6 @@
     "@isitfast/events": "workspace:*",
     "@isitfast/constants": "workspace:*",
     "@isitfast/modes": "workspace:*",
-    "ueve": "1.4.0"
+    "ueve": "1.69.0"
   }
 }

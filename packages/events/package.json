@@ -7,6 +7,6 @@
     "@isitfast/types": "workspace:*"
   },
   "dependencies": {
-    "ueve": "1.4.0"
+    "ueve": "1.69.0"
   }
 }
