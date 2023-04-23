@@ -1,66 +1,93 @@
 import { eve } from "ueve/async";
-import { Mode, Offset, Type } from "@isitfast/types";
+import { Mode, BenchmarkResult, Type, BenchmarkResults } from "@isitfast/types";
 
-export const $suiteStart = eve<{
-  suiteName: string;
-  benchmarkNames: string[];
-}>();
+export type SuiteStart = {
+  suiteName?: string;
+  benchmarkNames?: string[];
+};
 
-export const $suiteEnd = eve<{ suiteName: string }>();
+export const $suiteStart = eve<SuiteStart>();
 
-export const $offsetStart = eve<{
-  suiteName: string;
+export type SuiteEnd ={ suiteName?: string };
+
+export const $suiteEnd = eve<SuiteEnd>();
+
+export type OffsetStart ={
+  suiteName?: string;
   offsetName: string;
   type: Type;
   mode: Mode;
-}>();
+};
 
-export const $offsetEnd = eve<{
-  suiteName: string;
-  offsetName: string;
-  type: Type;
-  mode: Mode;
-  offset: Offset;
-}>();
+export const $offsetStart = eve<OffsetStart>();
 
-export const $benchmarkStart = eve<{
-  suiteName: string;
-  benchmarkName: string;
-  type: Type;
-}>();
+export type OffsetEnd = {
+  suiteName?: string;
+  offsetName?: string;
+  type?: Type;
+  mode?: Mode;
+  offset?: BenchmarkResult;
+};
 
-export const $benchmarkEnd = eve<{
-  suiteName: string;
-  benchmarkName: string;
-  type: Type;
-  data: {
-    cpu: Offset;
-    ram: Offset;
-  };
-}>();
+export const $offsetEnd = eve<OffsetEnd>();
 
-export const $garbageStart = eve<{
-  suiteName: string;
-}>();
+export type BenchmarkStart ={
+  suiteName?: string;
+  benchmarkName?: string;
+  type?: Type;
+};
 
-export const $garbageEnd = eve<{
-  suiteName: string;
-}>();
+export const $benchmarkStart = eve<BenchmarkStart>();
 
-export const $iterationStart = eve<{
-  suiteName: string;
-  benchmarkName: string;
-  type: Type;
-  mode: Mode;
-}>();
+export type BenchmarkEnd = {
+  suiteName?: string;
+  benchmarkName?: string;
+  type?: Type;
+  data: BenchmarkResults;
+};
 
-export const $iterationEnd = eve<{
-  suiteName: string;
-  benchmarkName: string;
-  type: Type;
-  mode: Mode;
+export const $benchmarkEnd = eve<BenchmarkEnd>();
+
+export type GarbageStart = {
+  suiteName?: string;
+};
+
+export const $garbageStart = eve<GarbageStart>();
+
+export type GarbageEnd = {
+  suiteName?: string;
+};
+
+export const $garbageEnd = eve<GarbageEnd>();
+
+export type IterationStart = {
+  suiteName?: string;
+  benchmarkName?: string;
+  type?: Type;
+  mode?: Mode;
+};
+
+export const $iterationStart = eve<IterationStart>();
+
+export type IterationEnd ={
+  suiteName?: string;
+  benchmarkName?: string;
+  type?: Type;
+  mode?: Mode;
   data: number;
-  isGCFluke: boolean;
-}>();
+  isFluke: boolean;
+};
+
+export const $iterationEnd = eve<IterationEnd>();
+
+export type Sample = {
+  suiteName?: string;
+  benchmarkName?: string;
+  type?: Type;
+  mode?: Mode;
+  offset: BenchmarkResult;
+};
+
+export const $sample = eve<Sample>();
 
 export { sub, clr, has } from "ueve/async";
