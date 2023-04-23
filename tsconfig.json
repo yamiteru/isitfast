@@ -13,8 +13,8 @@
     "esModuleInterop": true,
     "declaration": true,
     "noImplicitAny": true,
-    "typeRoots": ["./packages/types/@types", "./node_modules/@types"]
+    "typeRoots": ["@types", "node_modules/@types"]
   },
-  "include": ["packages/**/src/**/*"],
+  "include": ["packages/**/*"],
   "exclude": ["node_modules", "packages/**/node_modules"]
 }
