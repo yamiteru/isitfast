@@ -28,6 +28,21 @@ export async function benchmark(...props: unknown[]) {
     ram: await collect({ type, mode: "ram", fn }),
   };
 
+  if (CURRENT.suiteName) {
+    const keyCpu = `${type}-cpu`;
+    const minCpu = CURRENT.min?.[keyCpu];
+    const keyRam = `${type}-ram`;
+    const minRam = CURRENT.min?.[keyRam];
+
+    if (minCpu === undefined || data.cpu.median < minCpu) {
+      (CURRENT.min as Record<string, number>)[keyCpu] = data.cpu.median;
+    }
+
+    if (minRam === undefined || data.ram.median < minRam) {
+      (CURRENT.min as Record<string, number>)[keyRam] = data.ram.median;
+    }
+  }
+
   await benchmarkEnd({ data });
 
   return data;

@@ -54,7 +54,6 @@ export type BenchmarkResult = {
     "99.999": number;
   };
   iterations: number;
-  elapsed: number;
 };
 
 export type BenchmarkResults = {

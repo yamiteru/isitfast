@@ -7,15 +7,18 @@ import {
   BenchmarkResults,
 } from "@isitfast/types";
 
-export const CHUNK_SIZE = 10;
-export const SAMPLE_SIZE = 5;
+export const CHUNK_SIZE = 100;
+export const SAMPLE_SIZE = 10;
 export const DEVIATION_MAX = 1;
-export const BENCHMARK_TIMEOUT = 10_000;
+export const COLLECT_TIMEOUT = 10_000;
 export const COMPARE_SIZE = 3;
+export const FLUKE_PERCENT = 0.025;
 export const MATCH_NUMBER = SAMPLE_SIZE;
 export const ARRAY_CHUNK = new Uint32Array(CHUNK_SIZE * 2);
 export const ARRAY_BEFORE = new Uint32Array(COMPARE_SIZE);
 export const ARRAY_AFTER = new Uint32Array(COMPARE_SIZE + 1);
+export const TYPES: Type[] = ["async", "sync"];
+export const MODES: Mode[] = ["cpu", "ram"];
 
 export const CURRENT: Partial<{
   suiteName: string;
@@ -31,6 +34,8 @@ export const CURRENT: Partial<{
     [Either<[string, undefined]>, BenchmarkResults],
     Either<[Promise<void>, undefined]>
   >;
+  onOffsetStart: Fn<[Type, Mode], Either<[Promise<void>, undefined]>>;
+  onOffsetEnd: Fn<[Type, Mode, number], Either<[Promise<void>, undefined]>>;
   onIterationStart: Fn<
     [Either<[string, undefined]>],
     Either<[Promise<void>, undefined]>
@@ -42,6 +47,7 @@ export const CURRENT: Partial<{
   type: Type;
   mode: Mode;
   data: any;
+  min: Record<string, number>;
 }> = {};
 
 // Empty async function used to determine the overhead of async functions
@@ -93,7 +99,6 @@ export const OFFSET: BenchmarkResult = {
     "99.999": 0,
   },
   iterations: 0,
-  elapsed: 0,
 };
 
 export const IS_NODE = typeof process !== "undefined";

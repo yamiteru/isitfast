@@ -1,13 +1,22 @@
-import { CURRENT, FN_ASYNC } from "@isitfast/constants";
+import { CURRENT, FN_ASYNC, MODES, TYPES } from "@isitfast/constants";
 import {
   BenchmarkFunction,
   BenchmarkEvents,
   Fn,
   Either,
   BenchmarkResults,
+  Type,
+  Mode,
+  BenchmarkResult,
 } from "@isitfast/types";
 import { benchmark } from "./utils/benchmark.js";
-import { suiteEnd, suiteStart } from "./utils/events.js";
+import {
+  offsetEnd,
+  offsetStart,
+  suiteEnd,
+  suiteStart,
+} from "./utils/events.js";
+import { offset } from "./utils/offset.js";
 
 export { benchmark } from "./utils/benchmark.js";
 
@@ -70,18 +79,22 @@ export class Suite<$Data, $BenchmarkNames extends string[] = []> {
     CURRENT.onBenchmarkStart = (benchmarkName: Either<[string, undefined]>) =>
       this.benchmarkFunctions?.[
         benchmarkName as $BenchmarkNames[number]
-      ].events.onBenchmarkStart?.();
+      ]?.events.onBenchmarkStart?.();
     CURRENT.onBenchmarkEnd = (
       benchmarkName: Either<[string, undefined]>,
       data: BenchmarkResults,
     ) =>
       this.benchmarkFunctions?.[
         benchmarkName as $BenchmarkNames[number]
-      ].events.onBenchmarkEnd?.(data);
+      ]?.events.onBenchmarkEnd?.(data);
+    CURRENT.onOffsetStart = (type: Type, mode: Mode) =>
+      offsetStart({ type, mode });
+    CURRENT.onOffsetEnd = (type: Type, mode: Mode, median: number) =>
+      offsetEnd({ type, mode, median });
     CURRENT.onIterationStart = (benchmarkName: Either<[string, undefined]>) =>
       this.benchmarkFunctions?.[
         benchmarkName as $BenchmarkNames[number]
-      ].events.onIterationStart?.();
+      ]?.events.onIterationStart?.();
     CURRENT.onIterationEnd = (
       benchmarkName: Either<[string, undefined]>,
       data: number,
@@ -89,19 +102,32 @@ export class Suite<$Data, $BenchmarkNames extends string[] = []> {
     ) =>
       this.benchmarkFunctions?.[
         benchmarkName as $BenchmarkNames[number]
-      ].events.onIterationEnd?.(data, isGCFluke);
+      ]?.events.onIterationEnd?.(data, isGCFluke);
     CURRENT.data = this.dataFunction();
+    CURRENT.min = {};
 
     await suiteStart();
+
     await this.runBenchmarks();
+    await this.runOffsets();
+
     await suiteEnd();
   }
 
   private async runBenchmarks() {
-    for (const name in this.benchmarkNames) {
-      const n = name as $BenchmarkNames[number];
+    for (const name of this.benchmarkNames) {
+      await benchmark(
+        name,
+        this.benchmarkFunctions[name as $BenchmarkNames[number]].benchmark,
+      );
+    }
+  }
 
-      await benchmark(n, this.benchmarkFunctions[n].benchmark);
+  private async runOffsets() {
+    for (const type of TYPES) {
+      for (const mode of MODES) {
+        await offset(type, mode);
+      }
     }
   }
 }

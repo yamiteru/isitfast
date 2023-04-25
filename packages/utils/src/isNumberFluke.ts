@@ -1,4 +1,9 @@
-import { COMPARE_SIZE, ARRAY_BEFORE, ARRAY_AFTER } from "@isitfast/constants";
+import {
+  COMPARE_SIZE,
+  ARRAY_BEFORE,
+  ARRAY_AFTER,
+  FLUKE_PERCENT,
+} from "@isitfast/constants";
 import { median } from "./median.js";
 import { variance } from "./variance.js";
 import { standardDeviation } from "./standardDeviation.js";
@@ -33,13 +38,12 @@ export function isNumberFluke(
     const afterDeviation =
       standardDeviation(variance(ARRAY_AFTER)) / beforeMedian;
     const diff = afterDeviation - beforeDeviation;
-    const result = !(
+
+    return !(
       beforeDeviation === afterDeviation ||
-      diff < 0.2 ||
+      diff < FLUKE_PERCENT ||
       number <= max
     );
-
-    return result;
   }
 
   return false;

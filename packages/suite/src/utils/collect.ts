@@ -1,6 +1,6 @@
 import {
   FN_ASYNC,
-  BENCHMARK_TIMEOUT,
+  COLLECT_TIMEOUT,
   NS_IN_SECOND,
   CURRENT,
   CHUNK_SIZE,
@@ -43,8 +43,9 @@ export async function collect<$Data>({
   const isCpu = mode === "cpu";
   const measure = (isCpu ? now : mem) as Fn<[], number>;
   const gc = isCpu ? FN_ASYNC : collectGarbage;
-  const timeout = now() + BigInt((BENCHMARK_TIMEOUT * NS_IN_SECOND) / 1000);
+  const timeout = now() + BigInt((COLLECT_TIMEOUT * NS_IN_SECOND) / 1000);
 
+  CURRENT.type = type;
   CURRENT.mode = mode;
 
   iterations = 0;
