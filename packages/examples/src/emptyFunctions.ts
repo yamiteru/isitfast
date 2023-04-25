@@ -1,5 +1,5 @@
-import { Suite } from "../src";
-import { useTerminalCompact } from "../src/modes";
+import { Suite } from "@isitfast/suite";
+import { useTerminalVerbose } from "@isitfast/modes";
 
 const emptyFunctions = new Suite("Empty functions")
   .add("empty async", async function () {
@@ -9,6 +9,4 @@ const emptyFunctions = new Suite("Empty functions")
     /* */
   });
 
-useTerminalCompact();
-
-emptyFunctions.run();
+useTerminalVerbose(emptyFunctions);

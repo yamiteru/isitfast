@@ -58,40 +58,28 @@ export async function benchmarkEnd({ data }: { data: BenchmarkResults }) {
   });
 }
 
-export async function offsetStart({
-  name,
-  type,
-  mode,
-}: {
-  name: string;
-  type: Type;
-  mode: Mode;
-}) {
+export async function offsetStart({ type, mode }: { type: Type; mode: Mode }) {
   await pub($offsetStart, {
     suiteName: CURRENT.suiteName,
-    offsetName: name,
     type,
     mode,
   });
 }
 
 export async function offsetEnd({
-  name,
   type,
   mode,
-  offset,
+  median,
 }: {
-  name: string;
   type: Type;
   mode: Mode;
-  offset: BenchmarkResult;
+  median: number;
 }) {
   await pub($offsetEnd, {
     suiteName: CURRENT.suiteName,
-    offsetName: name,
     type,
     mode,
-    offset,
+    median,
   });
 }
 

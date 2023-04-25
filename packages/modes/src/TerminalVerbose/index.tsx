@@ -1,7 +1,7 @@
 import { FunctionComponent, useCallback, useEffect, useRef, useState } from "react";
 import { sub } from "ueve/async";
 import {$benchmarkEnd, $benchmarkStart, $offsetEnd, $offsetStart, $suiteEnd, $suiteStart} from "@isitfast/events";
-import {Either, Offset, SuiteAny, Type} from "@isitfast/types";
+import {Either, BenchmarkResult, SuiteAny, Type} from "@isitfast/types";
 import { Box, render, Text } from "ink";
 import {Loading} from "../components/Loading.js";
 
@@ -10,9 +10,9 @@ type Props = { suite: SuiteAny };
 export const TerminalVerbose: FunctionComponent<Props> = ({ suite }) => {
   const [, _] = useState({});
   const _suiteName = useRef<Either<[string, null]>>(null);
-  const _benchmarks = useRef<Record<string, { type: Type, data?: { cpu: Offset, ram: Offset } }>>({});
+  const _benchmarks = useRef<Record<string, { type: Type, data?: { cpu: BenchmarkResult, ram: BenchmarkResult } }>>({});
   const _benchmarkNames = useRef<string[]>([]);
-  const _offsets = useRef<Record<string, Either<[Offset, null]>>>({} as never);
+  const _offsets = useRef<Record<string, Either<[BenchmarkResult, null]>>>({} as never);
   const _offsetNames = useRef<string[]>([]);
   const _longestBenchmarkName = useRef<number>(0);
   // TODO: get rid of this and use a proper state management solution

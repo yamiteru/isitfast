@@ -14,7 +14,6 @@ export const $suiteEnd = eve<SuiteEnd>();
 
 export type OffsetStart = {
   suiteName?: string;
-  offsetName: string;
   type: Type;
   mode: Mode;
 };
@@ -23,10 +22,9 @@ export const $offsetStart = eve<OffsetStart>();
 
 export type OffsetEnd = {
   suiteName?: string;
-  offsetName?: string;
   type?: Type;
   mode?: Mode;
-  offset?: BenchmarkResult;
+  median?: number;
 };
 
 export const $offsetEnd = eve<OffsetEnd>();

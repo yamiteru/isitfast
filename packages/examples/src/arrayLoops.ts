@@ -27,5 +27,4 @@ const arrayLoops = new Suite("Array loops")
     data.forEach((v) => (result._ = v));
   });
 
-
 useTerminalVerbose(arrayLoops);

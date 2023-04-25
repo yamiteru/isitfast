@@ -1,3 +1,4 @@
+import { CHUNK_SIZE } from "@isitfast/constants";
 import { BenchmarkResult } from "@isitfast/types";
 import { deviations } from "./deviations.js";
 import { histogram } from "./histogram.js";
@@ -30,6 +31,5 @@ export function getOffset(
     },
     histogram: histogram(chunk),
     iterations,
-    elapsed: 0,
   };
 }
