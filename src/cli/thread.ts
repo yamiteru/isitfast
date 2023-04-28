@@ -1,12 +1,12 @@
 import {Mode} from "@types";
 import {isAsync as getIsAsync} from "@utils";
 import { Worker } from "node:worker_threads";
-import {transpileFile} from "./build.js";
+import {loadModule} from "./build.js";
 
 // TODO: use SharedArrayBuffer and Atomics
 export async function thread(sourceFile: string, mode: Mode) {
-  const outFile = await transpileFile(sourceFile);
-  const module = await import(outFile);
+  const outFile = await loadModule(sourceFile);
+  const module = await import(outFile as any);
   const [path, fn] =
     typeof module.default === "function"
       ? ["default", module.default]
