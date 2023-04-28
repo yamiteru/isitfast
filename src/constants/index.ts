@@ -26,6 +26,8 @@ export const ARRAY = {
   count: 0
 };
 
+export const FILE_CACHE = new Map<string, string>();
+
 export const CURRENT: Partial<{
   suiteName: string;
   benchmarkName: string;
