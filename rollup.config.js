@@ -5,10 +5,9 @@ export default {
   input: "src/index.ts",
   output: {
     dir: "dist",
+    format: "esm",
     compact: true,
     esModule: true,
-    format: "esm",
-    exports: "auto",
   },
   cache: true,
   treeshake: true,

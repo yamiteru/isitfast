@@ -1,22 +1,25 @@
-import { build, BuildOptions } from "esbuild";
+import { transformFile } from "@swc/core";
 import { randomUUID } from "node:crypto";
 import { homedir } from "node:os";
-
-const SHARED_OPTIONS = {
-  target: ["esnext", "node20.0.0"],
-  format: "esm",
-} as BuildOptions;
+import {FILE_CACHE} from "@constants";
+import {writeFile} from "node:fs/promises";
 
 export const transpileFile = async (path: string) => {
-  const outfile = `${homedir()}/.isitfast/cache/${randomUUID()}.mjs`;
+  const outFile = `${homedir()}/.isitfast/cache/${randomUUID()}.mjs`;
 
-  await build({
-    ...SHARED_OPTIONS,
-    platform: "node",
-    logLevel: "silent",
-    entryPoints: [path],
-    outfile,
-  });
+  if(!FILE_CACHE.has(path)) {
+    const output = await transformFile(path, {
+      jsc: {
+        parser: {
+          syntax: path.endsWith(".ts") ? "typescript": "ecmascript"
+        }
+      }
+    });
 
-  return outfile;
+    await writeFile(outFile, output.code)
+
+    FILE_CACHE.set(path, outFile)
+  }
+
+  return FILE_CACHE.get(path) as string;
 };
