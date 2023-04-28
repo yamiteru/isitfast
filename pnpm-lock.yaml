@@ -5,16 +5,16 @@ importers:
   .:
     dependencies:
       ink:
-        specifier: ^4.2.0
+        specifier: 4.2.0
         version: 4.2.0(react@18.2.0)
       meow:
-        specifier: ^11.0.0
+        specifier: 11.0.0
         version: 11.0.0
       react:
-        specifier: ^18.2.0
+        specifier: 18.2.0
         version: 18.2.0
       ueve:
-        specifier: ^1.69.0
+        specifier: 1.69.0
         version: 1.69.0
     devDependencies:
       '@rollup/plugin-typescript':
@@ -30,7 +30,7 @@ importers:
         specifier: 5.56.0
         version: 5.56.0(eslint@8.37.0)(typescript@4.9.5)
       esbuild:
-        specifier: ^0.17.18
+        specifier: 0.17.18
         version: 0.17.18
       eslint:
         specifier: 8.37.0
@@ -47,6 +47,9 @@ importers:
       rollup:
         specifier: 3.21.0
         version: 3.21.0
+      rollup-plugin-preserve-shebang:
+        specifier: ^1.0.1
+        version: 1.0.1
       typescript:
         specifier: 4.9.5
         version: 4.9.5
@@ -1652,6 +1655,12 @@ packages:
     engines: {node: '>=12'}
     dev: false
 
+  /magic-string@0.25.9:
+    resolution: {integrity: sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==}
+    dependencies:
+      sourcemap-codec: 1.4.8
+    dev: true
+
   /make-error@1.3.6:
     resolution: {integrity: sha512-s8UhlNe7vPKomQhC1qFelMokr/Sc3AgNbso3n74mVPA5LTZwkB9NlXf4XPamLxJE8h0gh73rM94xvwRT2CVInw==}
     dev: true
@@ -1967,6 +1976,12 @@ packages:
       glob: 7.2.3
     dev: true
 
+  /rollup-plugin-preserve-shebang@1.0.1:
+    resolution: {integrity: sha512-gk7ExGBqvUinhgrvldKHkAKXXwRkWMXMZymNkrtn50uBgHITlhRjhnKmbNGwAIc4Bzgl3yLv7/8Fhi/XeHhFKg==}
+    dependencies:
+      magic-string: 0.25.9
+    dev: true
+
   /rollup@3.21.0:
     resolution: {integrity: sha512-ANPhVcyeHvYdQMUyCbczy33nbLzI7RzrBje4uvNiTDJGIMtlKoOStmympwr9OtS1LZxiDmE2wvxHyVhoLtf1KQ==}
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
@@ -2039,6 +2054,11 @@ packages:
       ansi-styles: 6.2.1
       is-fullwidth-code-point: 4.0.0
     dev: false
+
+  /sourcemap-codec@1.4.8:
+    resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
+    deprecated: Please use @jridgewell/sourcemap-codec instead
+    dev: true
 
   /spdx-correct@3.2.0:
     resolution: {integrity: sha512-kN9dJbvnySHULIluDHy32WHRUu3Og7B9sbY7tsFLctQkIqnMh3hErYgdMjTYuqmcXX+lK5T1lnUt3G7zNswmZA==}

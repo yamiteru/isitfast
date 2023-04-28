@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 import {benchmark, input} from "@cli";
 
 const root = process.cwd();

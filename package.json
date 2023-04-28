@@ -2,6 +2,10 @@
   "name": "isitfast",
   "type": "module",
   "version": "0.0.8",
+  "main": "dist/index.js",
+  "bin": {
+    "isitfast": "./dist/index.js"
+  },
   "scripts": {
     "fix:format": "prettier --write \"**/*.ts\"",
     "fix:lint": "eslint --fix --ext .ts .",
@@ -9,7 +13,7 @@
     "check:format": "prettier --check \"**/*.ts\"",
     "check:lint": "eslint --ext .ts .",
     "check": "pnpm check:lint && pnpm check:format",
-    "build": "rollup --config rollup.config.js"
+    "build": "rollup --config rollup.config.js && chmod +x dist/index.js && npm install -g ."
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "11.1.0",
@@ -22,6 +26,7 @@
     "husky": "8.0.3",
     "prettier": "2.8.7",
     "rollup": "3.21.0",
+    "rollup-plugin-preserve-shebang": "1.0.1",
     "typescript": "4.9.5"
   },
   "engines": {
