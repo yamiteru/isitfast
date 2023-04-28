@@ -3,7 +3,7 @@
 import { Worker } from "node:worker_threads";
 import { transpileFile } from "./build.js";
 import { BenchmarkResult, Mode } from "@types";
-import { ARRAY, CHUNK_SIZE, COLLECT_TIMEOUT, DEVIATION_MAX, NS_IN_SECOND } from "@constants";
+import { ARRAY, CHUNK_SIZE, COLLECT_TIMEOUT, DEVIATION_MAX, MATCH_NUMBER, NS_IN_SECOND } from "@constants";
 import {getOffset, isAsync as getIsAsync, isNumberFluke, now} from "@utils";
 
 export { input, flags } from "./meow.js";
@@ -50,6 +50,7 @@ export const collect = (sourceFile: string, mode: Mode) => new Promise<Benchmark
       const fn = (await import("${outFile}")).${path};
 
       parentPort.on("message", ${prefix}() => {
+        // TODO: add gc when mode === "ram"
         const start = ${capture};
 
         ${run};
@@ -64,6 +65,7 @@ export const collect = (sourceFile: string, mode: Mode) => new Promise<Benchmark
   );
 
   ARRAY.index = 0;
+  ARRAY.count = 0;
 
   worker.on("message", async (v) => {
     ARRAY.chunk[ARRAY.index] = v;
@@ -85,8 +87,14 @@ export const collect = (sourceFile: string, mode: Mode) => new Promise<Benchmark
 
       // TODO: get rid of NaN
       if(isNaN(percent) || percent <= DEVIATION_MAX) {
-        resolve(offset);
-        worker.terminate();
+        if(ARRAY.count + 1 === MATCH_NUMBER) {
+          resolve(offset);
+          worker.terminate();
+        }
+
+        ARRAY.count += 1;
+      } else {
+        ARRAY.count = 0;
       }
     }
 
