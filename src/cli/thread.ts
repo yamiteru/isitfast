@@ -12,7 +12,7 @@ export async function thread(sourceFile: string, mode: Mode) {
       ? ["default", module.default]
       : module.default?.benchmark
       ? ["default.benchmark", module.default.benchmark]
-      : ["benchmark", module.benchmark];
+      : ["$benchmark", module.$benchmark];
 
   if (fn === undefined) {
     throw Error("No benchmark function found");
