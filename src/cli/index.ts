@@ -40,6 +40,7 @@ export const collect = (sourceFile: string, mode: Mode) => new Promise<Benchmark
   const prefix = isAsync ? "async " : "";
   const run = isAsync ? "await fn()" : "fn()";
   const timeout = now() + BigInt((COLLECT_TIMEOUT * NS_IN_SECOND) / 1000);
+  const gc = isCpu ? "global.gc();": "";
 
   // TODO: use SharedArrayBuffer and Atomics
   const worker = new Worker(
@@ -50,7 +51,8 @@ export const collect = (sourceFile: string, mode: Mode) => new Promise<Benchmark
       const fn = (await import("${outFile}")).${path};
 
       parentPort.on("message", ${prefix}() => {
-        // TODO: add gc when mode === "ram"
+        ${gc}
+
         const start = ${capture};
 
         ${run};
