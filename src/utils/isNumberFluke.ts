@@ -13,7 +13,7 @@ export function isNumberFluke(
   index: number,
   number: number,
 ) {
-  if (number === 0) {
+  if (number < 0) {
     return true;
   }
 
@@ -33,6 +33,11 @@ export function isNumberFluke(
 
     const max = ARRAY_BEFORE[COMPARE_SIZE - 1];
     const beforeMedian = median(ARRAY_BEFORE);
+
+    if(beforeMedian === number) {
+      return false;
+    }
+
     const beforeDeviation =
       standardDeviation(variance(ARRAY_BEFORE)) / beforeMedian;
     const afterDeviation =

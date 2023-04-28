@@ -1,4 +1,5 @@
 import typescript from "@rollup/plugin-typescript";
+import shebang from "rollup-plugin-preserve-shebang";
 
 export default {
   input: "src/index.ts",
@@ -11,5 +12,5 @@ export default {
   },
   cache: true,
   treeshake: true,
-  plugins: [typescript()]
+  plugins: [typescript(), shebang()]
 };

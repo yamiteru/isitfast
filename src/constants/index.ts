@@ -7,10 +7,10 @@ import {
   BenchmarkResults,
 } from "@types";
 
-export const CHUNK_SIZE = 100;
-export const SAMPLE_SIZE = 10;
+export const CHUNK_SIZE = 10;
+export const SAMPLE_SIZE = 5;
 export const DEVIATION_MAX = 1;
-export const COLLECT_TIMEOUT = 10_000;
+export const COLLECT_TIMEOUT = 2_000;
 export const COMPARE_SIZE = 3;
 export const FLUKE_PERCENT = 0.025;
 export const MATCH_NUMBER = SAMPLE_SIZE;
@@ -22,7 +22,7 @@ export const MODES: Mode[] = ["cpu", "ram"];
 
 export const ARRAY = {
   chunk: new Uint32Array(CHUNK_SIZE * 2),
-  index: -1,
+  index: 0,
 };
 
 export const CURRENT: Partial<{

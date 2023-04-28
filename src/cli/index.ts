@@ -2,14 +2,15 @@
 
 import { Worker } from "node:worker_threads";
 import { transpileFile } from "./build.js";
-import { Mode } from "@types";
-import { ARRAY, CHUNK_SIZE } from "@constants";
+import { BenchmarkResult, Mode } from "@types";
+import { ARRAY, CHUNK_SIZE, COLLECT_TIMEOUT, DEVIATION_MAX, NS_IN_SECOND } from "@constants";
+import {getOffset, isAsync as getIsAsync, isNumberFluke, now} from "@utils";
 
 export { input, flags } from "./meow.js";
 
 export const FILE_CACHE = new Map<string, string>();
 
-export async function iteration(sourceFile: string, mode: Mode) {
+export const collect = (sourceFile: string, mode: Mode) => new Promise<BenchmarkResult>(async (resolve, reject) => {
   const isCpu = mode === "cpu";
   const capture = isCpu
     ? "process.hrtime.bigint()"
@@ -23,8 +24,6 @@ export async function iteration(sourceFile: string, mode: Mode) {
     FILE_CACHE.set(sourceFile, outFile);
   }
 
-  console.log(mode, outFile);
-
   const module = await import(outFile);
   const [path, fn] =
     typeof module.default === "function"
@@ -34,13 +33,13 @@ export async function iteration(sourceFile: string, mode: Mode) {
       : ["benchmark", module.benchmark];
 
   if (fn === undefined) {
-    throw Error("No benchmark function found");
+    reject("No benchmark function found");
   }
 
-  // TODO: check fn if it's async
-  const isAsync = false;
+  const isAsync = getIsAsync(fn);
   const prefix = isAsync ? "async " : "";
   const run = isAsync ? "await fn()" : "fn()";
+  const timeout = now() + BigInt((COLLECT_TIMEOUT * NS_IN_SECOND) / 1000);
 
   // TODO: use SharedArrayBuffer and Atomics
   const worker = new Worker(
@@ -48,8 +47,7 @@ export async function iteration(sourceFile: string, mode: Mode) {
     const { parentPort } = require("node:worker_threads");
 
     (async () => {
-      const module = await import("${outFile}");
-      const fn = module.${path};
+      const fn = (await import("${outFile}")).${path};
 
       parentPort.on("message", ${prefix}() => {
         const start = ${capture};
@@ -65,30 +63,74 @@ export async function iteration(sourceFile: string, mode: Mode) {
     { eval: true },
   );
 
-  ARRAY.index = -1;
+  ARRAY.index = 0;
 
-  return new Promise<number>((resolve) => {
-    worker.on("message", async (v) => {
-      ARRAY.chunk[ARRAY.index++] = v;
+  worker.on("message", async (v) => {
+    ARRAY.chunk[ARRAY.index] = v;
 
-      if (ARRAY.index === CHUNK_SIZE) {
-        await worker.terminate();
+    const isOverSampleSize = ARRAY.index >= CHUNK_SIZE;
 
-        resolve(ARRAY.chunk[0]);
+    const offset = getOffset(
+      ARRAY.chunk.slice(
+        CHUNK_SIZE,
+        isOverSampleSize ? CHUNK_SIZE * 2 : CHUNK_SIZE + ARRAY.index,
+      ),
+      ARRAY.index,
+    );
+
+    if(ARRAY.index && !(ARRAY.index % CHUNK_SIZE)) {
+      ARRAY.chunk.copyWithin(CHUNK_SIZE, 0, CHUNK_SIZE);
+
+      const percent =offset.deviation.standard.percent;
+
+      // TODO: get rid of NaN
+      if(isNaN(percent) || percent <= DEVIATION_MAX) {
+        resolve(offset);
+        worker.terminate();
       }
-    });
+    }
+
+    const isFluke = isNumberFluke(
+      ARRAY.chunk.slice(0, isOverSampleSize ? CHUNK_SIZE : ARRAY.index),
+      ARRAY.index,
+      v
+    );
+
+    if (now() >= timeout) {
+      resolve(offset);
+      worker.terminate();
+    }
+
+    if(!isFluke) {
+      if (isOverSampleSize) {
+        for (let i = 0; i < CHUNK_SIZE - 1; ++i) {
+          ARRAY.chunk[i] = ARRAY.chunk[i + 1];
+        }
+
+        ARRAY.chunk[CHUNK_SIZE - 1] = v;
+      } else {
+        ARRAY.chunk[ARRAY.index] = v;
+      }
+
+      ARRAY.index += 1;
+    }
 
     worker.postMessage(null);
   });
-}
+
+  worker.postMessage(null);
+});
 
 export async function benchmark(root: string, file: string) {
   // TODO: run before benchmark
 
-  const cpu = await iteration(`${root}/${file}`, "cpu");
-  const ram = await iteration(`${root}/${file}`, "ram");
+  const cpu = await collect(`${root}/${file}`, "cpu");
+  const ram = await collect(`${root}/${file}`, "ram");
 
   // TODO: run after benchmark
 
-  return { cpu, ram };
+  return {
+    cpu,
+    ram
+  };
 }
