@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "strict": true,
-    "module": "node16",
+    "module": "NodeNext",
     "target": "ESNext",
-    "moduleResolution": "node16",
+    "moduleResolution": "nodenext",
     "lib": [
       "dom",
       "dom.iterable",
@@ -13,8 +13,20 @@
     "esModuleInterop": true,
     "declaration": true,
     "noImplicitAny": true,
-    "typeRoots": ["@types", "node_modules/@types"]
+    "typeRoots": ["@types", "node_modules/@types"],
+    "rootDir": "src",
+    "baseUrl": ".",
+    "outDir": "dist",
+    "declarationDir": "dist",
+    "paths": {
+      "@cli": ["src/cli/index.ts"],
+      "@constants": ["src/constants/index.ts"],
+      "@events": ["src/events/index.ts"],
+      "@suite": ["src/suite/index.ts"],
+      "@types": ["src/types/index.ts"],
+      "@utils": ["src/utils/index.ts"]
+    }
   },
-  "include": ["packages/**/*"],
-  "exclude": ["node_modules", "packages/**/node_modules"]
+  "include": ["src", "examples"],
+  "exclude": ["node_modules"]
 }

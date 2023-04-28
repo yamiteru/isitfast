@@ -2,30 +2,36 @@
   "name": "isitfast",
   "type": "module",
   "version": "0.0.8",
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "fix:format": "prettier --write \"**/*.ts\"",
     "fix:lint": "eslint --fix --ext .ts .",
     "fix": "pnpm fix:lint && pnpm fix:format",
     "check:format": "prettier --check \"**/*.ts\"",
     "check:lint": "eslint --ext .ts .",
-    "check": "pnpm check:lint && pnpm check:format"
+    "check": "pnpm check:lint && pnpm check:format",
+    "build": "rollup --config rollup.config.js"
   },
   "devDependencies": {
+    "@rollup/plugin-typescript": "11.1.0",
     "@types/node": "18.16.0",
     "@typescript-eslint/eslint-plugin": "5.56.0",
     "@typescript-eslint/parser": "5.56.0",
+    "esbuild": "0.17.18",
     "eslint": "8.37.0",
     "eslint-config-prettier": "8.8.0",
     "husky": "8.0.3",
     "prettier": "2.8.7",
-    "turbo": "1.8.8",
+    "rollup": "3.21.0",
     "typescript": "4.9.5"
   },
   "engines": {
     "node": ">=16.0.0"
   },
-  "packageManager": "pnpm@7.22.0"
+  "packageManager": "pnpm@7.22.0",
+  "dependencies": {
+    "ink": "4.2.0",
+    "meow": "11.0.0",
+    "react": "18.2.0",
+    "ueve": "1.69.0"
+  }
 }

@@ -1,6 +1,0 @@
-{
-  "version": "0.0.0",
-  "type": "module",
-  "name": "@isitfast/types",
-  "main": "src/index.ts"
-}
