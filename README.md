@@ -115,3 +115,82 @@ The `Suite` by itself doesn't return any data. For consuming suite and benchmark
 Behind the scenes `isitfast` uses [μEve](https://github.com/yamiteru/ueve) to create, subscribe to and publish into events.
 
 You can easily import `sub`/`clr`/`has` event functions from `isitfast`. They're just re-exported functions from `μEve`.
+
+## CLI
+
+### Single benchmark
+
+```shell
+isitfast b1.ts
+```
+
+### Multiple benchmarks
+
+```shell
+isitfast b1.ts b2.ts b3.ts
+```
+
+### Suite
+
+#### Folder
+
+```shell
+isitfast s1/
+```
+
+#### File
+
+```shell
+isitfast s1.ts
+```
+
+## How to define benchmark/suite
+
+### Default function benchmark
+
+```ts
+export default () => { /* .. */ };
+```
+
+### Default object benchmark
+
+```ts
+export default {
+  benchmark: () => { /* .. */ },
+  onBeforeBenchmark: () => { /* .. */ },
+  // ...
+};
+```
+
+### Named exports benchmark
+
+```ts
+export const $benchmark = () => { /* .. */ };
+
+export const $onBeforeBenchmark = () => { /* .. */ };
+```
+
+### Any folder suite
+
+- /suite-name
+  - _.ts
+  - b1.ts
+  - b2.ts
+  - b3.ts
+
+### Default object suite
+
+```ts
+export default {
+  setup: () => { /* .. */ },
+  benchmarks: { /* .. */ }
+};
+```
+
+### Named exports suite
+
+```ts
+export const $setup = () => { /* .. */ };
+
+export const $benchmarks = { /* .. */ };
+```
