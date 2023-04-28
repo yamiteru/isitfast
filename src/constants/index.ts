@@ -5,6 +5,7 @@ import {
   Fn,
   Either,
   BenchmarkResults,
+  Module,
 } from "@types";
 
 export const CHUNK_SIZE = 20;
@@ -26,7 +27,7 @@ export const ARRAY = {
   count: 0
 };
 
-export const FILE_CACHE = new Map<string, string>();
+export const FILE_CACHE = new Map<string, Module>();
 
 export const CURRENT: Partial<{
   suiteName: string;

@@ -16,6 +16,18 @@ export type BenchmarkEvents = Partial<{
   onBenchmarkEnd: Fn<[BenchmarkResults], Promise<void>>;
 }>;
 
+export type ModuleBenchmark = {
+  name: string;
+  fn: Fn<[], unknown>;
+  type: Type;
+};
+
+export type Module = {
+  sourcePath: string;
+  outPath: string;
+  benchmarks: ModuleBenchmark[];
+};
+
 export type BenchmarkResult = {
   min: number;
   max: number;
