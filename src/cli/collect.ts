@@ -1,11 +1,11 @@
-import { BenchmarkResult, Mode } from "@types";
+import { BenchmarkResult, Mode, Benchmark } from "@types";
 import { ARRAY, CHUNK_SIZE, COLLECT_TIMEOUT, DEVIATION_MAX, MATCH_NUMBER, NS_IN_SECOND } from "@constants";
-import { getOffset, isAsync as getIsAsync, isNumberFluke, now } from "@utils";
+import { getOffset, isNumberFluke, now } from "@utils";
 import { thread } from "./thread.js";
 
-export const collect = (sourceFile: string, mode: Mode) => new Promise<BenchmarkResult>(async (resolve, reject) => {
+export const collect = (benchmark: Benchmark, mode: Mode) => new Promise<BenchmarkResult>(async (resolve) => {
   const timeout = process.hrtime.bigint() + BigInt((COLLECT_TIMEOUT * NS_IN_SECOND) / 1000);
-  const worker = await thread(sourceFile, mode);
+  const worker = await thread(benchmark, mode);
 
   ARRAY.index = 0;
   ARRAY.count = 0;

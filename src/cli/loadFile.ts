@@ -4,10 +4,11 @@ import { homedir } from "node:os";
 import {FILE_CACHE} from "@constants";
 import {writeFile} from "node:fs/promises";
 import {isAsync} from "@utils";
-import {Fn, Module, Type} from "@types";
+import {Benchmark, File} from "@types";
 
-export const loadModule = async (sourcePath: string) => {
+export const loadFile = async (sourcePath: string): Promise<File> => {
   if(!FILE_CACHE.has(sourcePath)) {
+    const name = sourcePath.split("/").at(-1) as string;
     const outPath = `${homedir()}/.isitfast/cache/${randomUUID()}.mjs`;
     const output = await transformFile(sourcePath, {
       jsc: {
@@ -21,13 +22,7 @@ export const loadModule = async (sourcePath: string) => {
     await writeFile(outPath, output.code);
 
     const module = await import(outPath);
-    const benchmarks: {
-      name: string;
-      fn: Fn<[], unknown>;
-      type: Type;
-    }[] = [];
-
-    // TODO: check default function and/or object
+    const benchmarks: Benchmark[] = [];
 
     for(const name in module) {
       if(name[0] === "$") {
@@ -36,21 +31,20 @@ export const loadModule = async (sourcePath: string) => {
         benchmarks.push({
           name,
           fn,
-          type: isAsync(fn) ? "async": "sync"
+          type: isAsync(fn) ? "async": "sync",
+          file: outPath
         });
       }
     }
 
-    if (benchmarks.length === 0) {
-      throw Error("No benchmark function found");
-    }
-
     FILE_CACHE.set(sourcePath, {
-      sourcePath,
-      outPath,
+      type: "file",
+      name,
+      path: sourcePath,
+      file: outPath,
       benchmarks
     });
   }
 
-  return FILE_CACHE.get(sourcePath) as Module;
+  return FILE_CACHE.get(sourcePath) as File;
 };

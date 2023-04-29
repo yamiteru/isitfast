@@ -5,8 +5,9 @@ import {
   Fn,
   Either,
   BenchmarkResults,
-  Module,
+  Content,
 } from "@types";
+import {homedir} from "node:os";
 
 export const CHUNK_SIZE = 20;
 export const SAMPLE_SIZE = 10;
@@ -27,7 +28,9 @@ export const ARRAY = {
   count: 0
 };
 
-export const FILE_CACHE = new Map<string, Module>();
+export const FILE_CACHE = new Map<string, Content>();
+
+export const CACHE = `${homedir()}/.isitfast/cache/`;
 
 export const CURRENT: Partial<{
   suiteName: string;

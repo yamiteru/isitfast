@@ -1,28 +1,13 @@
-import {Mode} from "@types";
-import {isAsync as getIsAsync} from "@utils";
+import {Mode, Benchmark} from "@types";
 import { Worker } from "node:worker_threads";
-import {loadModule} from "./build.js";
 
 // TODO: use SharedArrayBuffer and Atomics
-export async function thread(sourceFile: string, mode: Mode) {
-  const outFile = await loadModule(sourceFile);
-  const module = await import(outFile as any);
-  const [path, fn] =
-    typeof module.default === "function"
-      ? ["default", module.default]
-      : module.default?.benchmark
-      ? ["default.benchmark", module.default.benchmark]
-      : ["$benchmark", module.$benchmark];
-
-  if (fn === undefined) {
-    throw Error("No benchmark function found");
-  }
-
+export async function thread(benchmark: Benchmark, mode: Mode) {
   const isCpu = mode === "cpu";
   const capture = isCpu
     ? "process.hrtime.bigint()"
     : "process.memoryUsage().heapUsed";
-  const isAsync = getIsAsync(fn);
+  const isAsync = benchmark.type === "async";
   const prefix = isAsync ? "async " : "";
   const run = isAsync ? "await fn()" : "fn()";
   const gc = isCpu ? "global.gc();": "";
@@ -32,7 +17,7 @@ export async function thread(sourceFile: string, mode: Mode) {
     const { parentPort } = require("node:worker_threads");
 
     (async () => {
-      const fn = (await import("${outFile}")).${path};
+      const fn = (await import("${benchmark.file}")).${benchmark.name};
 
       parentPort.on("message", ${prefix}() => {
         ${gc}

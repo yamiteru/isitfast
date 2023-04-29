@@ -22,10 +22,28 @@ export type ModuleBenchmark = {
   type: Type;
 };
 
-export type Module = {
-  sourcePath: string;
-  outPath: string;
-  benchmarks: ModuleBenchmark[];
+export type Benchmark = {
+  name: string;
+  fn: Fn<[], unknown>;
+  type: Type;
+  file: string;
+};
+
+export type Content = File | Directory;
+
+export type File = {
+  type: "file";
+  name: string;
+  path: string;
+  file: string;
+  benchmarks: Benchmark[];
+};
+
+export type Directory = {
+  type: "directory";
+  name: string;
+  path: string;
+  content: Content[];
 };
 
 export type BenchmarkResult = {

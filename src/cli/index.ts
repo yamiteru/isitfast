@@ -1,14 +1,8 @@
-import {collect} from "./collect.js";
-
+export * from "./runBenchmark.js";
+export * from "./loadFile.js";
+export * from "./runFile.js";
+export * from "./loadDirectory.js";
+export * from "./runDirectory.js";
+export * from "./collect.js";
 export * from "./meow.js";
-
-export async function benchmark(root: string, file: string) {
-  // TODO: run before benchmark
-
-  const cpu = await collect(`${root}/${file}`, "cpu");
-  const ram = await collect(`${root}/${file}`, "ram");
-
-  // TODO: run after benchmark
-
-  return { cpu, ram };
-}
+export * from "./thread.js";

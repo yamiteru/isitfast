@@ -1,36 +1,22 @@
 #! /usr/bin/env node --expose-gc
 
-import { input } from "@cli";
-import { Module } from "@types";
-import { mkdir, rm } from "node:fs/promises";
-import { homedir } from "node:os";
-import { loadModule } from "./cli/build.js";
-
-const root = process.cwd();
-const cache = `${homedir()}/.isitfast/cache/`;
+import { input, loadDirectory, runDirectory } from "@cli";
+import { CACHE } from "@constants";
+import { mkdir, rm } from "fs/promises";
 
 (async () => {
   try {
-    await mkdir(cache);
+    await mkdir(CACHE);
   } catch {
     // ..
   }
 
-  // TODO: check if it's suite or benchmark
-
-  const promises: Promise<Module>[] = [];
-
-  for (let i = 0; i < input.length; ++i) {
-    promises.push(loadModule(`${root}/${input[i]}`));
+  if(input.length === 0) {
+    input.push("/");
   }
 
-  const modules = await Promise.all(promises);
+  const directory = await loadDirectory(process.cwd(), input);
 
-  modules.forEach((v) => {
-    console.log(v.sourcePath, v.outPath);
-
-    v.benchmarks.forEach((v) => console.log(v));
-  });
-
-  // await rm(cache, { recursive: true, force: true });
+  await runDirectory(directory);
+  await rm(CACHE, { recursive: true, force: true });
 })();
