@@ -13,3 +13,5 @@ export * from "./isNumberFluke.js";
 export * from "./gc.js";
 export * from "./now.js";
 export * from "./mem.js";
+export * from "./isDirectory.js";
+export * from "./joinPath.js";
