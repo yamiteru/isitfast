@@ -1,11 +1,9 @@
+import {ARRAY_STATS, INDEX} from "@constants";
 import { BenchmarkResult } from "@types";
 import { deviations } from "./deviations.js";
 import { histogram } from "./histogram.js";
 
-export function getOffset(
-  chunk: Uint32Array,
-  iterations: number,
-): BenchmarkResult {
+export function getBenchmarkResult(): BenchmarkResult {
   const {
     min,
     max,
@@ -15,7 +13,7 @@ export function getOffset(
     standard,
     medianAbsolute,
     meanAbsolute,
-  } = deviations(chunk);
+  } = deviations(ARRAY_STATS);
 
   return {
     min,
@@ -28,7 +26,7 @@ export function getOffset(
       medianAbsolute,
       meanAbsolute,
     },
-    histogram: histogram(chunk),
-    iterations,
+    histogram: histogram(ARRAY_STATS),
+    iterations: Atomics.load(INDEX, 0),
   };
 }

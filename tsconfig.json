@@ -20,10 +20,9 @@
     "declarationDir": "dist",
     "paths": {
       "@cli": ["src/cli/index.ts"],
-      "@constants": ["src/constants/index.ts"],
-      "@events": ["src/events/index.ts"],
-      "@suite": ["src/suite/index.ts"],
-      "@types": ["src/types/index.ts"],
+      "@constants": ["src/constants.ts"],
+      "@events": ["src/events.ts"],
+      "@types": ["src/types.ts"],
       "@utils": ["src/utils/index.ts"]
     }
   },

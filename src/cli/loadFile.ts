@@ -1,15 +1,18 @@
 import { transformFile } from "@swc/core";
 import { randomUUID } from "node:crypto";
-import { homedir } from "node:os";
-import {FILE_CACHE} from "@constants";
-import {writeFile} from "node:fs/promises";
-import {isAsync} from "@utils";
-import {Benchmark, File} from "@types";
+import { CACHE_DIR, FILE_CACHE } from "@constants";
+import { writeFile } from "node:fs/promises";
+import { getType } from "@utils";
+import { Benchmark, File } from "@types";
+import {pub} from "ueve/async";
+import {$fileClose, $fileOpen} from "@events";
 
 export const loadFile = async (sourcePath: string): Promise<File> => {
+  await pub($fileOpen, {});
+
   if(!FILE_CACHE.has(sourcePath)) {
     const name = sourcePath.split("/").at(-1) as string;
-    const outPath = `${homedir()}/.isitfast/cache/${randomUUID()}.mjs`;
+    const outPath = `${CACHE_DIR}${randomUUID()}.mjs`;
     const output = await transformFile(sourcePath, {
       jsc: {
         parser: {
@@ -24,16 +27,27 @@ export const loadFile = async (sourcePath: string): Promise<File> => {
     const module = await import(outPath);
     const benchmarks: Benchmark[] = [];
 
-    for(const name in module) {
-      if(name[0] === "$") {
-        const fn = module[name];
+    if(typeof module.default === "function") {
+      benchmarks.push({
+        name,
+        path: "default",
+        fn: module.default,
+        type: getType(module.default),
+        file: outPath
+      });
+    } else {
+      for(const name in module) {
+        if(name[0] === "$") {
+          const fn = module[name];
 
-        benchmarks.push({
-          name,
-          fn,
-          type: isAsync(fn) ? "async": "sync",
-          file: outPath
-        });
+          benchmarks.push({
+            name,
+            path: name,
+            fn,
+            type: getType(module.default),
+            file: outPath
+          });
+        }
       }
     }
 
@@ -45,6 +59,8 @@ export const loadFile = async (sourcePath: string): Promise<File> => {
       benchmarks
     });
   }
+
+  await pub($fileClose, {});
 
   return FILE_CACHE.get(sourcePath) as File;
 };
