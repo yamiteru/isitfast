@@ -1,30 +1,15 @@
+import {MODES, TYPES} from "@constants";
+
 export type Either<$Options extends unknown[]> = $Options[number];
 
 export type Fn<$Input extends unknown[], $Output> = (
   ...props: $Input
 ) => $Output;
 
-export type BenchmarkFunction<$Data = any> = Fn<
-  [$Data],
-  Either<[Promise<void>, Promise<unknown>, void, unknown]>
->;
-
-export type BenchmarkEvents = Partial<{
-  onIterationStart: Fn<[], Promise<void>>;
-  onIterationEnd: Fn<[number, boolean], Promise<void>>;
-  onBenchmarkStart: Fn<[], Promise<void>>;
-  onBenchmarkEnd: Fn<[BenchmarkResults], Promise<void>>;
-}>;
-
-export type ModuleBenchmark = {
-  name: string;
-  fn: Fn<[], unknown>;
-  type: Type;
-};
-
 export type Benchmark = {
   name: string;
   fn: Fn<[], unknown>;
+  path: string;
   type: Type;
   file: string;
 };
@@ -91,6 +76,6 @@ export type BenchmarkResults = {
   ram: BenchmarkResult;
 };
 
-export type Type = Either<["async", "sync"]>;
+export type Type = typeof TYPES[number];
 
-export type Mode = Either<["cpu", "ram"]>;
+export type Mode = typeof MODES[number];

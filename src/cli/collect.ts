@@ -1,69 +1,61 @@
 import { BenchmarkResult, Mode, Benchmark } from "@types";
-import { ARRAY, CHUNK_SIZE, COLLECT_TIMEOUT, DEVIATION_MAX, MATCH_NUMBER, NS_IN_SECOND } from "@constants";
-import { getOffset, isNumberFluke, now } from "@utils";
+import { ARRAY_ACTIVE, INDEX, COUNT, CHUNK_SIZE, COLLECT_TIMEOUT, DEVIATION_MAX, MATCH_NUMBER, NS_IN_SECOND, ARRAY_STATS } from "@constants";
 import { thread } from "./thread.js";
+import {getBenchmarkResult, isNumberValid, shiftArray} from "@utils";
 
+// TODO: add before and after collect events
 export const collect = (benchmark: Benchmark, mode: Mode) => new Promise<BenchmarkResult>(async (resolve) => {
   const timeout = process.hrtime.bigint() + BigInt((COLLECT_TIMEOUT * NS_IN_SECOND) / 1000);
   const worker = await thread(benchmark, mode);
 
-  ARRAY.index = 0;
-  ARRAY.count = 0;
+  const send = (benchmarkResult: BenchmarkResult) => {
+    resolve(benchmarkResult);
+    worker.terminate();
+  };
+
+  Atomics.store(INDEX, 0, 0);
+  Atomics.store(COUNT, 0, 0);
 
   worker.on("message", async (v) => {
-    ARRAY.chunk[ARRAY.index] = v;
+    const index = Atomics.load(INDEX, 0);
 
-    const isOverSampleSize = ARRAY.index >= CHUNK_SIZE;
+    Atomics.store(ARRAY_ACTIVE, index, v);
 
-    const offset = getOffset(
-      ARRAY.chunk.slice(
-        CHUNK_SIZE,
-        isOverSampleSize ? CHUNK_SIZE * 2 : CHUNK_SIZE + ARRAY.index,
-      ),
-      ARRAY.index,
-    );
-
-    if(ARRAY.index && !(ARRAY.index % CHUNK_SIZE)) {
-      ARRAY.chunk.copyWithin(CHUNK_SIZE, 0, CHUNK_SIZE);
-
-      const percent = offset.deviation.standard.percent;
+    if(index && !(index % CHUNK_SIZE)) {
+      const benchmarkResult = getBenchmarkResult();
+      const percent = benchmarkResult.deviation.standard.percent;
 
       // TODO: get rid of NaN
-      if(isNaN(percent) || percent <= DEVIATION_MAX) {
-        if(ARRAY.count + 1 === MATCH_NUMBER) {
-          resolve(offset);
-          worker.terminate();
+      if(isNaN(percent) || (mode === "ram" && benchmarkResult.median === 0) || percent <= DEVIATION_MAX) {
+        if(Atomics.load(COUNT, 0) + 1 === MATCH_NUMBER) {
+          send(benchmarkResult);
         }
 
-        ARRAY.count += 1;
+        Atomics.add(COUNT, 0, 1);
       } else {
-        ARRAY.count = 0;
+        Atomics.store(COUNT, 0, 0);
       }
     }
 
-    const isFluke = isNumberFluke(
-      ARRAY.chunk.slice(0, isOverSampleSize ? CHUNK_SIZE : ARRAY.index),
-      ARRAY.index,
-      v
-    );
+    const isValid = isNumberValid(v);
 
-    if (now() >= timeout) {
-      resolve(offset);
-      worker.terminate();
+    if (process.hrtime.bigint() >= timeout) {
+      send(getBenchmarkResult());
     }
 
-    if(!isFluke) {
-      if (isOverSampleSize) {
-        for (let i = 0; i < CHUNK_SIZE - 1; ++i) {
-          ARRAY.chunk[i] = ARRAY.chunk[i + 1];
-        }
+    if(isValid) {
+      if (index >= CHUNK_SIZE) {
+        shiftArray(ARRAY_ACTIVE);
+        shiftArray(ARRAY_STATS);
 
-        ARRAY.chunk[CHUNK_SIZE - 1] = v;
+        Atomics.store(ARRAY_ACTIVE, CHUNK_SIZE - 1, v);
+        Atomics.store(ARRAY_STATS, CHUNK_SIZE - 1, v);
       } else {
-        ARRAY.chunk[ARRAY.index] = v;
+        Atomics.store(ARRAY_ACTIVE, index, v);
+        Atomics.store(ARRAY_STATS, index, v);
       }
 
-      ARRAY.index += 1;
+      Atomics.add(INDEX, 0, 1);
     }
 
     worker.postMessage(null);

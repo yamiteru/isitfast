@@ -1,13 +1,15 @@
+import {$directoryClose, $directoryOpen} from "@events";
 import {Content, Directory} from "@types";
 import {isDirectory, joinPath} from "@utils";
 import {readdir} from "fs/promises";
+import {pub} from "ueve/async";
 import {loadFile} from "./loadFile.js";
 
 export const loadDirectory = async (root: string, input: string[]): Promise<Directory> => {
   const name = root.split("/").at(root.at(-1) === "/" ? -2: -1) as string;
   const promises: Promise<Content>[] = [];
 
-  // TODO: compilation start
+  await pub($directoryOpen, {});
 
   for (let i = 0; i < input.length; ++i) {
     const path = joinPath(root, input[i]);
@@ -20,13 +22,13 @@ export const loadDirectory = async (root: string, input: string[]): Promise<Dire
         resolve(folder);
       }));
     } else {
-      promises.push(loadFile(joinPath(root, input[i])));
+      promises.push(loadFile(path));
     }
   }
 
   const content = await Promise.all(promises);
 
-  // TODO: compilation end
+  await pub($directoryClose, {});
 
   return {
     type: "directory",

@@ -3,7 +3,7 @@ export function mean(array: Uint32Array) {
 
   let sum = 0;
   for (let i = 0; i < length; ++i) {
-    sum += array[i];
+    sum += Atomics.load(array, i);
   }
 
   return sum / length;
