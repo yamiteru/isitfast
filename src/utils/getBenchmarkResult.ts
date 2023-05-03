@@ -1,4 +1,4 @@
-import {ARRAY_STATS, INDEX} from "@constants";
+import { ARRAY_STATS, INDEX } from "@constants";
 import { BenchmarkResult } from "@types";
 import { deviations } from "./deviations.js";
 import { histogram } from "./histogram.js";

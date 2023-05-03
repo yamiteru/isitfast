@@ -1,9 +1,6 @@
-import {homedir} from "node:os";
-import {
-  BenchmarkResult,
-  Content,
-} from "@types";
-import {subarray} from "@utils";
+import { homedir } from "node:os";
+import { BenchmarkResult, Content } from "@types";
+import { subarray } from "@utils";
 
 // TODO: rename these constants since it's not clear what they're used for
 export const CHUNK_SIZE = 100;
@@ -19,8 +16,21 @@ export const UINT32_MAX = 4_294_967_295;
 export const TYPES = ["async", "sync"] as const;
 export const MODES = ["cpu", "ram"] as const;
 
-export const ARRAY_SCHEMA = [CHUNK_SIZE, CHUNK_SIZE, COMPARE_SIZE, COMPARE_SIZE + 1, 1, 1, 1, 1, 1, 1];
-export const ARRAY = new Uint32Array(ARRAY_SCHEMA.reduce((acc, v) => acc + v, 0));
+export const ARRAY_SCHEMA = [
+  CHUNK_SIZE,
+  CHUNK_SIZE,
+  COMPARE_SIZE,
+  COMPARE_SIZE + 1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+];
+export const ARRAY = new Uint32Array(
+  ARRAY_SCHEMA.reduce((acc, v) => acc + v, 0),
+);
 
 export const [
   ARRAY_ACTIVE,
@@ -32,7 +42,7 @@ export const [
   ASYNC_CPU,
   ASYNC_RAM,
   SYNC_CPU,
-  SYNC_RAM
+  SYNC_RAM,
 ] = subarray(ARRAY, ARRAY_SCHEMA);
 
 export const FILE_CACHE = new Map<string, Content>();
@@ -42,13 +52,13 @@ export const CACHE_DIR = `${ISITFAST_DIR}/cache`;
 
 export const OFFSET_FUNCTIONS = {
   async: {
-    fn: async function() {},
-    file: `${CACHE_DIR}/async.mjs`
+    fn: async function () {},
+    file: `${CACHE_DIR}/async.mjs`,
   },
   sync: {
-    fn: function() {},
-    file: `${CACHE_DIR}/sync.mjs`
-  }
+    fn: function () {},
+    file: `${CACHE_DIR}/sync.mjs`,
+  },
 };
 
 // Default offset

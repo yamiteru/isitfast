@@ -4,13 +4,18 @@ import { CACHE_DIR, FILE_CACHE } from "@constants";
 import { writeFile } from "node:fs/promises";
 import { getType } from "@utils";
 import { Benchmark, File } from "@types";
-import {pub} from "ueve/async";
-import {$compilationEnd, $compilationStart, $fileClose, $fileOpen} from "@events";
+import { pub } from "ueve/async";
+import {
+  $compilationEnd,
+  $compilationStart,
+  $fileClose,
+  $fileOpen,
+} from "@events";
 
 export const loadFile = async (path: string): Promise<File> => {
   await pub($fileOpen, { path });
 
-  if(!FILE_CACHE.has(path)) {
+  if (!FILE_CACHE.has(path)) {
     await pub($compilationStart, { path });
 
     const name = path.split("/").at(-1) as string;
@@ -18,10 +23,10 @@ export const loadFile = async (path: string): Promise<File> => {
     const output = await transformFile(path, {
       jsc: {
         parser: {
-          syntax: path.endsWith(".ts") ? "typescript": "ecmascript"
+          syntax: path.endsWith(".ts") ? "typescript" : "ecmascript",
         },
-        target: "esnext"
-      }
+        target: "esnext",
+      },
     });
 
     await writeFile(outPath, output.code);
@@ -29,17 +34,17 @@ export const loadFile = async (path: string): Promise<File> => {
     const module = await import(outPath);
     const benchmarks: Benchmark[] = [];
 
-    if(typeof module.default === "function") {
+    if (typeof module.default === "function") {
       benchmarks.push({
         name,
         path: "default",
         fn: module.default,
         type: getType(module.default),
-        file: outPath
+        file: outPath,
       });
     } else {
-      for(const name in module) {
-        if(name[0] === "$") {
+      for (const name in module) {
+        if (name[0] === "$") {
           const fn = module[name];
 
           benchmarks.push({
@@ -47,7 +52,7 @@ export const loadFile = async (path: string): Promise<File> => {
             path: name,
             fn,
             type: getType(fn),
-            file: outPath
+            file: outPath,
           });
         }
       }
@@ -58,7 +63,7 @@ export const loadFile = async (path: string): Promise<File> => {
       name,
       path: path,
       file: outPath,
-      benchmarks
+      benchmarks,
     });
 
     await pub($compilationEnd, { path });

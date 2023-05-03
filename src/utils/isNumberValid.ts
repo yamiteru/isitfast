@@ -12,19 +12,17 @@ import { variance } from "./variance.js";
 import { standardDeviation } from "./standardDeviation.js";
 import { sort } from "./sort.js";
 
-export function isNumberValid(
-  number: number,
-) {
+export function isNumberValid(number: number) {
   if (number < 0) {
     return false;
   }
 
   const index = INDEX[0];
 
-  if(index < COMPARE_SIZE) {
+  if (index < COMPARE_SIZE) {
     return true;
   } else {
-    const ceil = index > CHUNK_SIZE ? CHUNK_SIZE: index;
+    const ceil = index > CHUNK_SIZE ? CHUNK_SIZE : index;
     const array = ARRAY_STATS.subarray(ceil - COMPARE_SIZE, ceil);
 
     for (let i = 0; i < COMPARE_SIZE; i++) {
@@ -40,7 +38,7 @@ export function isNumberValid(
     const max = ARRAY_BEFORE[COMPARE_SIZE - 1];
     const beforeMedian = median(ARRAY_BEFORE);
 
-    if(beforeMedian === number) {
+    if (beforeMedian === number) {
       return true;
     }
 
@@ -50,6 +48,10 @@ export function isNumberValid(
       standardDeviation(variance(ARRAY_AFTER)) / beforeMedian;
     const diff = afterDeviation - beforeDeviation;
 
-    return diff < FLUKE_PERCENT || number <= max || beforeDeviation === afterDeviation;
+    return (
+      diff < FLUKE_PERCENT ||
+      number <= max ||
+      beforeDeviation === afterDeviation
+    );
   }
 }
