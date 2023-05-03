@@ -44,7 +44,7 @@ export const loadFile = async (sourcePath: string): Promise<File> => {
             name,
             path: name,
             fn,
-            type: getType(module.default),
+            type: getType(fn),
             file: outPath
           });
         }
