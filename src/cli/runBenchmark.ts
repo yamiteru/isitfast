@@ -24,6 +24,8 @@ export async function runBenchmark(benchmark: Benchmark) {
       ram = ramResult;
     }
 
+    console.log({ cpu: cpuResult, ram: ramResult });
+
     await pub($runEnd, {});
   }
 
