@@ -2,9 +2,14 @@
 
 import { input, loadDirectory, runDirectory, runOffsets } from "@cli";
 import { ASYNC_CPU, ASYNC_RAM, CACHE_DIR, OFFSET_FUNCTIONS, SYNC_CPU, SYNC_RAM, UINT32_MAX } from "@constants";
-import { mkdir, rm, writeFile } from "fs/promises";
+import {$benchmarkEnd, $benchmarkStart, $iterationEnd, $offsetEnd, $offsetStart, $sessionEnd, $sessionStart} from "@events";
+import {randomUUID} from "crypto";
+import { appendFile, mkdir, rm, writeFile } from "fs/promises";
+import {pub, sub} from "ueve/async";
 
 (async () => {
+  const id = randomUUID();
+  await pub($sessionStart, { id });
   try {
     await rm(CACHE_DIR, { recursive: true, force: true });
   } catch {}
@@ -33,4 +38,5 @@ import { mkdir, rm, writeFile } from "fs/promises";
   try {
     await rm(CACHE_DIR, { recursive: true, force: true });
   } catch {}
+  await pub($sessionEnd, { id });
 })();
