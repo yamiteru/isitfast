@@ -1,5 +1,4 @@
 import {
-  ARRAY_ACTIVE,
   ARRAY_AFTER,
   ARRAY_BEFORE,
   ARRAY_STATS,
