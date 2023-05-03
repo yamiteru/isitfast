@@ -27,6 +27,6 @@ export function getBenchmarkResult(): BenchmarkResult {
       meanAbsolute,
     },
     histogram: histogram(ARRAY_STATS),
-    iterations: Atomics.load(INDEX, 0),
+    iterations: INDEX[0],
   };
 }

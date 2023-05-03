@@ -1,4 +1,5 @@
 import {
+  ARRAY_ACTIVE,
   ARRAY_AFTER,
   ARRAY_BEFORE,
   ARRAY_STATS,
@@ -19,34 +20,37 @@ export function isNumberValid(
     return false;
   }
 
-  const isOverChunkSize = INDEX[0] > CHUNK_SIZE;
-  const ceil = isOverChunkSize ? CHUNK_SIZE : INDEX[0];
-  const array = isOverChunkSize ? ARRAY_STATS: ARRAY_STATS.slice(0, INDEX[0]);
+  const index = INDEX[0];
 
-  for (let i = ceil - COMPARE_SIZE, j = 0; i < ceil; i++, j++) {
-    ARRAY_BEFORE[j] = array[i];
-    ARRAY_AFTER[j] = array[i];
-  }
-
-  ARRAY_AFTER[COMPARE_SIZE] = number;
-
-  sort(ARRAY_BEFORE);
-  sort(ARRAY_AFTER);
-
-  const max = ARRAY_BEFORE[COMPARE_SIZE - 1];
-  const beforeMedian = median(ARRAY_BEFORE);
-
-  if(beforeMedian === number) {
+  if(index < COMPARE_SIZE) {
     return true;
+  } else {
+    const ceil = index > CHUNK_SIZE ? CHUNK_SIZE: index;
+    const array = ARRAY_STATS.subarray(ceil - COMPARE_SIZE, ceil);
+
+    for (let i = 0; i < COMPARE_SIZE; i++) {
+      ARRAY_BEFORE[i] = array[i];
+      ARRAY_AFTER[i] = array[i];
+    }
+
+    ARRAY_AFTER[COMPARE_SIZE] = number;
+
+    sort(ARRAY_BEFORE);
+    sort(ARRAY_AFTER);
+
+    const max = ARRAY_BEFORE[COMPARE_SIZE - 1];
+    const beforeMedian = median(ARRAY_BEFORE);
+
+    if(beforeMedian === number) {
+      return true;
+    }
+
+    const beforeDeviation =
+      standardDeviation(variance(ARRAY_BEFORE)) / beforeMedian;
+    const afterDeviation =
+      standardDeviation(variance(ARRAY_AFTER)) / beforeMedian;
+    const diff = afterDeviation - beforeDeviation;
+
+    return diff < FLUKE_PERCENT || number <= max || beforeDeviation === afterDeviation;
   }
-
-  const beforeDeviation =
-    standardDeviation(variance(ARRAY_BEFORE)) / beforeMedian;
-  const afterDeviation =
-    standardDeviation(variance(ARRAY_AFTER)) / beforeMedian;
-  const diff = afterDeviation - beforeDeviation;
-
-  return beforeDeviation === afterDeviation ||
-    diff < FLUKE_PERCENT ||
-    number <= max;
 }

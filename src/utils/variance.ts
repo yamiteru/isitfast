@@ -6,7 +6,7 @@ export function variance(array: Uint32Array) {
   const squareDiffs = new Uint32Array(length);
 
   for (let i = 0; i < length; ++i) {
-    squareDiffs[i] = (Atomics.load(array, i) - average) ** 2;
+    squareDiffs[i] = (array[i] - average) ** 2;
   }
 
   return mean(squareDiffs);

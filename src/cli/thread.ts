@@ -1,7 +1,6 @@
 import {Mode, Benchmark} from "@types";
 import { Worker } from "node:worker_threads";
 
-// TODO: use SharedArrayBuffer and Atomics
 export async function thread(benchmark: Benchmark, mode: Mode) {
   const isCpu = mode === "cpu";
   const capture = isCpu

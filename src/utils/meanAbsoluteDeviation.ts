@@ -3,7 +3,7 @@ export function meanAbsoluteDeviation(mean: number, array: Uint32Array) {
 
   let sum = 0;
   for (let i = 0; i < length; ++i) {
-    sum += Math.abs(Atomics.load(array, i) - mean);
+    sum += Math.abs(array[i] - mean);
   }
 
   return sum / length;
