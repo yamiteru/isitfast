@@ -7,13 +7,13 @@ import {subarray} from "@utils";
 
 // TODO: rename these constants since it's not clear what they're used for
 export const CHUNK_SIZE = 100;
-export const SAMPLE_SIZE = 10;
-export const DEVIATION_MAX = 2.5;
-export const COLLECT_TIMEOUT = 2_000;
+export const SAMPLE_SIZE = 5;
+export const DEVIATION_MAX = 1;
+export const COLLECT_TIMEOUT = 10_000;
 export const COMPARE_SIZE = 5;
-export const BENCHMARK_RUNS = 3;
-export const FLUKE_PERCENT = 0.1;
-export const MATCH_NUMBER = 3;
+export const BENCHMARK_RUNS = 6;
+export const FLUKE_PERCENT = 0.01;
+export const MATCH_NUMBER = 10;
 export const UINT32_MAX = 4_294_967_295;
 
 export const TYPES = ["async", "sync"] as const;

@@ -1,33 +1,38 @@
+import {Benchmark, BenchmarkResult, BenchmarkResults, Mode} from "@types";
 import { eve } from "ueve/async";
 
-export const $compilationStart = eve();
+export const $sessionStart = eve<{ id: string }>();
 
-export const $compilationEnd = eve();
+export const $sessionEnd = eve<{ id: string }>();
 
-export const $directoryOpen = eve();
+export const $benchmarkStart = eve<{ benchmark: Benchmark }>();
 
-export const $directoryClose = eve();
+export const $benchmarkEnd = eve<{ benchmark: Benchmark, results: BenchmarkResults }>();
 
-export const $fileOpen = eve();
+export const $offsetStart = eve<{ benchmark: Benchmark, mode: Mode }>();
 
-export const $fileClose = eve();
+export const $offsetEnd = eve<{ benchmark: Benchmark, mode: Mode, median: number }>();
 
-export const $iterationStart = eve();
+export const $runStart = eve<{ benchmark: Benchmark, index: number }>();
 
-export const $iterationEnd = eve();
+export const $runEnd = eve<{ benchmark: Benchmark, index: number }>();
 
-export const $collectStart = eve();
+export const $iterationStart = eve<{ benchmark: Benchmark, mode: Mode }>();
 
-export const $collectEnd = eve();
+export const $iterationEnd = eve<{ benchmark: Benchmark, mode: Mode, median: number, isValid: boolean }>();
 
-export const $benchmarkStart = eve();
+export const $collectStart = eve<{ benchmark: Benchmark, mode: Mode }>();
 
-export const $benchmarkEnd = eve();
+export const $collectEnd = eve<{ benchmark: Benchmark, mode: Mode, result: BenchmarkResult }>();
 
-export const $runStart = eve();
+export const $directoryOpen = eve<{ root: string, input: string[] }>();
 
-export const $runEnd = eve();
+export const $directoryClose = eve<{ root: string, input: string[] }>();
 
-export const $sessionStart = eve();
+export const $fileOpen = eve<{ path: string }>();
 
-export const $sessionEnd = eve();
+export const $fileClose = eve<{ path: string }>();
+
+export const $compilationStart = eve<{ path: string }>();
+
+export const $compilationEnd = eve<{ path: string }>();

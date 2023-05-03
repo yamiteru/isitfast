@@ -1,5 +1,7 @@
 import {ASYNC_CPU, ASYNC_RAM, OFFSET_FUNCTIONS, SYNC_CPU, SYNC_RAM, UINT32_MAX} from "@constants";
-import {Mode, Type} from "@types";
+import {$offsetEnd, $offsetStart} from "@events";
+import {Benchmark, Mode, Type} from "@types";
+import {pub} from "ueve/async";
 import {collect} from "./collect.js";
 
 export async function runOffsets() {
@@ -17,29 +19,25 @@ export async function runOffsets() {
 
       if(min !== UINT32_MAX) {
         const { fn, file } = OFFSET_FUNCTIONS[_type];
-
-        // TODO: add before offset
-
-        const offset = await collect({
+        const benchmark = {
           name: `${type}_${mode}`,
           fn,
           path: "default",
           type: _type,
           file
-        }, _mode);
+        } as Benchmark;
 
-        // TODO: this is ugly as fuck
-        const median = offset.median >= min
+        await pub($offsetStart, { benchmark, mode: _mode });
+
+        const offset = await collect(benchmark, _mode);
+
+        await pub($offsetEnd, { benchmark, mode: _mode, median: offset.median >= min
           ? min === 0
             ? 0
             : _mode === "ram"
               ? min
               : min - 1
-          : offset.median;
-
-        console.log(_type, _mode, median);
-
-        // TODO: add after offset
+          : offset.median });
       }
     }
   }

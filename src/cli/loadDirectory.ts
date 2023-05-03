@@ -9,7 +9,7 @@ export const loadDirectory = async (root: string, input: string[]): Promise<Dire
   const name = root.split("/").at(root.at(-1) === "/" ? -2: -1) as string;
   const promises: Promise<Content>[] = [];
 
-  await pub($directoryOpen, {});
+  await pub($directoryOpen, { root, input });
 
   for (let i = 0; i < input.length; ++i) {
     const path = joinPath(root, input[i]);
@@ -28,7 +28,7 @@ export const loadDirectory = async (root: string, input: string[]): Promise<Dire
 
   const content = await Promise.all(promises);
 
-  await pub($directoryClose, {});
+  await pub($directoryClose, { root, input });
 
   return {
     type: "directory",
