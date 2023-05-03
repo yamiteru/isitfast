@@ -1,17 +1,17 @@
 import {BENCHMARK_RUNS} from "@constants";
 import {$benchmarkEnd, $benchmarkStart, $runEnd, $runStart} from "@events";
-import {Benchmark, BenchmarkResult} from "@types";
+import {Benchmark, BenchmarkResult, BenchmarkResults} from "@types";
 import {pub} from "ueve/async";
 import {collect} from "./collect.js";
 
 export async function runBenchmark(benchmark: Benchmark) {
-  await pub($benchmarkStart, {});
+  await pub($benchmarkStart, { benchmark });
 
   let cpu: null | BenchmarkResult = null;
   let ram: null | BenchmarkResult = null;
 
   for(let i = 0; i < BENCHMARK_RUNS; ++i) {
-    await pub($runStart, {});
+    await pub($runStart, { benchmark, index: i });
 
     const cpuResult = await collect(benchmark, "cpu");
     const ramResult = await collect(benchmark, "ram");
@@ -24,12 +24,12 @@ export async function runBenchmark(benchmark: Benchmark) {
       ram = ramResult;
     }
 
-    await pub($runEnd, {});
+    await pub($runEnd, { benchmark, index: i });
   }
 
-  await pub($benchmarkEnd, {});
+  const results = { cpu, ram } as BenchmarkResults;
 
-  console.log(benchmark.fn, benchmark.type, benchmark.file, { cpu, ram });
+  await pub($benchmarkEnd, { benchmark, results });
 
-  return { cpu, ram } as { cpu: BenchmarkResult, ram: BenchmarkResult };
+  return results;
 }

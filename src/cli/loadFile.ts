@@ -5,18 +5,20 @@ import { writeFile } from "node:fs/promises";
 import { getType } from "@utils";
 import { Benchmark, File } from "@types";
 import {pub} from "ueve/async";
-import {$fileClose, $fileOpen} from "@events";
+import {$compilationEnd, $compilationStart, $fileClose, $fileOpen} from "@events";
 
-export const loadFile = async (sourcePath: string): Promise<File> => {
-  await pub($fileOpen, {});
+export const loadFile = async (path: string): Promise<File> => {
+  await pub($fileOpen, { path });
 
-  if(!FILE_CACHE.has(sourcePath)) {
-    const name = sourcePath.split("/").at(-1) as string;
+  if(!FILE_CACHE.has(path)) {
+    await pub($compilationStart, { path });
+
+    const name = path.split("/").at(-1) as string;
     const outPath = `${CACHE_DIR}${randomUUID()}.mjs`;
-    const output = await transformFile(sourcePath, {
+    const output = await transformFile(path, {
       jsc: {
         parser: {
-          syntax: sourcePath.endsWith(".ts") ? "typescript": "ecmascript"
+          syntax: path.endsWith(".ts") ? "typescript": "ecmascript"
         },
         target: "esnext"
       }
@@ -51,16 +53,18 @@ export const loadFile = async (sourcePath: string): Promise<File> => {
       }
     }
 
-    FILE_CACHE.set(sourcePath, {
+    FILE_CACHE.set(path, {
       type: "file",
       name,
-      path: sourcePath,
+      path: path,
       file: outPath,
       benchmarks
     });
+
+    await pub($compilationEnd, { path });
   }
 
-  await pub($fileClose, {});
+  await pub($fileClose, { path });
 
-  return FILE_CACHE.get(sourcePath) as File;
+  return FILE_CACHE.get(path) as File;
 };
