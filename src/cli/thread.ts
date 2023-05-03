@@ -1,4 +1,4 @@
-import {Mode, Benchmark} from "@types";
+import { Mode, Benchmark } from "@types";
 import { Worker } from "node:worker_threads";
 
 export async function thread(benchmark: Benchmark, mode: Mode) {
@@ -9,7 +9,7 @@ export async function thread(benchmark: Benchmark, mode: Mode) {
   const isAsync = benchmark.type === "async";
   const prefix = isAsync ? "async " : "";
   const run = isAsync ? "await fn()" : "fn()";
-  const gc = isCpu ? "global.gc();": "";
+  const gc = isCpu ? "global.gc();" : "";
 
   return new Worker(
     `

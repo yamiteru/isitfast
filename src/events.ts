@@ -1,4 +1,4 @@
-import {Benchmark, BenchmarkResult, BenchmarkResults, Mode} from "@types";
+import { Benchmark, BenchmarkResult, BenchmarkResults, Mode } from "@types";
 import { eve } from "ueve/async";
 
 export const $sessionStart = eve<{ id: string }>();
@@ -7,27 +7,43 @@ export const $sessionEnd = eve<{ id: string }>();
 
 export const $benchmarkStart = eve<{ benchmark: Benchmark }>();
 
-export const $benchmarkEnd = eve<{ benchmark: Benchmark, results: BenchmarkResults }>();
+export const $benchmarkEnd = eve<{
+  benchmark: Benchmark;
+  results: BenchmarkResults;
+}>();
 
-export const $offsetStart = eve<{ benchmark: Benchmark, mode: Mode }>();
+export const $offsetStart = eve<{ benchmark: Benchmark; mode: Mode }>();
 
-export const $offsetEnd = eve<{ benchmark: Benchmark, mode: Mode, median: number }>();
+export const $offsetEnd = eve<{
+  benchmark: Benchmark;
+  mode: Mode;
+  median: number;
+}>();
 
-export const $runStart = eve<{ benchmark: Benchmark, index: number }>();
+export const $runStart = eve<{ benchmark: Benchmark; index: number }>();
 
-export const $runEnd = eve<{ benchmark: Benchmark, index: number }>();
+export const $runEnd = eve<{ benchmark: Benchmark; index: number }>();
 
-export const $iterationStart = eve<{ benchmark: Benchmark, mode: Mode }>();
+export const $iterationStart = eve<{ benchmark: Benchmark; mode: Mode }>();
 
-export const $iterationEnd = eve<{ benchmark: Benchmark, mode: Mode, median: number, isValid: boolean }>();
+export const $iterationEnd = eve<{
+  benchmark: Benchmark;
+  mode: Mode;
+  median: number;
+  isValid: boolean;
+}>();
 
-export const $collectStart = eve<{ benchmark: Benchmark, mode: Mode }>();
+export const $collectStart = eve<{ benchmark: Benchmark; mode: Mode }>();
 
-export const $collectEnd = eve<{ benchmark: Benchmark, mode: Mode, result: BenchmarkResult }>();
+export const $collectEnd = eve<{
+  benchmark: Benchmark;
+  mode: Mode;
+  result: BenchmarkResult;
+}>();
 
-export const $directoryOpen = eve<{ root: string, input: string[] }>();
+export const $directoryOpen = eve<{ root: string; input: string[] }>();
 
-export const $directoryClose = eve<{ root: string, input: string[] }>();
+export const $directoryClose = eve<{ root: string; input: string[] }>();
 
 export const $fileOpen = eve<{ path: string }>();
 

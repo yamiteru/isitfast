@@ -13,7 +13,6 @@
     "esModuleInterop": true,
     "declaration": true,
     "noImplicitAny": true,
-    "typeRoots": ["@types", "node_modules/@types"],
     "rootDir": "src",
     "baseUrl": ".",
     "outDir": "dist",

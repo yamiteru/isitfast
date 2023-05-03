@@ -13,7 +13,9 @@ module.exports = {
   },
   rules: {
     "@typescript-eslint/no-explicit-any": "off",
-    "no-constant-condition": "off"
+    "no-constant-condition": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "no-async-promise-executor": "off"
   },
   env: {
     browser: true,
