@@ -24,12 +24,12 @@ export async function runBenchmark(benchmark: Benchmark) {
       ram = ramResult;
     }
 
-    console.log({ cpu: cpuResult, ram: ramResult });
-
     await pub($runEnd, {});
   }
 
   await pub($benchmarkEnd, {});
+
+  console.log(benchmark.fn, benchmark.type, benchmark.file, { cpu, ram });
 
   return { cpu, ram } as { cpu: BenchmarkResult, ram: BenchmarkResult };
 }

@@ -8,17 +8,18 @@ import {subarray} from "@utils";
 // TODO: rename these constants since it's not clear what they're used for
 export const CHUNK_SIZE = 100;
 export const SAMPLE_SIZE = 10;
-export const DEVIATION_MAX = 1;
-export const COLLECT_TIMEOUT = 5_000;
-export const COMPARE_SIZE = 3;
-export const BENCHMARK_RUNS = 5;
-export const FLUKE_PERCENT = 0.05;
-export const MATCH_NUMBER = SAMPLE_SIZE;
+export const DEVIATION_MAX = 2.5;
+export const COLLECT_TIMEOUT = 2_000;
+export const COMPARE_SIZE = 5;
+export const BENCHMARK_RUNS = 3;
+export const FLUKE_PERCENT = 0.1;
+export const MATCH_NUMBER = 3;
+export const UINT32_MAX = 4_294_967_295;
 
 export const TYPES = ["async", "sync"] as const;
 export const MODES = ["cpu", "ram"] as const;
 
-export const ARRAY_SCHEMA = [CHUNK_SIZE, CHUNK_SIZE, COMPARE_SIZE, COMPARE_SIZE + 1, 1, 1];
+export const ARRAY_SCHEMA = [CHUNK_SIZE, CHUNK_SIZE, COMPARE_SIZE, COMPARE_SIZE + 1, 1, 1, 1, 1, 1, 1];
 export const ARRAY = new Uint32Array(ARRAY_SCHEMA.reduce((acc, v) => acc + v, 0));
 
 export const [
@@ -28,11 +29,27 @@ export const [
   ARRAY_AFTER,
   INDEX,
   COUNT,
+  ASYNC_CPU,
+  ASYNC_RAM,
+  SYNC_CPU,
+  SYNC_RAM
 ] = subarray(ARRAY, ARRAY_SCHEMA);
 
 export const FILE_CACHE = new Map<string, Content>();
 
-export const CACHE_DIR = `${homedir()}/.isitfast/cache/`;
+export const ISITFAST_DIR = `${homedir()}/.isitfast`;
+export const CACHE_DIR = `${ISITFAST_DIR}/cache`;
+
+export const OFFSET_FUNCTIONS = {
+  async: {
+    fn: async function() {},
+    file: `${CACHE_DIR}/async.mjs`
+  },
+  sync: {
+    fn: function() {},
+    file: `${CACHE_DIR}/sync.mjs`
+  }
+};
 
 // Default offset
 export const OFFSET: BenchmarkResult = {
