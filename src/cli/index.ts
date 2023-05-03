@@ -1,4 +1,5 @@
 export * from "./runBenchmark.js";
+export * from "./runOffsets.js";
 export * from "./loadFile.js";
 export * from "./runFile.js";
 export * from "./loadDirectory.js";

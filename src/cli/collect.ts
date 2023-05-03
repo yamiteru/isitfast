@@ -9,7 +9,6 @@ export const collect = (benchmark: Benchmark, mode: Mode) => new Promise<Benchma
   const worker = await thread(benchmark, mode);
 
   const send = (benchmarkResult: BenchmarkResult) => {
-    console.log(ARRAY_ACTIVE);
     resolve(benchmarkResult);
     worker.terminate();
   };
