@@ -15,3 +15,4 @@ export * from "./joinPath.js";
 export * from "./shiftArray.js";
 export * from "./getType.js";
 export * from "./subarray.js";
+export * from "./ast.js";
