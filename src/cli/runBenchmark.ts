@@ -8,6 +8,8 @@ import {collectNone} from "./collectNone.js";
 export async function runBenchmark(benchmark: Benchmark) {
   await pub($benchmarkStart, { benchmark });
 
+  // TODO: what to do with cpu/ramAll and cpu/ramNone?
+
   const cpuAll= await collectAll(benchmark, "cpu");
   const ramAll= await collectAll(benchmark, "ram");
 
@@ -18,8 +20,6 @@ export async function runBenchmark(benchmark: Benchmark) {
   const ramNone= await collectNone(benchmark, "ram");
 
   const results = { cpu: cpuAuto, ram: ramAuto};
-
-  console.log({cpuAll, ramAll, cpuAuto, ramAuto, cpuNone, ramNone});
 
   await pub($benchmarkEnd, { benchmark, results });
 
