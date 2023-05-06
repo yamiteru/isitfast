@@ -16,6 +16,8 @@ export const collectAuto = (benchmark: Benchmark, mode: Mode, min: number) => ne
   INDEX[0] = 0;
   COUNT[0] = 0;
 
+  let iterationsUntilStable = 0;
+
   const start = async () => {
     await pub($iterationStart, { benchmark, mode, opt: OPT });
 
@@ -61,17 +63,23 @@ export const collectAuto = (benchmark: Benchmark, mode: Mode, min: number) => ne
       } else {
         ARRAY_ACTIVE[index] = v;
       }
+
+      if(iterationsUntilStable === 0) {
+        if(v <= (min * 1.25)) {
+          COUNT[0] += 1;
+        } else {
+          COUNT[0] = 0;
+        }
+      }
     }
 
-    if(v <= min) {
-      COUNT[0] += 1;
-    } else {
-      COUNT[0] = 0;
-    }
-
-    if(COUNT[0] < MATCH_NUMBER) {
+    if(iterationsUntilStable === 0 || index < iterationsUntilStable) {
       if(!shouldIgnore) {
         INDEX[0] += 1;
+      }
+
+      if(iterationsUntilStable === 0 && COUNT[0] === MATCH_NUMBER) {
+        iterationsUntilStable = index * 2;
       }
 
       await pub($iterationEnd, {

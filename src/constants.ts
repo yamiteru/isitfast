@@ -11,7 +11,7 @@ export const COLLECT_TIMEOUT = 10_000;
 export const COMPARE_SIZE = 5;
 export const BENCHMARK_RUNS = 6;
 export const FLUKE_PERCENT = 0.01;
-export const MATCH_NUMBER = Math.ceil(CHUNK_SIZE * 0.75);
+export const MATCH_NUMBER = Math.ceil(CHUNK_SIZE * 0.5);
 
 export const TYPES = ["async", "sync"] as const;
 export const MODES = ["cpu", "ram"] as const;
