@@ -1,33 +1,25 @@
-import { BENCHMARK_RUNS } from "@constants";
-import { $benchmarkEnd, $benchmarkStart, $runEnd, $runStart } from "@events";
-import { Benchmark, BenchmarkResult, BenchmarkResults } from "@types";
+import {$benchmarkStart, $benchmarkEnd} from "@events";
+import {Benchmark} from "@types";
 import { pub } from "ueve/async";
-import { collect } from "./collect.js";
+import {collectAll} from "./collectAll.js";
+import {collectAuto} from "./collectAuto.js";
+import {collectNone} from "./collectNone.js";
 
 export async function runBenchmark(benchmark: Benchmark) {
   await pub($benchmarkStart, { benchmark });
 
-  // let cpu: null | BenchmarkResult = null;
-  // let ram: null | BenchmarkResult = null;
-  //
-  // for (let i = 0; i < BENCHMARK_RUNS; ++i) {
-  //   await pub($runStart, { benchmark, index: i });
+  const cpuAll= await collectAll(benchmark, "cpu");
+  const ramAll= await collectAll(benchmark, "ram");
 
-    const cpuResult = await collect(benchmark, "cpu");
-    const ramResult = await collect(benchmark, "ram");
+  const cpuAuto= await collectAuto(benchmark, "cpu", cpuAll.median);
+  const ramAuto= await collectAuto(benchmark, "ram", ramAll.median);
 
-  //   if (cpu === null || cpu.median > cpuResult.median) {
-  //     cpu = cpuResult;
-  //   }
-  //
-  //   if (ram === null || ram.median > ramResult.median) {
-  //     ram = ramResult;
-  //   }
-  //
-  //   await pub($runEnd, { benchmark, index: i });
-  // }
+  const cpuNone= await collectNone(benchmark, "cpu");
+  const ramNone= await collectNone(benchmark, "ram");
 
-  const results = { cpu: cpuResult, ram: ramResult };
+  const results = { cpu: cpuAuto, ram: ramAuto};
+
+  console.log({cpuAll, ramAll, cpuAuto, ramAuto, cpuNone, ramNone});
 
   await pub($benchmarkEnd, { benchmark, results });
 

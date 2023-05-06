@@ -5,16 +5,17 @@ import { subarray } from "@utils";
 import {Options} from "@swc/core";
 
 // TODO: rename these constants since it's not clear what they're used for
-export const CHUNK_SIZE = 100;
+export const CHUNK_SIZE = 250;
 export const DEVIATION_MAX = 1;
-export const COLLECT_TIMEOUT = 15_000;
+export const COLLECT_TIMEOUT = 10_000;
 export const COMPARE_SIZE = 5;
 export const BENCHMARK_RUNS = 6;
 export const FLUKE_PERCENT = 0.01;
-export const MATCH_NUMBER = 10;
+export const MATCH_NUMBER = Math.ceil(CHUNK_SIZE * 0.75);
 
 export const TYPES = ["async", "sync"] as const;
 export const MODES = ["cpu", "ram"] as const;
+export const OPTS = ["all", "auto", "none"] as const;
 
 export const SWC_OPTIONS: Options = {
   jsc: {

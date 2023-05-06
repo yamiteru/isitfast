@@ -1,4 +1,4 @@
-import { Benchmark, BenchmarkResult, BenchmarkResults, Mode } from "@types";
+import { Benchmark, BenchmarkResult, BenchmarkResults, Mode, Opt } from "@types";
 import { eve } from "ueve/async";
 
 export const $sessionStart = eve<{ id: string }>();
@@ -24,21 +24,32 @@ export const $runStart = eve<{ benchmark: Benchmark; index: number }>();
 
 export const $runEnd = eve<{ benchmark: Benchmark; index: number }>();
 
-export const $iterationStart = eve<{ benchmark: Benchmark; mode: Mode }>();
+export const $iterationStart = eve<{
+  benchmark: Benchmark;
+  mode: Mode;
+  opt: Opt;
+}>();
 
 export const $iterationEnd = eve<{
   benchmark: Benchmark;
   mode: Mode;
+  opt: Opt;
   median: number;
-  isValid: boolean;
+  timedOut: boolean;
 }>();
 
-export const $collectStart = eve<{ benchmark: Benchmark; mode: Mode }>();
+export const $collectStart = eve<{
+  benchmark: Benchmark;
+  mode: Mode;
+  opt: Opt;
+}>();
 
 export const $collectEnd = eve<{
   benchmark: Benchmark;
   mode: Mode;
+  opt: Opt;
   result: BenchmarkResult;
+  timedOut: boolean;
 }>();
 
 export const $directoryOpen = eve<{ root: string; input: string[] }>();
