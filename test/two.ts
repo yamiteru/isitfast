@@ -1,3 +1,3 @@
-export const $ignore = () => {};
-
-export default () => {};
+const a = () => {
+  process.memoryUsage().heapUsed;
+}

@@ -32,10 +32,11 @@
     "typescript": "4.9.5"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "packageManager": "pnpm@7.22.0",
   "dependencies": {
+    "cuid": "3.0.0",
     "ink": "4.2.0",
     "meow": "11.0.0",
     "react": "18.2.0",

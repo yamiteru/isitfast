@@ -7,27 +7,27 @@ import { collect } from "./collect.js";
 export async function runBenchmark(benchmark: Benchmark) {
   await pub($benchmarkStart, { benchmark });
 
-  let cpu: null | BenchmarkResult = null;
-  let ram: null | BenchmarkResult = null;
-
-  for (let i = 0; i < BENCHMARK_RUNS; ++i) {
-    await pub($runStart, { benchmark, index: i });
+  // let cpu: null | BenchmarkResult = null;
+  // let ram: null | BenchmarkResult = null;
+  //
+  // for (let i = 0; i < BENCHMARK_RUNS; ++i) {
+  //   await pub($runStart, { benchmark, index: i });
 
     const cpuResult = await collect(benchmark, "cpu");
     const ramResult = await collect(benchmark, "ram");
 
-    if (cpu === null || cpu.median > cpuResult.median) {
-      cpu = cpuResult;
-    }
+  //   if (cpu === null || cpu.median > cpuResult.median) {
+  //     cpu = cpuResult;
+  //   }
+  //
+  //   if (ram === null || ram.median > ramResult.median) {
+  //     ram = ramResult;
+  //   }
+  //
+  //   await pub($runEnd, { benchmark, index: i });
+  // }
 
-    if (ram === null || ram.median > ramResult.median) {
-      ram = ramResult;
-    }
-
-    await pub($runEnd, { benchmark, index: i });
-  }
-
-  const results = { cpu, ram } as BenchmarkResults;
+  const results = { cpu: cpuResult, ram: ramResult };
 
   await pub($benchmarkEnd, { benchmark, results });
 

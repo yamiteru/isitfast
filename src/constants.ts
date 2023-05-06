@@ -1,30 +1,37 @@
+import cuid from "cuid";
 import { homedir } from "node:os";
 import { BenchmarkResult, Content } from "@types";
 import { subarray } from "@utils";
+import {Options} from "@swc/core";
 
 // TODO: rename these constants since it's not clear what they're used for
 export const CHUNK_SIZE = 100;
-export const SAMPLE_SIZE = 5;
 export const DEVIATION_MAX = 1;
-export const COLLECT_TIMEOUT = 10_000;
+export const COLLECT_TIMEOUT = 15_000;
 export const COMPARE_SIZE = 5;
 export const BENCHMARK_RUNS = 6;
 export const FLUKE_PERCENT = 0.01;
 export const MATCH_NUMBER = 10;
-export const UINT32_MAX = 4_294_967_295;
 
 export const TYPES = ["async", "sync"] as const;
 export const MODES = ["cpu", "ram"] as const;
+
+export const SWC_OPTIONS: Options = {
+  jsc: {
+    parser: {
+      syntax: "typescript",
+    },
+    target: "esnext"
+  }
+};
+
+export const AST_START = cuid();
 
 export const ARRAY_SCHEMA = [
   CHUNK_SIZE,
   CHUNK_SIZE,
   COMPARE_SIZE,
   COMPARE_SIZE + 1,
-  1,
-  1,
-  1,
-  1,
   1,
   1,
 ];
@@ -39,27 +46,12 @@ export const [
   ARRAY_AFTER,
   INDEX,
   COUNT,
-  ASYNC_CPU,
-  ASYNC_RAM,
-  SYNC_CPU,
-  SYNC_RAM,
 ] = subarray(ARRAY, ARRAY_SCHEMA);
 
 export const FILE_CACHE = new Map<string, Content>();
 
 export const ISITFAST_DIR = `${homedir()}/.isitfast`;
 export const CACHE_DIR = `${ISITFAST_DIR}/cache`;
-
-export const OFFSET_FUNCTIONS = {
-  async: {
-    fn: async function () {},
-    file: `${CACHE_DIR}/async.mjs`,
-  },
-  sync: {
-    fn: function () {},
-    file: `${CACHE_DIR}/sync.mjs`,
-  },
-};
 
 // Default offset
 export const OFFSET: BenchmarkResult = {
@@ -101,11 +93,3 @@ export const OFFSET: BenchmarkResult = {
   },
   iterations: 0,
 };
-
-export const TIME_UNIT = "ns";
-
-export const NS_IN_SECOND = 1_000_000_000;
-
-export const MS_IN_SECOND = 1_000;
-
-export const UNITS_IN_SECOND = NS_IN_SECOND;
