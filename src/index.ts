@@ -10,8 +10,7 @@ import { pub, sub } from "ueve/async";
 if (input.length === 0) input[0] = "/";
 
 sub($iterationEnd, async ({benchmark, median, mode, opt, timedOut}) => {
-  // console.log(benchmark.name, mode, median, timedOut);
-  await appendFile(`./${benchmark.name}-${mode}-${opt}.json`, `${median},`);
+  median >= 0 && await appendFile(`./${benchmark.name}-${mode}-${opt}.json`, `${median},`);
 });
 
 (async () => {
