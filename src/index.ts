@@ -3,14 +3,36 @@
 import cuid from "cuid";
 import { input, loadDirectory, runDirectory } from "@cli";
 import { CACHE_DIR } from "@constants";
-import { $sessionStart, $sessionEnd, $iterationEnd } from "@events";
+import { $sessionStart, $sessionEnd, $iterationEnd, $benchmarkEnd, $collectStart, $collectEnd } from "@events";
 import { rm, mkdir, appendFile } from "fs/promises";
 import { pub, sub } from "ueve/async";
 
 if (input.length === 0) input[0] = "/";
 
-sub($iterationEnd, async ({benchmark, median, mode, opt, timedOut}) => {
-  median >= 0 && await appendFile(`./${benchmark.name}-${mode}-${opt}.json`, `${median},`);
+let first = true;
+
+sub($iterationEnd, async ({benchmark, median, mode, opt}) => {
+  if(median >= 0) {
+    await appendFile(`./${benchmark.name}-${mode}-${opt}.json`, `${first ? "": ","}${median}`);
+    first = false
+  }
+});
+
+sub($collectStart, async ({benchmark, mode, opt}) => {
+  const name = `./${benchmark.name}-${mode}-${opt}.json`;
+
+  first = true;
+
+  await rm(name, { force: true });
+  await appendFile(name, "[");
+});
+
+sub($collectEnd, async ({benchmark, mode, opt}) => {
+  await appendFile(`./${benchmark.name}-${mode}-${opt}.json`, "]");
+});
+
+sub($benchmarkEnd, async ({benchmark, results}) => {
+  console.log(benchmark.name, results);
 });
 
 (async () => {
