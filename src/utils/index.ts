@@ -16,3 +16,4 @@ export * from "./shiftArray.js";
 export * from "./getType.js";
 export * from "./subarray.js";
 export * from "./ast.js";
+export * from "./getResultFileName.js";

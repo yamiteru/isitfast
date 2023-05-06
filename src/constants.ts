@@ -52,7 +52,8 @@ export const [
 export const FILE_CACHE = new Map<string, Content>();
 
 export const ISITFAST_DIR = `${homedir()}/.isitfast`;
-export const CACHE_DIR = `${ISITFAST_DIR}/cache`;
+export const COMPILE_DIR = `${ISITFAST_DIR}/compile`;
+export const RESULTS_DIR = `${ISITFAST_DIR}/results`;
 
 // Default offset
 export const OFFSET: BenchmarkResult = {

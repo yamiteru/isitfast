@@ -6,7 +6,9 @@ export type Fn<$Input extends unknown[], $Output> = (
   ...props: $Input
 ) => $Output;
 
+// TODO: rename props since some of them don't make much sense
 export type Benchmark = {
+  id: string;
   name: string;
   path: string;
   async: boolean;

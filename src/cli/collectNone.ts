@@ -55,15 +55,15 @@ export const collectNone = (benchmark: Benchmark, mode: Mode) => new Promise<Ben
     if(index < CHUNK_SIZE) {
       if(!shouldIgnore) {
         INDEX[0] += 1;
-      }
 
-      await pub($iterationEnd, {
-        benchmark,
-        median: v,
-        mode,
-        opt: OPT,
-        timedOut: false
-      });
+        await pub($iterationEnd, {
+          benchmark,
+          median: v,
+          mode,
+          opt: OPT,
+          timedOut: false
+        });
+      }
 
       await start();
     } else {

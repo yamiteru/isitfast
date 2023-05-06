@@ -76,19 +76,19 @@ export const collectAuto = (benchmark: Benchmark, mode: Mode, min: number) => ne
     if(iterationsUntilStable === 0 || index < iterationsUntilStable) {
       if(!shouldIgnore) {
         INDEX[0] += 1;
+
+        await pub($iterationEnd, {
+          benchmark,
+          median: v,
+          mode,
+          opt: OPT,
+          timedOut: false
+        });
       }
 
       if(iterationsUntilStable === 0 && COUNT[0] === MATCH_NUMBER) {
         iterationsUntilStable = index * 2;
       }
-
-      await pub($iterationEnd, {
-        benchmark,
-        median: v,
-        mode,
-        opt: OPT,
-        timedOut: false
-      });
 
       await start();
     } else {

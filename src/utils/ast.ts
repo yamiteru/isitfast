@@ -1,5 +1,5 @@
 import cuid from "cuid";
-import {AST_START, CACHE_DIR, SWC_OPTIONS} from "@constants";
+import {AST_START, COMPILE_DIR, SWC_OPTIONS} from "@constants";
 import {Identifier, Expression, Span, Argument, MemberExpression, CallExpression, BinaryOperator, BinaryExpression, VariableDeclarationKind, VariableDeclarator, VariableDeclaration, ReturnStatement, parseFile, transform} from "@swc/core";
 import {Benchmark} from "@types";
 import {writeFile} from "fs/promises";
@@ -105,6 +105,8 @@ const measureEnd = (expression: Expression) => returnStatement(
   )
 );
 
+// TODO: support default exports
+// TODO: get rid of duplicate code
 export const collectBenchmarksFromFile = async (path: string): Promise<Benchmark[]> => {
   const ast = await parseFile(path);
   const benchmarks: Benchmark[] = [];
@@ -117,10 +119,10 @@ export const collectBenchmarksFromFile = async (path: string): Promise<Benchmark
 
         if(VariableDeclarator.id.type === "Identifier" && VariableDeclarator.init?.type === "ArrowFunctionExpression" && (VariableDeclarator.id.value === "$$benchmark" || VariableDeclarator.id.value[0] === "$")) {
           if(VariableDeclarator.init.body.type === "BlockStatement") {
-            const id = cuid();
+            const id = path.split("/").join("-").replace(".", "-").toLowerCase();
             const name = VariableDeclarator.id.value;
-            const fileCpu = `${CACHE_DIR}/${id}_cpu.mjs`;
-            const fileRam = `${CACHE_DIR}/${id}_ram.mjs`;
+            const fileCpu = `${COMPILE_DIR}/${id}_${name}_cpu.mjs`;
+            const fileRam = `${COMPILE_DIR}/${id}_${name}_ram.mjs`;
             const original = VariableDeclarator.init.body.stmts;
 
             VariableDeclarator.init.body.stmts = [
@@ -149,6 +151,7 @@ export const collectBenchmarksFromFile = async (path: string): Promise<Benchmark
             ]);
 
             benchmarks.push({
+              id,
               name,
               path: name,
               async: VariableDeclarator.init.async,
@@ -162,10 +165,10 @@ export const collectBenchmarksFromFile = async (path: string): Promise<Benchmark
       // export function xyz() {}
       else if(ModuleItem.declaration.type === "FunctionDeclaration") {
         if(ModuleItem.declaration.body) {
-          const id = cuid();
+          const id = path.split("/").join("-").replace(".", "-").toLowerCase();
           const name = ModuleItem.declaration.identifier.value;
-          const fileCpu = `${CACHE_DIR}/${id}_cpu.mjs`;
-          const fileRam = `${CACHE_DIR}/${id}_ram.mjs`;
+          const fileCpu = `${COMPILE_DIR}/${id}_${name}_cpu.mjs`;
+          const fileRam = `${COMPILE_DIR}/${id}_${name}_ram.mjs`;
           const original = ModuleItem.declaration.body.stmts;
 
           ModuleItem.declaration.body.stmts = [
@@ -194,6 +197,7 @@ export const collectBenchmarksFromFile = async (path: string): Promise<Benchmark
           ]);
 
           benchmarks.push({
+            id,
             name,
             path: name,
             async: ModuleItem.declaration.async,
