@@ -1,4 +1,4 @@
-import { MODES, TYPES } from "@constants";
+import { MODES, OPTS, TYPES } from "@constants";
 
 export type Either<$Options extends unknown[]> = $Options[number];
 
@@ -76,5 +76,5 @@ export type BenchmarkResults = {
 };
 
 export type Type = (typeof TYPES)[number];
-
 export type Mode = (typeof MODES)[number];
+export type Opt = (typeof OPTS)[number];

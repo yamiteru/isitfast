@@ -1,19 +1,18 @@
-#! /usr/bin/env node --expose-gc
+#! /usr/bin/env node --allow-natives-syntax
 
 import cuid from "cuid";
 import { input, loadDirectory, runDirectory } from "@cli";
 import { CACHE_DIR } from "@constants";
-import { $sessionStart, $sessionEnd, $iterationEnd, $collectStart, $collectEnd } from "@events";
+import { $sessionStart, $sessionEnd, $iterationEnd } from "@events";
 import { rm, mkdir, appendFile } from "fs/promises";
 import { pub, sub } from "ueve/async";
 
 if (input.length === 0) input[0] = "/";
 
-// sub($iterationEnd, async ({benchmark, median, mode, isValid}) => {
-//   if(isValid) {
-//     await appendFile(`./${benchmark.name}-${mode}.json`, `${median},`);
-//   }
-// });
+sub($iterationEnd, async ({benchmark, median, mode, opt, timedOut}) => {
+  // console.log(benchmark.name, mode, median, timedOut);
+  await appendFile(`./${benchmark.name}-${mode}-${opt}.json`, `${median},`);
+});
 
 (async () => {
   const id = cuid();
