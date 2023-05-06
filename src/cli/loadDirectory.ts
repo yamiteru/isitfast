@@ -27,7 +27,7 @@ export const loadDirectory = async (
         }),
       );
     } else {
-      promises.push(loadFile(path));
+      promises.push(loadFile(path) as any);
     }
   }
 

@@ -1,5 +1,8 @@
-import {Identifier, Expression, Span, Argument, MemberExpression, CallExpression, BinaryOperator, BinaryExpression, VariableDeclarationKind, VariableDeclarator, VariableDeclaration, ReturnStatement, Module} from "@swc/core";
-import {Mode} from "@types";
+import cuid from "cuid";
+import {AST_START, CACHE_DIR, SWC_OPTIONS} from "@constants";
+import {Identifier, Expression, Span, Argument, MemberExpression, CallExpression, BinaryOperator, BinaryExpression, VariableDeclarationKind, VariableDeclarator, VariableDeclaration, ReturnStatement, parseFile, transform} from "@swc/core";
+import {Benchmark} from "@types";
+import {writeFile} from "fs/promises";
 
 const span = { start: 0, end: 0, ctxt: 0 };
 
@@ -82,7 +85,7 @@ const ram = memberExpression(
 
 const measureStart = (expression: Expression) => variableDeclaration("const", [
   variableDeclarator(
-    identifier("start"),
+    identifier(AST_START),
     expression
   )
 ]);
@@ -95,29 +98,112 @@ const measureEnd = (expression: Expression) => returnStatement(
         binaryExpression(
           "-",
           expression,
-          identifier("start")
+          identifier(AST_START)
         )
       )
     ]
   )
 );
 
-export const inlineMeasurementCode = (ast: Module, name: string, mode: Mode) => {
-  const measure = mode === "cpu" ? cpu: ram;
+export const collectBenchmarksFromFile = async (path: string): Promise<Benchmark[]> => {
+  const ast = await parseFile(path);
+  const benchmarks: Benchmark[] = [];
 
   for (const ModuleItem of ast.body) {
-    if(ModuleItem.type === "ExportDeclaration" && ModuleItem.declaration.type === "VariableDeclaration") {
-      for (const VariableDeclarator of ModuleItem.declaration.declarations) {
-        if(VariableDeclarator.id.type === "Identifier" && VariableDeclarator.id.value === name) {
-          if(VariableDeclarator.init?.type === "ArrowFunctionExpression" && VariableDeclarator.init.body.type === "BlockStatement") {
+    if(ModuleItem.type === "ExportDeclaration") {
+      // export const xyz = () => {};
+      if(ModuleItem.declaration.type === "VariableDeclaration") {
+        const VariableDeclarator = ModuleItem.declaration.declarations[0];
+
+        if(VariableDeclarator.id.type === "Identifier" && VariableDeclarator.init?.type === "ArrowFunctionExpression" && (VariableDeclarator.id.value === "$$benchmark" || VariableDeclarator.id.value[0] === "$")) {
+          if(VariableDeclarator.init.body.type === "BlockStatement") {
+            const id = cuid();
+            const name = VariableDeclarator.id.value;
+            const fileCpu = `${CACHE_DIR}/${id}_cpu.mjs`;
+            const fileRam = `${CACHE_DIR}/${id}_ram.mjs`;
+            const original = VariableDeclarator.init.body.stmts;
+
             VariableDeclarator.init.body.stmts = [
-              measureStart(measure),
-              ...VariableDeclarator.init.body.stmts,
-              measureEnd(measure)
+              measureStart(cpu),
+              ...original,
+              measureEnd(cpu)
             ];
+
+            const cpuOutput = await transform(ast, SWC_OPTIONS);
+
+            VariableDeclarator.init.body.stmts = original;
+
+            VariableDeclarator.init.body.stmts = [
+              measureStart(ram),
+              ...original,
+              measureEnd(ram)
+            ];
+
+            const ramOutput = await transform(ast, SWC_OPTIONS);
+
+            VariableDeclarator.init.body.stmts = original;
+
+            await Promise.all([
+              writeFile(fileCpu, cpuOutput.code),
+              writeFile(fileRam, ramOutput.code),
+            ]);
+
+            benchmarks.push({
+              name,
+              path: name,
+              async: VariableDeclarator.init.async,
+              fileCpu,
+              fileRam,
+            });
           }
+        }
+      }
+
+      // export function xyz() {}
+      else if(ModuleItem.declaration.type === "FunctionDeclaration") {
+        if(ModuleItem.declaration.body) {
+          const id = cuid();
+          const name = ModuleItem.declaration.identifier.value;
+          const fileCpu = `${CACHE_DIR}/${id}_cpu.mjs`;
+          const fileRam = `${CACHE_DIR}/${id}_ram.mjs`;
+          const original = ModuleItem.declaration.body.stmts;
+
+          ModuleItem.declaration.body.stmts = [
+            measureStart(cpu),
+            ...original,
+            measureEnd(cpu)
+          ];
+
+          const cpuOutput = await transform(ast, SWC_OPTIONS);
+
+          ModuleItem.declaration.body.stmts = original;
+
+          ModuleItem.declaration.body.stmts = [
+            measureStart(ram),
+            ...original,
+            measureEnd(ram)
+          ];
+
+          const ramOutput = await transform(ast, SWC_OPTIONS);
+
+          ModuleItem.declaration.body.stmts = original;
+
+          await Promise.all([
+            writeFile(fileCpu, cpuOutput.code),
+            writeFile(fileRam, ramOutput.code),
+          ]);
+
+          benchmarks.push({
+            name,
+            path: name,
+            async: ModuleItem.declaration.async,
+            fileCpu,
+            fileRam,
+          });
         }
       }
     }
   }
+
+  return benchmarks;
 };

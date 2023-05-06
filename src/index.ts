@@ -1,46 +1,29 @@
 #! /usr/bin/env node --expose-gc
 
-import { input, loadDirectory, runDirectory, runOffsets } from "@cli";
-import {
-  ASYNC_CPU,
-  ASYNC_RAM,
-  CACHE_DIR,
-  OFFSET_FUNCTIONS,
-  SYNC_CPU,
-  SYNC_RAM,
-  UINT32_MAX,
-} from "@constants";
-import { $sessionStart, $sessionEnd } from "@events";
-import { randomUUID } from "crypto";
-import { rm, mkdir, writeFile } from "fs/promises";
-import { pub } from "ueve/async";
+import cuid from "cuid";
+import { input, loadDirectory, runDirectory } from "@cli";
+import { CACHE_DIR } from "@constants";
+import { $sessionStart, $sessionEnd, $iterationEnd, $collectStart, $collectEnd } from "@events";
+import { rm, mkdir, appendFile } from "fs/promises";
+import { pub, sub } from "ueve/async";
+
+if (input.length === 0) input[0] = "/";
+
+// sub($iterationEnd, async ({benchmark, median, mode, isValid}) => {
+//   if(isValid) {
+//     await appendFile(`./${benchmark.name}-${mode}.json`, `${median},`);
+//   }
+// });
 
 (async () => {
-  const id = randomUUID();
+  const id = cuid();
 
   await pub($sessionStart, { id });
   await rm(CACHE_DIR, { recursive: true, force: true });
   await mkdir(CACHE_DIR);
 
-  await Promise.all([
-    writeFile(
-      OFFSET_FUNCTIONS.async.file,
-      "export default async function() {}",
-    ),
-    writeFile(OFFSET_FUNCTIONS.sync.file, "export default function() {}"),
-  ]);
+  const directory = await loadDirectory(process.cwd(), input);
 
-  if (input.length === 0) {
-    input.push("/");
-  }
-
-  ASYNC_CPU[0] = UINT32_MAX;
-  ASYNC_RAM[0] = UINT32_MAX;
-  SYNC_CPU[0] = UINT32_MAX;
-  SYNC_RAM[0] = UINT32_MAX;
-
-  await runDirectory(await loadDirectory(process.cwd(), input));
-  await runOffsets();
-  await rm(CACHE_DIR, { recursive: true, force: true });
+  await runDirectory(directory);
   await pub($sessionEnd, { id });
 })();

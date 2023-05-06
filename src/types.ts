@@ -8,10 +8,10 @@ export type Fn<$Input extends unknown[], $Output> = (
 
 export type Benchmark = {
   name: string;
-  fn: Fn<[], unknown>;
   path: string;
-  type: Type;
-  file: string;
+  async: boolean;
+  fileCpu: string;
+  fileRam: string;
 };
 
 export type Content = File | Directory;
@@ -20,7 +20,6 @@ export type File = {
   type: "file";
   name: string;
   path: string;
-  file: string;
   benchmarks: Benchmark[];
 };
 

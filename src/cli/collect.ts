@@ -7,7 +7,6 @@ import {
   COLLECT_TIMEOUT,
   DEVIATION_MAX,
   MATCH_NUMBER,
-  NS_IN_SECOND,
   ARRAY,
 } from "@constants";
 import { thread } from "./thread.js";
@@ -22,8 +21,7 @@ import {
 
 export const collect = (benchmark: Benchmark, mode: Mode) =>
   new Promise<BenchmarkResult>(async (resolve) => {
-    const timeout =
-      process.hrtime.bigint() + BigInt((COLLECT_TIMEOUT * NS_IN_SECOND) / 1000);
+    const timeout = process.hrtime.bigint() + BigInt(COLLECT_TIMEOUT * 1_000_000);
     const worker = await thread(benchmark, mode);
 
     const start = async () => {
