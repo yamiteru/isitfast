@@ -1,5 +1,5 @@
-import { Mode, Benchmark, Opt } from "@types";
 import { Worker } from "node:worker_threads";
+import {Benchmark, Mode, Opt} from "./types.js";
 
 export async function thread({ async, fileCpu, fileRam, path }: Benchmark, mode: Mode, opt: Opt) {
   return new Worker(

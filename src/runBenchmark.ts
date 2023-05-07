@@ -1,6 +1,6 @@
-import {BENCHMARK_RUNS} from "@constants";
-import {Benchmark} from "@types";
 import {collect} from "./collect.js";
+import {BENCHMARK_RUNS} from "./constants.js";
+import {Benchmark} from "./types.js";
 
 export async function runBenchmark(benchmark: Benchmark) {
   for(let i = 0; i < BENCHMARK_RUNS; ++i) {

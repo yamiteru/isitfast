@@ -1,4 +1,4 @@
-import { MODES, OPTS, TYPES } from "@constants";
+import {TYPES, MODES, OPTS} from "./constants.js";
 
 export type Either<$Options extends unknown[]> = $Options[number];
 
