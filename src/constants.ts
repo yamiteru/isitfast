@@ -1,12 +1,11 @@
 import cuid from "cuid";
 import { homedir } from "node:os";
-import { Content } from "@types";
-import { subarray } from "@utils";
 import {Options} from "@swc/core";
+import {subarray} from "./subarray.js";
+import {Content} from "./types.js";
 
-export const ITERATIONS = 5_000;
-export const COLLECT_TIMEOUT = 10_000;
-export const BENCHMARK_RUNS = 10;
+export const ITERATIONS = 2_500;
+export const BENCHMARK_RUNS = 3;
 
 export const TYPES = ["async", "sync"] as const;
 export const MODES = ["cpu", "ram"] as const;

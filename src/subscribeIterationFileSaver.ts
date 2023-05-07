@@ -1,8 +1,8 @@
-import {ARRAY} from "@constants";
-import {$collectEnd} from "@events";
-import {getResultFileName} from "@utils";
 import {writeFile} from "fs/promises";
 import {sub} from "ueve";
+import {ARRAY} from "./constants.js";
+import {$collectEnd} from "./events.js";
+import {getResultFileName} from "./getResultFileName.js";
 
 export function subscribeIterationFileSaver() {
   sub($collectEnd, async ({benchmark, mode, opt, run}) => {

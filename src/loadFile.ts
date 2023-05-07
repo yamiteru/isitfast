@@ -1,12 +1,7 @@
 import { pub } from "ueve/async";
-import {
-  $compilationEnd,
-  $compilationStart,
-  $fileClose,
-  $fileOpen,
-} from "@events";
-import {collectBenchmarksFromFile} from "src/utils/ast.js";
-import {FILE_CACHE} from "@constants";
+import {collectBenchmarksFromFile} from "./ast.js";
+import {FILE_CACHE} from "./constants.js";
+import {$fileOpen, $compilationStart, $compilationEnd, $fileClose} from "./events.js";
 
 export const loadFile = async (path: string): Promise<File> => {
   await pub($fileOpen, { path });

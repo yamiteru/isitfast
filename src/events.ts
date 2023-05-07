@@ -1,5 +1,5 @@
-import { Benchmark, Mode, Opt } from "@types";
 import { eve } from "ueve/async";
+import {Benchmark, Mode, Opt} from "./types.js";
 
 export const $iterationStart = eve<{
   benchmark: Benchmark;

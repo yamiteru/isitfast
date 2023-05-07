@@ -1,7 +1,7 @@
-import {AST_START, COMPILE_DIR, SWC_OPTIONS} from "@constants";
 import {Identifier, Expression, Span, Argument, MemberExpression, CallExpression, BinaryOperator, BinaryExpression, VariableDeclarationKind, VariableDeclarator, VariableDeclaration, ReturnStatement, parseFile, transform} from "@swc/core";
-import {Benchmark} from "@types";
 import {writeFile} from "fs/promises";
+import {AST_START, COMPILE_DIR, SWC_OPTIONS} from "./constants.js";
+import {Benchmark} from "./types.js";
 
 const span = { start: 0, end: 0, ctxt: 0 };
 

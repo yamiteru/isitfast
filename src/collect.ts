@@ -1,8 +1,8 @@
-import {INDEX, ARRAY, ITERATIONS} from "@constants";
-import {$collectEnd, $collectStart, $iterationEnd, $iterationStart} from "@events";
-import {Benchmark, Mode, Opt} from "@types";
 import {pub} from "ueve/async";
+import {INDEX, ARRAY, ITERATIONS} from "./constants.js";
+import {$collectStart, $iterationStart, $iterationEnd, $collectEnd} from "./events.js";
 import {thread} from "./thread.js";
+import {Benchmark, Mode, Opt} from "./types.js";
 
 export const collect = (
   benchmark: Benchmark,

@@ -1,9 +1,10 @@
-import { $directoryClose, $directoryOpen } from "@events";
-import { Content, Directory } from "@types";
-import { isDirectory, joinPath } from "@utils";
 import { readdir } from "fs/promises";
 import { pub } from "ueve/async";
+import {$directoryOpen, $directoryClose} from "./events.js";
+import {isDirectory} from "./isDirectory.js";
+import {joinPath} from "./joinPath.js";
 import { loadFile } from "./loadFile.js";
+import {Directory, Content} from "./types.js";
 
 export const loadDirectory = async (
   root: string,

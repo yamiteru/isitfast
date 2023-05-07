@@ -16,14 +16,7 @@
     "rootDir": "src",
     "baseUrl": ".",
     "outDir": "dist",
-    "declarationDir": "dist",
-    "paths": {
-      "@cli": ["src/cli/index.ts"],
-      "@constants": ["src/constants.ts"],
-      "@events": ["src/events.ts"],
-      "@types": ["src/types.ts"],
-      "@utils": ["src/utils/index.ts"]
-    }
+    "declarationDir": "dist"
   },
   "include": ["src", "examples"],
   "exclude": ["node_modules"]
