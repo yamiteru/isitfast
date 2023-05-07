@@ -6,7 +6,6 @@ export type Fn<$Input extends unknown[], $Output> = (
   ...props: $Input
 ) => $Output;
 
-// TODO: rename props since some of them don't make much sense
 export type Benchmark = {
   id: string;
   name: string;
@@ -30,51 +29,6 @@ export type Directory = {
   name: string;
   path: string;
   content: Content[];
-};
-
-export type BenchmarkResult = {
-  min: number;
-  max: number;
-  mean: number;
-  median: number;
-  variance: number;
-  deviation: {
-    standard: {
-      value: number;
-      percent: number;
-      error: number;
-    };
-    medianAbsolute: {
-      value: number;
-      percent: number;
-    };
-    meanAbsolute: {
-      value: number;
-      percent: number;
-    };
-  };
-  histogram: {
-    "0.001": number;
-    "0.01": number;
-    "0.1": number;
-    "1": number;
-    "2.5": number;
-    "25": number;
-    "50": number;
-    "75": number;
-    "90": number;
-    "97.5": number;
-    "99": number;
-    "99.9": number;
-    "99.99": number;
-    "99.999": number;
-  };
-  iterations: number;
-};
-
-export type BenchmarkResults = {
-  cpu: BenchmarkResult;
-  ram: BenchmarkResult;
 };
 
 export type Type = (typeof TYPES)[number];
