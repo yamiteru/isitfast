@@ -28,6 +28,7 @@ export const $iterationStart = eve<{
   benchmark: Benchmark;
   mode: Mode;
   opt: Opt;
+  run: number;
 }>();
 
 export const $iterationEnd = eve<{
@@ -36,12 +37,14 @@ export const $iterationEnd = eve<{
   opt: Opt;
   median: number;
   timedOut: boolean;
+  run: number;
 }>();
 
 export const $collectStart = eve<{
   benchmark: Benchmark;
   mode: Mode;
   opt: Opt;
+  run: number;
 }>();
 
 export const $collectEnd = eve<{
@@ -50,6 +53,7 @@ export const $collectEnd = eve<{
   opt: Opt;
   result: BenchmarkResult;
   timedOut: boolean;
+  run: number;
 }>();
 
 export const $directoryOpen = eve<{ root: string; input: string[] }>();

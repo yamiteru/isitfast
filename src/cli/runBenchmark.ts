@@ -1,5 +1,6 @@
+import {BENCHMARK_RUNS} from "@constants";
 import {$benchmarkStart, $benchmarkEnd} from "@events";
-import {Benchmark} from "@types";
+import {Benchmark, BenchmarkResult} from "@types";
 import { pub } from "ueve/async";
 import {collectAll} from "./collectAll.js";
 import {collectAuto} from "./collectAuto.js";
@@ -10,16 +11,21 @@ export async function runBenchmark(benchmark: Benchmark) {
 
   // TODO: what to do with cpu/ramAll and cpu/ramNone?
 
-  const cpuAll= await collectAll(benchmark, "cpu");
-  const ramAll= await collectAll(benchmark, "ram");
+  let cpu: BenchmarkResult = null as never;
+  let ram: BenchmarkResult = null as never;
 
-  const cpuAuto= await collectAuto(benchmark, "cpu", cpuAll.median);
-  const ramAuto= await collectAuto(benchmark, "ram", ramAll.median);
+  for(let i = 0; i < BENCHMARK_RUNS; ++i) {
+    const cpuAll = await collectAll(benchmark, "cpu", i);
+    const ramAll = await collectAll(benchmark, "ram", i);
 
-  const cpuNone= await collectNone(benchmark, "cpu");
-  const ramNone= await collectNone(benchmark, "ram");
+    cpu = await collectAuto(benchmark, "cpu", cpuAll.median, i);
+    ram = await collectAuto(benchmark, "ram", ramAll.median, i);
 
-  const results = { cpu: cpuAuto, ram: ramAuto};
+    await collectNone(benchmark, "cpu", i);
+    await collectNone(benchmark, "ram", i);
+  }
+
+  const results = { cpu, ram };
 
   await pub($benchmarkEnd, { benchmark, results });
 

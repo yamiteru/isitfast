@@ -7,11 +7,11 @@ import {thread} from "./thread.js";
 
 const OPT: Opt = "auto";
 
-export const collectAuto = (benchmark: Benchmark, mode: Mode, min: number) => new Promise<BenchmarkResult>(async (resolve) => {
+export const collectAuto = (benchmark: Benchmark, mode: Mode, min: number, run: number) => new Promise<BenchmarkResult>(async (resolve) => {
   const worker = await thread(benchmark, mode, OPT);
   const timeout = process.hrtime.bigint() + BigInt(COLLECT_TIMEOUT * 1_000_000);
 
-  await pub($collectStart, { benchmark, mode, opt: OPT });
+  await pub($collectStart, { benchmark, mode, opt: OPT, run });
 
   INDEX[0] = 0;
   COUNT[0] = 0;
@@ -19,7 +19,7 @@ export const collectAuto = (benchmark: Benchmark, mode: Mode, min: number) => ne
   let iterationsUntilStable = 0;
 
   const start = async () => {
-    await pub($iterationStart, { benchmark, mode, opt: OPT });
+    await pub($iterationStart, { benchmark, mode, opt: OPT, run });
 
     worker.postMessage(null);
   };
@@ -32,7 +32,8 @@ export const collectAuto = (benchmark: Benchmark, mode: Mode, min: number) => ne
       mode,
       opt: OPT,
       median: result.median,
-      timedOut
+      timedOut,
+      run
     });
 
     await pub($collectEnd, {
@@ -40,7 +41,8 @@ export const collectAuto = (benchmark: Benchmark, mode: Mode, min: number) => ne
       mode,
       result,
       opt: OPT,
-      timedOut
+      timedOut,
+      run
     });
 
     resolve(result);
@@ -82,7 +84,8 @@ export const collectAuto = (benchmark: Benchmark, mode: Mode, min: number) => ne
           median: v,
           mode,
           opt: OPT,
-          timedOut: false
+          timedOut: false,
+          run
         });
       }
 

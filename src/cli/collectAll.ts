@@ -7,16 +7,16 @@ import {thread} from "./thread.js";
 
 const OPT: Opt = "all";
 
-export const collectAll = (benchmark: Benchmark, mode: Mode) => new Promise<BenchmarkResult>( async (resolve) => {
+export const collectAll = (benchmark: Benchmark, mode: Mode, run: number) => new Promise<BenchmarkResult>( async (resolve) => {
   const worker = await thread(benchmark, mode, OPT);
 
-  await pub($collectStart, { benchmark, mode, opt: OPT });
+  await pub($collectStart, { benchmark, mode, opt: OPT, run });
 
   INDEX[0] = 0;
   COUNT[0] = 0;
 
   const start = async () => {
-    await pub($iterationStart, { benchmark, mode, opt: OPT });
+    await pub($iterationStart, { benchmark, mode, opt: OPT, run });
 
     worker.postMessage(null);
   };
@@ -29,7 +29,8 @@ export const collectAll = (benchmark: Benchmark, mode: Mode) => new Promise<Benc
       mode,
       opt: OPT,
       median: result.median,
-      timedOut
+      timedOut,
+      run
     });
 
     await pub($collectEnd, {
@@ -37,7 +38,8 @@ export const collectAll = (benchmark: Benchmark, mode: Mode) => new Promise<Benc
       mode,
       result,
       opt: OPT,
-      timedOut
+      timedOut,
+      run
     });
 
     resolve(result);
@@ -61,7 +63,8 @@ export const collectAll = (benchmark: Benchmark, mode: Mode) => new Promise<Benc
           median: v,
           mode,
           opt: OPT,
-          timedOut: false
+          timedOut: false,
+          run
         });
       }
 

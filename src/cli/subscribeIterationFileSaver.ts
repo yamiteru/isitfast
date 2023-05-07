@@ -6,14 +6,14 @@ import {sub} from "ueve";
 export function subscribeIterationFileSaver() {
   let first = true;
 
-  sub($iterationEnd, async ({benchmark, median, mode, opt}) => {
-      await appendFile(getResultFileName(benchmark, mode, opt), `${first ? "": ","}${median}`);
+  sub($iterationEnd, async ({benchmark, median, mode, opt, run}) => {
+      await appendFile(getResultFileName(benchmark, mode, opt, run), `${first ? "": ","}${median}`);
 
       first = false
   });
 
-  sub($collectStart, async ({benchmark, mode, opt}) => {
-    const name = getResultFileName(benchmark, mode, opt);
+  sub($collectStart, async ({benchmark, mode, opt, run}) => {
+    const name = getResultFileName(benchmark, mode, opt, run);
 
     first = true;
 
@@ -21,7 +21,7 @@ export function subscribeIterationFileSaver() {
     await appendFile(name, "[");
   });
 
-  sub($collectEnd, async ({benchmark, mode, opt}) => {
-    await appendFile(getResultFileName(benchmark, mode, opt), "]");
+  sub($collectEnd, async ({benchmark, mode, opt, run}) => {
+    await appendFile(getResultFileName(benchmark, mode, opt, run), "]");
   });
 }

@@ -1,4 +1,4 @@
-import {ARRAY_ACTIVE, CHUNK_SIZE, COLLECT_TIMEOUT, COUNT, INDEX} from "@constants";
+import {ARRAY_ACTIVE, CHUNK_SIZE, COUNT, INDEX} from "@constants";
 import {$collectEnd, $collectStart, $iterationEnd, $iterationStart} from "@events";
 import {Benchmark, BenchmarkResult, Mode, Opt} from "@types";
 import {getBenchmarkResult} from "@utils";
@@ -7,16 +7,16 @@ import {thread} from "./thread.js";
 
 const OPT: Opt = "none";
 
-export const collectNone = (benchmark: Benchmark, mode: Mode) => new Promise<BenchmarkResult>( async (resolve) => {
+export const collectNone = (benchmark: Benchmark, mode: Mode, run: number) => new Promise<BenchmarkResult>( async (resolve) => {
   const worker = await thread(benchmark, mode, OPT);
 
-  await pub($collectStart, { benchmark, mode, opt: OPT });
+  await pub($collectStart, { benchmark, mode, opt: OPT, run });
 
   INDEX[0] = 0;
   COUNT[0] = 0;
 
   const start = async () => {
-    await pub($iterationStart, { benchmark, mode, opt: OPT });
+    await pub($iterationStart, { benchmark, mode, opt: OPT, run });
 
     worker.postMessage(null);
   };
@@ -29,7 +29,8 @@ export const collectNone = (benchmark: Benchmark, mode: Mode) => new Promise<Ben
       mode,
       opt: OPT,
       median: result.median,
-      timedOut
+      timedOut,
+      run
     });
 
     await pub($collectEnd, {
@@ -37,7 +38,8 @@ export const collectNone = (benchmark: Benchmark, mode: Mode) => new Promise<Ben
       mode,
       result,
       opt: OPT,
-      timedOut
+      timedOut,
+      run
     });
 
     resolve(result);
@@ -61,7 +63,8 @@ export const collectNone = (benchmark: Benchmark, mode: Mode) => new Promise<Ben
           median: v,
           mode,
           opt: OPT,
-          timedOut: false
+          timedOut: false,
+          run
         });
       }
 

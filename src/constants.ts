@@ -9,7 +9,7 @@ export const CHUNK_SIZE = 250;
 export const DEVIATION_MAX = 1;
 export const COLLECT_TIMEOUT = 10_000;
 export const COMPARE_SIZE = 5;
-export const BENCHMARK_RUNS = 6;
+export const BENCHMARK_RUNS = 10;
 export const FLUKE_PERCENT = 0.01;
 export const MATCH_NUMBER = Math.ceil(CHUNK_SIZE * 0.5);
 
