@@ -1,6 +1,6 @@
 # Isitfast
 
-# Docs are outdated. I'm currently rewriting the whole library. See issue to get a bit more context.
+# Docs are outdated. I'm currently rewriting the whole library. See issues to get a bit more context.
 
 A modular benchmarking library with V8 warmup and CPU/RAM denoising for the most accurate and consistent results.
 
