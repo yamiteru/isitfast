@@ -1,4 +1,4 @@
-import {Identifier, Expression, Span, Argument, MemberExpression, CallExpression, BinaryOperator, BinaryExpression, VariableDeclarationKind, VariableDeclarator, VariableDeclaration, ReturnStatement, parseFile, transform} from "@swc/core";
+import {Identifier, Expression, Span, Argument, MemberExpression, CallExpression, BinaryOperator, BinaryExpression, VariableDeclarationKind, VariableDeclarator, VariableDeclaration, ReturnStatement, parseFile, transform, Module, ModuleItem, Statement, FunctionDeclaration, ImportDeclaration, ExportDeclaration, ExportNamedDeclaration, ExportDefaultDeclaration, ExportAllDeclaration, TsImportEqualsDeclaration, TsExportAssignment, TsNamespaceDeclaration, BlockStatement, EmptyStatement, DebuggerStatement, WithStatement, LabeledStatement, BreakStatement, ContinueStatement, IfStatement, SwitchStatement, ThrowStatement, TryStatement, WhileStatement, Declaration, ExpressionStatement, DoWhileStatement, ForStatement, ForInStatement, ForOfStatement, ExportDefaultExpression} from "@swc/core";
 import {writeFile} from "fs/promises";
 import {AST_START, COMPILE_DIR, SWC_OPTIONS} from "./constants.js";
 import {Benchmark} from "./types.js";
@@ -104,109 +104,102 @@ const measureEnd = (expression: Expression) => returnStatement(
   )
 );
 
-// TODO: support default exports
-// TODO: get rid of duplicate code
-export const collectBenchmarksFromFile = async (path: string): Promise<Benchmark[]> => {
-  const ast = await parseFile(path);
-  const benchmarks: Benchmark[] = [];
+type Modules = {
+  VariableDeclaration: VariableDeclaration;
+  ReturnStatement: ReturnStatement;
+  ImportDeclaration: ImportDeclaration;
+  ExportDeclaration: ExportDeclaration;
+  ExportNamedDeclaration: ExportNamedDeclaration;
+  ExportDefaultDeclaration: ExportDefaultDeclaration;
+  ExportDefaultExpression: ExportDefaultExpression;
+  ExportAllDeclaration: ExportAllDeclaration;
+  TsImportEqualsDeclaration: TsImportEqualsDeclaration;
+  TsExportAssignment: TsExportAssignment;
+  TsNamespaceExportDeclaration: TsNamespaceDeclaration;
+  BlockStatement: BlockStatement;
+  EmptyStatement: EmptyStatement;
+  DebuggerStatement: DebuggerStatement;
+  WithStatement: WithStatement;
+  LabeledStatement: LabeledStatement;
+  BreakStatement: BreakStatement;
+  ContinueStatement: ContinueStatement;
+  IfStatement: IfStatement;
+  SwitchStatement: SwitchStatement;
+  ThrowStatement: ThrowStatement;
+  TryStatement: TryStatement;
+  WhileStatement: WhileStatement;
+  DoWholeStatement: DoWhileStatement;
+  ForStatement: ForStatement;
+  ForInStatement: ForInStatement;
+  ForOfStatement: ForOfStatement;
+  Declaration: Declaration;
+  ExpressionStatement: ExpressionStatement;
+};
 
-  for (const ModuleItem of ast.body) {
-    if(ModuleItem.type === "ExportDeclaration") {
-      // export const xyz = () => {};
-      if(ModuleItem.declaration.type === "VariableDeclaration") {
-        const VariableDeclarator = ModuleItem.declaration.declarations[0];
+const getReferences = (modules: ModuleItem[]) => {
+  const functionReferences: Map<string, ModuleItem> = new Map();
+  const variableReferences: Map<string, ModuleItem> = new Map();
 
-        if(VariableDeclarator.id.type === "Identifier" && VariableDeclarator.init?.type === "ArrowFunctionExpression" && (VariableDeclarator.id.value === "$$benchmark" || VariableDeclarator.id.value[0] === "$")) {
-          if(VariableDeclarator.init.body.type === "BlockStatement") {
-            const id = path.split("/").join("-").replace(".", "-").toLowerCase();
-            const name = VariableDeclarator.id.value;
-            const fileCpu = `${COMPILE_DIR}/${id}_${name}_cpu.mjs`;
-            const fileRam = `${COMPILE_DIR}/${id}_${name}_ram.mjs`;
-            const original = VariableDeclarator.init.body.stmts;
-
-            VariableDeclarator.init.body.stmts = [
-              measureStart(cpu),
-              ...original,
-              measureEnd(cpu)
-            ];
-
-            const cpuOutput = await transform(ast, SWC_OPTIONS);
-
-            VariableDeclarator.init.body.stmts = original;
-
-            VariableDeclarator.init.body.stmts = [
-              measureStart(ram),
-              ...original,
-              measureEnd(ram)
-            ];
-
-            const ramOutput = await transform(ast, SWC_OPTIONS);
-
-            VariableDeclarator.init.body.stmts = original;
-
-            await Promise.all([
-              writeFile(fileCpu, cpuOutput.code),
-              writeFile(fileRam, ramOutput.code),
-            ]);
-
-            benchmarks.push({
-              id,
-              name,
-              path: name,
-              async: VariableDeclarator.init.async,
-              fileCpu,
-              fileRam,
-            });
-          }
-        }
-      }
-
-      // export function xyz() {}
-      else if(ModuleItem.declaration.type === "FunctionDeclaration") {
-        if(ModuleItem.declaration.body) {
-          const id = path.split("/").join("-").replace(".", "-").toLowerCase();
-          const name = ModuleItem.declaration.identifier.value;
-          const fileCpu = `${COMPILE_DIR}/${id}_${name}_cpu.mjs`;
-          const fileRam = `${COMPILE_DIR}/${id}_${name}_ram.mjs`;
-          const original = ModuleItem.declaration.body.stmts;
-
-          ModuleItem.declaration.body.stmts = [
-            measureStart(cpu),
-            ...original,
-            measureEnd(cpu)
-          ];
-
-          const cpuOutput = await transform(ast, SWC_OPTIONS);
-
-          ModuleItem.declaration.body.stmts = original;
-
-          ModuleItem.declaration.body.stmts = [
-            measureStart(ram),
-            ...original,
-            measureEnd(ram)
-          ];
-
-          const ramOutput = await transform(ast, SWC_OPTIONS);
-
-          ModuleItem.declaration.body.stmts = original;
-
-          await Promise.all([
-            writeFile(fileCpu, cpuOutput.code),
-            writeFile(fileRam, ramOutput.code),
-          ]);
-
-          benchmarks.push({
-            id,
-            name,
-            path: name,
-            async: ModuleItem.declaration.async,
-            fileCpu,
-            fileRam,
-          });
-        }
-      }
+  for(const module of modules) {
+    switch (module.type) {
+      case "ImportDeclaration": {}
+      case "FunctionDeclaration": {}
+      case "VariableDeclaration": {}
+      case "ExportDeclaration": {}
+      case "ExportNamedDeclaration": {}
     }
   }
+
+
+  // for(const module of modules) {
+  //   switch (module.type) {
+  //     case "ImportDeclaration": {
+  //       importReferences.push(module);
+  //
+  //       break;
+  //     }
+  //     case "VariableDeclaration": {
+  //       for(const declaration of module.declarations) {
+  //         switch (declaration.id.type) {
+  //           case "Identifier": {
+  //             const name = declaration.id.value;
+  //
+  //             (name[0] === "$" ? benchmarkReferences: otherReferences).set(
+  //               name,
+  //               variableDeclaration(module.kind, [declaration])
+  //             );
+  //
+  //             break;
+  //           }
+  //         }
+  //       }
+  //
+  //       break;
+  //     }
+  //     case "FunctionDeclaration": {
+  //       const name = (module as FunctionDeclaration).identifier.value;
+  //
+  //       (name[0] === "$" ? benchmarkReferences: otherReferences).set(name, module);
+  //
+  //       break;
+  //     }
+  //   }
+  // }
+  //
+  // return {
+  //   importReferences,
+  //   benchmarkReferences,
+  //   otherReferences
+  // };
+};
+
+export const getBenchmarksFromFile = async (path: string): Promise<Benchmark[]> => {
+  const ast = await parseFile(path);
+  const modules = ast.body;
+  const benchmarks: Benchmark[] = [];
+  const references = getReferences(modules);
+
+  console.log(references);
 
   return benchmarks;
 };
