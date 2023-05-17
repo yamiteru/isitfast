@@ -6,6 +6,7 @@ export type Fn<$Input extends unknown[], $Output> = (
   ...props: $Input
 ) => $Output;
 
+// TODO: rename props since some of them don't make much sense
 export type Benchmark = {
   id: string;
   name: string;
@@ -33,4 +34,5 @@ export type Directory = {
 
 export type Type = (typeof TYPES)[number];
 export type Mode = (typeof MODES)[number];
+// TODO: rename since it's not very clear what Opt means
 export type Opt = (typeof OPTS)[number];

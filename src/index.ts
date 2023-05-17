@@ -24,5 +24,5 @@ subscribeIterationFileSaver();
 
   const directory = await loadDirectory(process.cwd(), input);
 
-  await runDirectory(directory);
+  // await runDirectory(directory);
 })();
