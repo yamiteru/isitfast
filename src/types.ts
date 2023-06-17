@@ -1,4 +1,4 @@
-import {TYPES, MODES, OPTS} from "./constants.js";
+import { TYPES, MODES, OPTS } from "./constants.js";
 
 export type Either<$Options extends unknown[]> = $Options[number];
 
@@ -6,14 +6,17 @@ export type Fn<$Input extends unknown[], $Output> = (
   ...props: $Input
 ) => $Output;
 
-// TODO: rename props since some of them don't make much sense
 export type Benchmark = {
   id: string;
+  variable: string;
+  count: number;
   name: string;
-  path: string;
   async: boolean;
-  fileCpu: string;
-  fileRam: string;
+  path: {
+    source: string;
+    cpu: string;
+    ram: string;
+  };
 };
 
 export type Content = File | Directory;
