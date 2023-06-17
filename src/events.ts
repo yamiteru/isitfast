@@ -1,5 +1,5 @@
 import { eve } from "ueve/async";
-import {Benchmark, Mode, Opt} from "./types.js";
+import { Benchmark, Mode, Opt } from "./types.js";
 
 export const $iterationStart = eve<{
   benchmark: Benchmark;
@@ -28,6 +28,7 @@ export const $collectEnd = eve<{
   mode: Mode;
   opt: Opt;
   run: number;
+  index: number;
 }>();
 
 export const $directoryOpen = eve<{

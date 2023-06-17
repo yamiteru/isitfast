@@ -25,174 +25,123 @@ To install, run the following command in your terminal:
 yarn add isitfast
 ```
 
-## How to run
-
-It is recommended to run isitfast with the --expose-gc Node flag to enable the library to run GC and collect more statistically correct memory data.
-
-When used in a TypeScript environment, you can run it like this: node --expose-gc -r ts-node/register benchmarks/benchmarkName.ts.
-
-For the most accurate results, it is recommended to run benchmark suites in different JS realms by putting them in separate files and executing them individually.
-
 ## Example
 
 ```ts
-import { Suite, useTerminal } from "isitfast";
+// utils/benchmark.ts
+import { input } from "isitfast";
+import { CHARS } from "./constants";
 
-// define your suite with benchmarks
-const testBenchmark = new Suite("Test")
-  .add("emptyAsync", async () => {})
-  .add("emptySync", () => {});
+export const randomArray = (length: number) => input(`${length}`, () => ({
+  data: [...new Array(length)].map(Math.random),
+  length
+}));
 
-// collect data and print them into a terminal
-useTerminal();
+export const randomChars = (length: number) => input(`${length} chars`, () => ({
+  string: CHARS.slice(0, length),
+  length
+}));
 
-// run all benchmarks and trigger lifecycle events
-testBenchmark.run();
-```
+// benchmarks/loop.ts
+import { benchmark } from "isitfast";
+import { randomArray } from "../utils/benchmark";
 
----
+const data = [
+  randomArray(1),
+  randomArray(10),
+  randomArray(100),
+  randomArray(1_000),
+  randomArray(10_000),
+  randomArray(100_000),
+  randomArray(1_000_000),
+];
 
-# API
+const $for = group("For loops", data, [
+  benchmark(
+    "For loop | no length cache | i++",
+    ({ data }, set) => {
+      for(let i = 0; i < data.length; i++) {
+        set(data[i] + 1);
+      }
+    }
+  ),
+  benchmark(
+    "For loop | no length cache | ++i",
+    ({ data }, set) => {
+      for(let i = 0; i < data.length; ++i) {
+        set(data[i] + 1);
+      }
+    }
+  ),
+  benchmark(
+    "For loop | length cache | i++",
+    ({ data, length }, set) => {
+      for(let i = 0; i < length; i++) {
+        set(data[i] + 1);
+      }
+    }
+  ),
+  benchmark(
+    "For loop | length cache | ++i",
+    ({ data, length }, set) => {
+      for(let i = 0; i < length; ++i) {
+        set(data[i] + 1);
+      }
+    }
+  ),
+  // for benchmarks
+]);
 
-## Suite
+// {
+//   name: "For loops",
+//   data: [
+//     { name: "1", () => [...new Array(1)].map(Math.random) },
+//     // ...
+//   ],
+//   benchmarks: [
+//     {
+//       name: "For loop | no length cache | i++",
+//       benchmark: ({ data }, set) => {
+//         for(let i = 0; i < data.length; i++) {
+//           set(data[i] + 1);
+//         }
+//       }
+//     },
+//     // ...
+//   ]
+// }
 
-```ts
-const testTwo = new Suite("Test Two", {
-  // options
-});
-```
+const $while = group("While loops", data, [
+  // while benchmarks
+]);
 
-These are the default options:
+// utils/hash.ts
+import { benchmark, input } from "isitfast";
+import { randomChars } from "../utils/benchmark";
 
-```ts
-{
-  cpu: {
-    chunkSize: 1_000,
-    deviationPercent: 1,
-  },
-  ram: {
-    chunkSize: 5,
-    deviationPercent: 1,
-  },
-  offset: {
-    allow: true,
-    deviationPercent: 1,
-  },
-  gc: {
-    allow: true,
-  }
-}
-```
-
-## Modes
-
-### `useTerminal`
-
-Listens to events and prints verbose suite and benchmark results into a terminal.
-
-```ts
-// subscribe to events
-useTerminal();
-
-// run suite which publishes data to the events
-runBenchmarks.run();
-```
-
-### `useTerminalCompact`
-
-Listens to events and prints compact suite and benchmark results into a terminal.
-
-```ts
-// subscribe to events
-useTerminalCompact();
-
-// run suite which publishes data to the events
-runBenchmarks.run();
-```
-
-## Events
-
-The `Suite` by itself doesn't return any data. For consuming suite and benchmarks data you should listen to events. All events are prefixed with `$`.
-
-Behind the scenes `isitfast` uses [μEve](https://github.com/yamiteru/ueve) to create, subscribe to and publish into events.
-
-You can easily import `sub`/`clr`/`has` event functions from `isitfast`. They're just re-exported functions from `μEve`.
-
-## CLI
-
-### Single benchmark
-
-```shell
-isitfast b1.ts
-```
-
-### Multiple benchmarks
-
-```shell
-isitfast b1.ts b2.ts b3.ts
-```
-
-### Suite
-
-#### Folder
-
-```shell
-isitfast s1/
-```
-
-#### File
-
-```shell
-isitfast s1.ts
-```
-
-## How to define benchmark/suite
-
-### Default function benchmark
-
-```ts
-export default () => { /* .. */ };
-```
-
-### Default object benchmark
-
-```ts
-export default {
-  benchmark: () => { /* .. */ },
-  onBeforeBenchmark: () => { /* .. */ },
+export const hash = async (value: string) => {
   // ...
 };
-```
 
-### Named exports benchmark
+const $benchmark = benchmark("Hash", [
+  randomChar(1),
+  randomChar(2),
+  randomChar(4),
+  randomChar(8),
+  randomChar(16),
+  randomChar(32),
+], ({ string }, set) => {
+  set(hash(string));
+});
 
-```ts
-export const $benchmark = () => { /* .. */ };
-
-export const $onBeforeBenchmark = () => { /* .. */ };
-```
-
-### Any folder suite
-
-- /suite-name
-  - _.ts
-  - b1.ts
-  - b2.ts
-  - b3.ts
-
-### Default object suite
-
-```ts
-export default {
-  setup: () => { /* .. */ },
-  benchmarks: { /* .. */ }
-};
-```
-
-### Named exports suite
-
-```ts
-export const $setup = () => { /* .. */ };
-
-export const $benchmarks = { /* .. */ };
+// {
+//   name: "Hash",
+//   data: [
+//     { name: "1 chars", data: () => CHARS.slice(0, 1) },
+//     // ...
+//   ],
+//   benchmark: ({ string }, set) => {
+//     set(hash(string));
+//   }
+// }
 ```

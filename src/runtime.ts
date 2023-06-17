@@ -1,21 +1,21 @@
-import {Fn} from "./types.js";
+import { Fn } from "./types.js";
 
 export function benchmarkOne<$Input>(
-  input: (() => $Input),
-  benchmark: Fn<[$Input], void>
+  input: () => $Input,
+  benchmark: Fn<[$Input], void>,
 ) {
   return {
     input,
-    benchmark
+    benchmark,
   };
 }
 
 export function benchmarkMany<$Input>(
   inputs: (() => $Input)[],
-  benchmark: Fn<[$Input], void>
+  benchmark: Fn<[$Input], void>,
 ) {
   return {
     inputs,
-    benchmark
+    benchmark,
   };
 }

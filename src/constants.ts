@@ -1,8 +1,8 @@
 import cuid from "cuid";
 import { homedir } from "node:os";
-import {Options} from "@swc/core";
-import {subarray} from "./subarray.js";
-import {Content} from "./types.js";
+import { Options } from "@swc/core";
+import { subarray } from "./subarray.js";
+import { Content } from "./types.js";
 
 export const ITERATIONS = 2_500;
 export const BENCHMARK_RUNS = 3;
@@ -16,19 +16,16 @@ export const SWC_OPTIONS: Options = {
     parser: {
       syntax: "typescript",
     },
-    target: "esnext"
-  }
+    target: "esnext",
+  },
 };
 
 export const AST_START = cuid();
 
-export const [
-  ARRAY,
-  INDEX,
-] = subarray(
-  new Uint32Array(ITERATIONS + 1),
-  [ ITERATIONS, 1 ]
-);
+export const [ARRAY, INDEX] = subarray(new Uint32Array(ITERATIONS + 1), [
+  ITERATIONS,
+  1,
+]);
 
 export const FILE_CACHE = new Map<string, Content>();
 export const ISITFAST_DIR = `${homedir()}/.isitfast`;
