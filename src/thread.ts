@@ -25,7 +25,7 @@ export async function thread(
         opt === "all"
           ? `
           %PrepareFunctionForOptimization(fn);
-          fn();
+          fn(data, set);
           %OptimizeFunctionOnNextCall(fn);
         `
           : ""

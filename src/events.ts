@@ -5,7 +5,6 @@ export const $iterationStart = eve<{
   benchmark: Benchmark;
   mode: Mode;
   opt: Opt;
-  run: number;
 }>();
 
 export const $iterationEnd = eve<{
@@ -13,21 +12,18 @@ export const $iterationEnd = eve<{
   mode: Mode;
   opt: Opt;
   median: number;
-  run: number;
 }>();
 
 export const $collectStart = eve<{
   benchmark: Benchmark;
   mode: Mode;
   opt: Opt;
-  run: number;
 }>();
 
 export const $collectEnd = eve<{
   benchmark: Benchmark;
   mode: Mode;
   opt: Opt;
-  run: number;
   index: number;
 }>();
 

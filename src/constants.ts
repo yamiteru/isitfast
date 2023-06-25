@@ -4,7 +4,7 @@ import { Options } from "@swc/core";
 import { subarray } from "./subarray.js";
 import { Content } from "./types.js";
 
-export const ITERATIONS = 2_500;
+export const ITERATIONS = 5_000;
 export const BENCHMARK_RUNS = 3;
 
 export const TYPES = ["async", "sync"] as const;

@@ -13,18 +13,21 @@ export const collect = (
   benchmark: Benchmark,
   mode: Mode,
   opt: Opt,
-  run: number,
   index: number,
 ) =>
   new Promise<boolean>(async (resolve) => {
+    const MAX = opt === "auto" ? ITERATIONS: Math.round(ITERATIONS / 5);
     const worker = await thread(benchmark, mode, opt, index);
+    const compare = mode === "cpu"
+      ? ((v: number) => v <= 0)
+      : ((v: number) => v < 0);
 
-    await pub($collectStart, { benchmark, mode, opt, run });
+    await pub($collectStart, { benchmark, mode, opt });
 
     INDEX[0] = 0;
 
     const start = async () => {
-      await pub($iterationStart, { benchmark, mode, opt, run });
+      await pub($iterationStart, { benchmark, mode, opt });
 
       worker.postMessage(null);
     };
@@ -35,14 +38,12 @@ export const collect = (
         mode,
         opt,
         median,
-        run,
       });
 
       await pub($collectEnd, {
         benchmark,
         mode,
         opt,
-        run,
         index,
       });
 
@@ -52,13 +53,13 @@ export const collect = (
 
     worker.on("message", async (v) => {
       const index = INDEX[0];
-      const shouldIgnore = v < 0;
+      const shouldIgnore = compare(v);
 
       if (!shouldIgnore) {
         ARRAY[index] = v;
       }
 
-      if (index < ITERATIONS) {
+      if (index < MAX) {
         if (!shouldIgnore) {
           INDEX[0] += 1;
 
@@ -67,7 +68,6 @@ export const collect = (
             median: v,
             mode,
             opt,
-            run,
           });
         }
 
