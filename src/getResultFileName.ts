@@ -5,8 +5,7 @@ export function getResultFileName(
   benchmark: Benchmark,
   mode: Mode,
   opt: Opt,
-  run: number,
   index: number,
 ) {
-  return `${RESULTS_DIR}/${benchmark.id}_${mode}_${opt}_${index}_${run}`;
+  return `${RESULTS_DIR}/${benchmark.id}_${mode}_${opt}_${index}`;
 }

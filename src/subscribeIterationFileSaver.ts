@@ -5,7 +5,7 @@ import { $collectEnd } from "./events.js";
 import { getResultFileName } from "./getResultFileName.js";
 
 export function subscribeIterationFileSaver() {
-  sub($collectEnd, async ({ benchmark, mode, opt, run, index }) => {
-    await writeFile(getResultFileName(benchmark, mode, opt, run, index), ARRAY);
+  sub($collectEnd, async ({ benchmark, mode, opt, index }) => {
+    await writeFile(getResultFileName(benchmark, mode, opt, index), ARRAY);
   });
 }
