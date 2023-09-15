@@ -131,6 +131,8 @@ export const BENCHMARK_PROPERTIES = {
   benchmark: "ArrowFunctionExpression",
 };
 
+export const CASE_KEY = ["name", "data"] as const;
+
 export type BenchmarkPropertyName = (typeof BENCHMARK_PROPERTY_NAMES)[number];
 
 export const collectBenchmarksFromFile = async (
@@ -197,6 +199,54 @@ export const collectBenchmarksFromFile = async (
         throw Error("Benchmark body should be BlockStatement");
       }
 
+      const cases: string[] = [];
+
+      for (const element of props.data.elements) {
+        if (element === undefined) {
+          throw Error("Case has to be defined");
+        }
+
+        if (element.expression.type !== "ObjectExpression") {
+          throw Error("Case should be an object");
+        }
+
+        if (element.expression.properties.length !== 2) {
+          throw Error("Case should have 2 properties");
+        }
+
+        for (const property of element.expression.properties) {
+          if (property === undefined) {
+            throw Error("Case property should be defined");
+          }
+
+          if (property.type !== "KeyValueProperty") {
+            throw Error("Case property should be KeyValueProperty");
+          }
+
+          if (property.key.type !== "Identifier") {
+            throw Error("Case property key should be Identifier");
+          }
+
+          if (!CASE_KEY.includes(property.key.value as never)) {
+            throw Error(`Case property key should be [${CASE_KEY}]`);
+          }
+
+          if (property.key.value === "name") {
+            if (property.value.type !== "StringLiteral") {
+              throw Error("Case property 'name' should be StringLiteral");
+            }
+
+            cases.push(property.value.value);
+          } else if (property.key.value === "data") {
+            if (property.value.type !== "ArrowFunctionExpression") {
+              throw Error(
+                "Case property 'data' should be ArrowFunctionExpression",
+              );
+            }
+          }
+        }
+      }
+
       const fileCpu = `${COMPILE_DIR}/${id}_cpu.mjs`;
       const fileRam = `${COMPILE_DIR}/${id}_ram.mjs`;
       const original = props.benchmark.body.stmts;
@@ -229,7 +279,7 @@ export const collectBenchmarksFromFile = async (
       benchmarks.push({
         id,
         variable,
-        count: props.data.elements.length,
+        cases,
         name: props.name.value,
         async: props.benchmark.async,
         path: {

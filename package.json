@@ -13,33 +13,22 @@
     "check:format": "prettier --check \"**/*.ts\"",
     "check:lint": "eslint --ext .ts .",
     "check": "pnpm check:lint && pnpm check:format",
-    "build": "rollup --config rollup.config.js && chmod +x dist/index.js && npm install -g ."
+    "build": "rollup --config rollup.config.js && chmod +x dist/index.js && npm install -g .",
+    "dev": "pnpm build && isitfast benchmark.js"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "11.1.0",
-    "@swc/cli": "0.1.62",
-    "@swc/core": "1.3.55",
-    "@types/node": "18.16.0",
-    "@typescript-eslint/eslint-plugin": "5.56.0",
-    "@typescript-eslint/parser": "5.56.0",
-    "esbuild": "0.17.18",
-    "eslint": "8.37.0",
+    "@typescript-eslint/eslint-plugin": "5.60.1",
+    "@typescript-eslint/parser": "5.60.1",
+    "eslint": "8.43.0",
     "eslint-config-prettier": "8.8.0",
     "husky": "8.0.3",
-    "prettier": "2.8.7",
-    "rollup": "3.21.0",
-    "rollup-plugin-preserve-shebang": "1.0.1",
-    "typescript": "4.9.5"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "prettier": "2.8.8",
+    "typescript": "5.1.6"
   },
   "packageManager": "pnpm@7.22.0",
   "dependencies": {
-    "cuid": "3.0.0",
     "ink": "4.2.0",
-    "meow": "11.0.0",
-    "react": "18.2.0",
-    "ueve": "1.69.0"
+    "meow": "12.0.1",
+    "react": "18.2.0"
   }
 }

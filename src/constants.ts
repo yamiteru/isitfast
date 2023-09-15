@@ -1,8 +1,8 @@
-import cuid from "cuid";
 import { homedir } from "node:os";
 import { Options } from "@swc/core";
 import { subarray } from "./subarray.js";
 import { Content } from "./types.js";
+import { createId } from "@paralleldrive/cuid2";
 
 export const ITERATIONS = 5_000;
 export const BENCHMARK_RUNS = 3;
@@ -20,7 +20,7 @@ export const SWC_OPTIONS: Options = {
   },
 };
 
-export const AST_START = cuid();
+export const AST_START = createId();
 
 export const [ARRAY, INDEX] = subarray(new Uint32Array(ITERATIONS + 1), [
   ITERATIONS,

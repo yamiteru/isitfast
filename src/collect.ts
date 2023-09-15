@@ -8,6 +8,7 @@ import {
 } from "./events.js";
 import { thread } from "./thread.js";
 import { Benchmark, Mode, Opt } from "./types.js";
+import { write_data_count, write_data_init, write_data_value } from "./file.js";
 
 export const collect = (
   benchmark: Benchmark,
@@ -16,13 +17,13 @@ export const collect = (
   index: number,
 ) =>
   new Promise<boolean>(async (resolve) => {
-    const MAX = opt === "auto" ? ITERATIONS: Math.round(ITERATIONS / 5);
+    const MAX = opt === "auto" ? ITERATIONS : Math.round(ITERATIONS / 5);
     const worker = await thread(benchmark, mode, opt, index);
-    const compare = mode === "cpu"
-      ? ((v: number) => v <= 0)
-      : ((v: number) => v < 0);
+    const compare =
+      mode === "cpu" ? (v: number) => v <= 0 : (v: number) => v < 0;
 
     await pub($collectStart, { benchmark, mode, opt });
+    await write_data_init();
 
     INDEX[0] = 0;
 
@@ -47,8 +48,11 @@ export const collect = (
         index,
       });
 
+      await write_data_count(INDEX[0]);
+
       resolve(true);
-      worker.terminate();
+
+      await worker.terminate();
     };
 
     worker.on("message", async (v) => {
@@ -62,6 +66,8 @@ export const collect = (
       if (index < MAX) {
         if (!shouldIgnore) {
           INDEX[0] += 1;
+
+          await write_data_value(v);
 
           await pub($iterationEnd, {
             benchmark,
