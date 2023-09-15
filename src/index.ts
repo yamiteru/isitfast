@@ -5,11 +5,8 @@ import { COMPILE_DIR, ISITFAST_DIR, RESULTS_DIR } from "./constants.js";
 import { loadDirectory } from "./loadDirectory.js";
 import { input } from "./meow.js";
 import { runDirectory } from "./runDirectory.js";
-import { subscribeIterationFileSaver } from "./subscribeIterationFileSaver.js";
 
 if (input.length === 0) input[0] = "/";
-
-subscribeIterationFileSaver();
 
 (async () => {
   try {

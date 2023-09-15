@@ -9,7 +9,7 @@ export type Fn<$Input extends unknown[], $Output> = (
 export type Benchmark = {
   id: string;
   variable: string;
-  count: number;
+  cases: string[];
   name: string;
   async: boolean;
   path: {
@@ -25,6 +25,7 @@ export type File = {
   type: "file";
   name: string;
   path: string;
+  result: string;
   benchmarks: Benchmark[];
 };
 

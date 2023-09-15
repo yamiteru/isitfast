@@ -1,6 +1,6 @@
 import { pub } from "ueve/async";
 import { collectBenchmarksFromFile } from "./ast.js";
-import { FILE_CACHE } from "./constants.js";
+import { FILE_CACHE, RESULTS_DIR } from "./constants.js";
 import {
   $fileOpen,
   $compilationStart,
@@ -21,6 +21,7 @@ export const loadFile = async (path: string): Promise<File> => {
       type: "file",
       name,
       path: path,
+      result: `${RESULTS_DIR}/${name.split(".").at(0)}`,
       benchmarks,
     });
 
