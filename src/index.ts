@@ -1,28 +1,35 @@
 #! /usr/bin/env node --allow-natives-syntax
 
-import { rm, mkdir } from "fs/promises";
-import { COMPILE_DIR, ISITFAST_DIR, RESULTS_DIR } from "./constants.js";
-import { loadDirectory } from "./loadDirectory.js";
-import { input } from "./meow.js";
-import { runDirectory } from "./runDirectory.js";
-
-if (input.length === 0) input[0] = "/";
+import { access, rm } from "fs/promises";
+import { input, flags } from "./meow.js";
+import { createFolder } from "./createFolder.js";
+import {
+  ISITFAST_FOLDER,
+  COMPILE_FOLDER,
+  RESULTS_FOLDER,
+  WORKERS_FOLDER,
+} from "./constants.js";
+import { parse } from "./parse.js";
+import { parsePath } from "./parsePath.js";
+import { createWorker } from "./createWorker.js";
 
 (async () => {
   try {
-    await mkdir(ISITFAST_DIR);
+    await rm(ISITFAST_FOLDER, { recursive: true });
   } catch {
-    // ...
+    // don't care
   }
 
-  await Promise.all([
-    rm(COMPILE_DIR, { recursive: true, force: true }),
-    rm(RESULTS_DIR, { recursive: true, force: true }),
-  ]);
+  await createFolder(ISITFAST_FOLDER);
+  await createFolder(RESULTS_FOLDER);
+  await createFolder(WORKERS_FOLDER);
+  await createFolder(COMPILE_FOLDER);
 
-  await Promise.all([mkdir(COMPILE_DIR), mkdir(RESULTS_DIR)]);
+  const command = (COMMANDS as any)[input[0]];
 
-  const directory = await loadDirectory(process.cwd(), input);
+  if (!command) {
+    throw Error("Unknown command");
+  }
 
-  await runDirectory(directory);
+  await command(input, flags);
 })();

@@ -1,42 +1,27 @@
-import { TYPES, MODES, OPTS } from "./constants.js";
+import { ParsedFile } from "./parsePath.js";
 
-export type Either<$Options extends unknown[]> = $Options[number];
-
-export type Fn<$Input extends unknown[], $Output> = (
-  ...props: $Input
-) => $Output;
+export type Nullable<T> = T | null;
 
 export type Benchmark = {
-  id: string;
+  name: string;
   variable: string;
-  cases: string[];
-  name: string;
   async: boolean;
-  path: {
-    source: string;
-    cpu: string;
-    ram: string;
-  };
+  data: string[];
 };
 
-export type Content = File | Directory;
+export type Benchmarks = Benchmark[];
 
-export type File = {
-  type: "file";
-  name: string;
-  path: string;
-  result: string;
-  benchmarks: Benchmark[];
+export type Mode = "cpu" | "ram";
+
+export type WorkerProps = {
+  mode: Mode;
+  index: number;
+  file: ParsedFile;
+  benchmark: Benchmark;
 };
 
-export type Directory = {
-  type: "directory";
-  name: string;
-  path: string;
-  content: Content[];
+export type CompiledProps = {
+  mode: WorkerProps["mode"];
+  file: WorkerProps["file"];
+  benchmark: WorkerProps["benchmark"];
 };
-
-export type Type = (typeof TYPES)[number];
-export type Mode = (typeof MODES)[number];
-// TODO: rename since it's not very clear what Opt means
-export type Opt = (typeof OPTS)[number];

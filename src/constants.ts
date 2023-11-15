@@ -1,15 +1,18 @@
-import { homedir } from "node:os";
-import { Options } from "@swc/core";
-import { subarray } from "./subarray.js";
-import { Content } from "./types.js";
+import { join } from "path";
 import { createId } from "@paralleldrive/cuid2";
+import { Options } from "@swc/core";
 
-export const ITERATIONS = 5_000;
-export const BENCHMARK_RUNS = 3;
+export const HERE = process.cwd();
 
-export const TYPES = ["async", "sync"] as const;
-export const MODES = ["cpu", "ram"] as const;
-export const OPTS = ["all", "auto", "none"] as const;
+export const ISITFAST_FOLDER = join(HERE, ".isitfast");
+
+export const COMPILE_FOLDER = join(ISITFAST_FOLDER, "compile");
+
+export const WORKERS_FOLDER = join(ISITFAST_FOLDER, "workers");
+
+export const RESULTS_FOLDER = join(ISITFAST_FOLDER, "results");
+
+export const AST_START = createId();
 
 export const SWC_OPTIONS: Options = {
   jsc: {
@@ -19,15 +22,3 @@ export const SWC_OPTIONS: Options = {
     target: "esnext",
   },
 };
-
-export const AST_START = createId();
-
-export const [ARRAY, INDEX] = subarray(new Uint32Array(ITERATIONS + 1), [
-  ITERATIONS,
-  1,
-]);
-
-export const FILE_CACHE = new Map<string, Content>();
-export const ISITFAST_DIR = `${homedir()}/.isitfast`;
-export const COMPILE_DIR = `${ISITFAST_DIR}/compile`;
-export const RESULTS_DIR = `${ISITFAST_DIR}/results`;

@@ -2,8 +2,11 @@
 .code
 .idea
 .obsidian
+.isitfast
 
 node_modules
 dist
 coverage
 examples/*.md
+*.bench.js
+*.bench.ts

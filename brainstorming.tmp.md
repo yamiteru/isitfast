@@ -1,16 +1,12 @@
 # Brainstorming
 
-## Binary file
-
-
-
 ## CLI
 
 - [ ] `isitfast inspect index.bench.js`
   - Interactively choose benchmark
-  - Select mode (cpu/ram/download/parse)
+  - Select mode (cpu/ram)
   - Select which dataset to run
-  - Inifnitely run selected combination
+  - Infinitely run selected combination
   - See real-time results in a graph
   - Capture and save all results
 
@@ -39,6 +35,8 @@
   - Saves results into `.isitfast` files
   - Prints out stats overview of all benchmarks
 
+---
+
 ## Nice to have
 
 - Execution of js/jsx/ts/tsx files
@@ -50,6 +48,50 @@
 - Distinguish between files where benchmarks should be compared and files where there's just multiple of different benchmarks that should not be compared
 - `summary`/`compare`/`run` can use generated profile and/or generate it if it doesn't exist yet
 - `inspect` can inspect system noise
+
+---
+
+## Stat types
+
+- Size
+- Parse time
+- CPU
+- Memory
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
