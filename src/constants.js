@@ -4,6 +4,10 @@ import { createId } from '@paralleldrive/cuid2';
 
 export const NS_IN_MS = 1e6;
 
+export const SAMPLES = 5_000;
+export const RUNS = 20;
+export const BUFFER = Buffer.alloc(1);
+
 export const HOME = homedir();
 export const HERE = process.cwd();
 export const PATH = process.argv[2];
@@ -60,3 +64,21 @@ export const TEMPLATE_BENCHMARK = `benchmark___${createId()}`;
 export const TEMPLATE_GENERATOR = `generator___${createId()}`;
 export const TEMPLATE_TMP = `tmp___${createId()}`;
 export const TEMPLATE_BLACKBOX = `blackbox___${createId()}`;
+
+export const NODE_MAIN_COLUMNS = [
+  "run",
+  "iteration",
+  "cpu",
+  "ram",
+];
+
+export const NODE_STARTUP_COLUMNS = [
+  "run",
+  "iteration",
+  "duration",
+  "node",
+  "v8",
+  "bootstrap",
+  "environment",
+  "loop",
+];

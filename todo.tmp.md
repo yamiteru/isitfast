@@ -1,8 +1,8 @@
 - [/] CPU and RAM
-  - [/] Compile
+  - [x] Compile
   - [ ] Run
 - [/] Parse time
-  - [/] Compile
+  - [x] Compile
   - [ ] Run
 - [ ] Simple benchmark
   - Before other benchmarks
