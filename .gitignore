@@ -2,11 +2,17 @@
 .code
 .idea
 .obsidian
-.isitfast
 
 node_modules
 dist
 coverage
+results
 examples/*.md
 *.bench.js
 *.bench.ts
+.Rproj.user
+
+
+# Added by cargo
+
+/target
