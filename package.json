@@ -9,7 +9,8 @@
     "benchmark:validate:zod": "FILE=validate.js BENCHMARK=zod node newer/index.js",
     "benchmark:validate:valibot": "FILE=validate.js BENCHMARK=valibot node newer/index.js",
     "compile": "node newer/compile.js",
-    "ast:template": "FILE=newer/template.js node ast.js > template.json"
+    "ast:template": "FILE=newer/template.js node ast.js > template.json",
+    "start": "node src/index.js benchmarks"
   },
   "devDependencies": {
     "@types/node": "20.9.0",
