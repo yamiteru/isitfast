@@ -1,8 +1,9 @@
 import { readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { parseFile } from "@swc/core";
+import { parseFile, transform } from "@swc/core";
 import { minify } from "terser";
-import { CONTEXT_PATH, ISITFAST_COMPILE_PATH, BENCHMARK_PREFIX, COMPILED_FILES } from "../constants.js";
+import { CONTEXT_PATH, ISITFAST_COMPILE_PATH, BENCHMARK_PREFIX, COMPILED_FILES, SWC_OPTIONS, TEMPLATE_GENERATOR, TEMPLATE_BENCHMARK } from "../constants.js";
+import { script, variableDeclaration, variableDeclarator } from "../ast.js";
 
 export const assert = (predicate, message) => {
   if(predicate) {
@@ -52,7 +53,6 @@ export const compileFiles = async (type, custom) => {
   for (const file of files) {
     if (isBenchmarkFile(file)) {
       const ast = await getAstFromFile(file);
-
       const benchmarkNodes = [];
       const otherNodes = [];
 
@@ -103,13 +103,32 @@ export const compileFiles = async (type, custom) => {
         assert(!generator_ast, "No $generator provided");
         assert(!benchmark_ast, "No $function provided");
 
+        const [
+          body,
+          benchmark,
+          generator
+        ] = await Promise.all([
+          transform(script(
+            otherNodes
+          ), SWC_OPTIONS),
+          transform(script([
+            variableDeclaration([
+              variableDeclarator(TEMPLATE_BENCHMARK, benchmark_ast)
+            ])
+          ]), SWC_OPTIONS),
+          transform(script([
+            variableDeclaration([
+              variableDeclarator(TEMPLATE_GENERATOR, generator_ast)
+            ])
+          ]), SWC_OPTIONS)
+        ]);
+
         promises.push(writeCompiledContent(
           benchmarkPath,
-          // TODO: get strings from ASTs
           (await custom({
-            body: "",
-            generator: "() => {}",
-            benchmark: "() => {}"
+            body,
+            generator,
+            benchmark
           }))
         ));
 

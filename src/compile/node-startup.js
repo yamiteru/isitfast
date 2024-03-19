@@ -13,7 +13,6 @@ import {
   TEMPLATE_SOCKET_CLASS,
   TEMPLATE_SOCKET_INSTANCE,
   TEMPLATE_BUFFER,
-  TEMPLATE_BENCHMARK,
 } from "../constants.js";
 import { compileFiles } from "./utils.js";
 
@@ -30,9 +29,9 @@ export const compileStartupNode = () => compileFiles("startup", async ({
 
     import { Socket as ${TEMPLATE_SOCKET_CLASS} } from "node:net";
 
-    ${body}
+    ${body.code}
 
-    const ${TEMPLATE_BENCHMARK} = ${benchmark};
+    ${benchmark.code};
 
     const ${TEMPLATE_SOCKET_INSTANCE} = new ${TEMPLATE_SOCKET_CLASS}({ fd: 3, readable: true, writable: true });
     const ${TEMPLATE_BUFFER} = Buffer.alloc(${BUFFER_STARTUP_SIZE});

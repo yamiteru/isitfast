@@ -1,6 +1,4 @@
-import { transform } from "@swc/core";
 import {
-  SWC_OPTIONS,
   BUFFER_MAIN_SIZE,
   BUFFER_TYPE_INDEX,
   BUFFER_CPU_BEFORE_INDEX,
@@ -28,14 +26,14 @@ export const compileMainNode = () => compileFiles("main", async ({
   const content = `
     import { Socket as ${TEMPLATE_SOCKET_CLASS} } from "node:net";
 
-    ${body}
+    ${body.code}
 
-    const ${TEMPLATE_BENCHMARK} = ${benchmark};
+    ${benchmark.code};
+
+    ${generator.code};
 
     const ${TEMPLATE_SOCKET_INSTANCE} = new ${TEMPLATE_SOCKET_CLASS}({ fd: 3, readable: true, writable: true });
     const ${TEMPLATE_BUFFER} = Buffer.alloc(${BUFFER_MAIN_SIZE});
-
-    const ${TEMPLATE_GENERATOR} = ${generator};
 
     let ${TEMPLATE_TMP} = 0;
 
