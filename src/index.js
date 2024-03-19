@@ -1,71 +1,72 @@
-import { stat, unlink, writeFile } from "node:fs/promises";
+import { appendFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { createServer } from "node:net";
-import { exec } from "child_process";
+import { spawn } from "node:child_process";
 
 const HERE = process.cwd();
-const FILE_DATASETS = 4;
-const INPUT_FILE = "foreach";
-const SOCKET_FILE = '/tmp/isitfast.sock';
-const RUNS = 1000;
-const buffer = Buffer.alloc(1);
+const BENCHMARK = process.env.BENCHMARK;
+const FILE = process.env.FILE;
+const SAMPLES = 5_000;
+const RUNS = 20;
+const BUFFER = Buffer.alloc(1);
+const STATS_FILE_NAME = join(HERE, "results", "newer", `${FILE}-$${BENCHMARK}.csv`);
 
-let stats = [];
-let runCount = 0;
-let datasetIndex = 0;
+export const STATS_COLUMNS = [
+  "run",
+  "iteration",
+  "cpu",
+  "ram",
+];
 
-const next = () => {
-  if(datasetIndex < FILE_DATASETS) {
-    const cmd = `node ${join(HERE, ".isitfast", `${INPUT_FILE}.${datasetIndex}.cpu.normal.js`)}`;
+export const row = (values) => `${values.join(",")}\n`;
+export const header = (values) => `${values.map((v) => `"${v}"`).join(",")}\n`;
 
-    console.log(`Run: ${cmd}`);
+let iterationIndex = 0;
+let runIndex = 0;
 
-    exec(cmd, (e) => {
-      if (e) {
-        console.log(e);
-      } else {
-        datasetIndex++;
-        next();
-      }
-    });
-  }
+const run = async () => {
+  const proc = spawn(
+    "node",
+    [join(HERE, "compile", `${FILE}-$${BENCHMARK}.js`)],
+    { stdio: ["inherit", "inherit", "inherit", "pipe"] }
+  );
+
+  const stream = proc.stdio[3];
+
+  stream.on("data", async (buffer) => {
+    const type = buffer.readUInt32LE(0);
+
+    if(type === 1) {
+        const cpu = Number(buffer.readBigInt64LE(12) - buffer.readBigInt64LE(4));
+        const ram = buffer.readUInt32LE(24) - buffer.readUInt32LE(20);
+
+        if(cpu >= 0 && ram >= 0) {
+          await appendFile(STATS_FILE_NAME, row([
+            runIndex,
+            iterationIndex,
+            cpu,
+            ram,
+          ]));
+
+          if(++iterationIndex === SAMPLES) {
+            proc.kill();
+
+            if(++runIndex < RUNS) {
+              iterationIndex = 0;
+              await run();
+            }
+          } else {
+            stream.write(BUFFER);
+          }
+        } else {
+          stream.write(BUFFER);
+        }
+    } else {
+      stream.write(BUFFER);
+    }
+  });
 };
 
 (async () => {
-  try {
-    await stat(SOCKET_FILE);
-    await unlink(SOCKET_FILE);
-  } catch {
-    // nothing
-  }
-
-  const server = createServer((stream) => {
-    stats = [];
-    runCount = 0;
-
-    stream.write(buffer);
-
-    stream.on("data", async (buffer) => {
-      stats.push(buffer.readUint32LE(0));
-
-      if (++runCount === RUNS) {
-        stream.end();
-
-        const file = `${INPUT_FILE}.${datasetIndex}.cpu.normal.json`;
-
-        console.log(`Save: ${file}`);
-
-        await writeFile(join(HERE, file), JSON.stringify(stats));
-      } else {
-        stream.write(buffer);
-      }
-    });
-  }).listen(SOCKET_FILE);
-
-  process.on('SIGINT', () => {
-    server.close();
-    process.exit(0);
-  });
-
-  next();
+  await writeFile(STATS_FILE_NAME, header(STATS_COLUMNS));
+  await run();
 })();
