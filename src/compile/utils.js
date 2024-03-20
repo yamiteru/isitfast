@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { parseFile, transform } from "@swc/core";
 import { minify } from "terser";
 import { CONTEXT_PATH, ISITFAST_COMPILE_PATH, BENCHMARK_PREFIX, COMPILED_FILES, SWC_OPTIONS, TEMPLATE_GENERATOR, TEMPLATE_BENCHMARK } from "../constants.js";
-import { script, variableDeclaration, variableDeclarator } from "../ast.js";
+import { module, variableDeclaration, variableDeclarator } from "../ast.js";
 
 export const assert = (predicate, message) => {
   if(predicate) {
@@ -20,7 +20,12 @@ export const getFileList = () => readdir(
 export const writeCompiledContent = async (benchmarkPath, content) => {
   console.log("WRITE START - ", benchmarkPath);
 
-  const { code } = await minify(content, { toplevel: true });
+  const { code } = await minify(content, {
+    compress: false,
+    ecma: 2020,
+    module: true,
+    toplevel: true
+  });
   await writeFile(benchmarkPath, code);
 
   console.log("WRITE END - ", benchmarkPath);
@@ -41,7 +46,7 @@ export const isBenchmarkFile = (file) => {
 
 // TODO: take into account file.path
 export const getCompiledBenchmarkPath = (type, file, benchmarkName) => {
-  return `${join(ISITFAST_COMPILE_PATH, file.name)}-${benchmarkName}-${type}.js`;
+  return `${join(ISITFAST_COMPILE_PATH, file.name)}-${benchmarkName}-${type}.mjs`;
 };
 
 export const compileFiles = async (type, custom) => {
@@ -108,15 +113,15 @@ export const compileFiles = async (type, custom) => {
           benchmark,
           generator
         ] = await Promise.all([
-          transform(script(
+          transform(module(
             otherNodes
           ), SWC_OPTIONS),
-          transform(script([
+          transform(module([
             variableDeclaration([
               variableDeclarator(TEMPLATE_BENCHMARK, benchmark_ast)
             ])
           ]), SWC_OPTIONS),
-          transform(script([
+          transform(module([
             variableDeclaration([
               variableDeclarator(TEMPLATE_GENERATOR, generator_ast)
             ])

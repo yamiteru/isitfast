@@ -26,7 +26,7 @@ export const variableDeclaration = (declarations) => {
   };
 };
 
-export const script = (body) => {
+export const module = (body) => {
   return {
     type: 'Module',
     span: { ...span, start: 1 },

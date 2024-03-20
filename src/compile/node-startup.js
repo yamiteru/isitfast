@@ -23,7 +23,7 @@ export const compileStartupNode = () => compileFiles("startup", async ({
   console.log("CUSTOM START - startup");
 
   const content = `
-    import { performance as ${TEMPLATE_PERFORMANCE_INSTANCE} } from "performance";
+    import { performance as ${TEMPLATE_PERFORMANCE_INSTANCE} } from "node:perf_hooks";
 
     const ${TEMPLATE_PERFORMANCE_TIMING} = ${TEMPLATE_PERFORMANCE_INSTANCE}.nodeTiming;
 
@@ -31,7 +31,7 @@ export const compileStartupNode = () => compileFiles("startup", async ({
 
     ${body.code}
 
-    ${benchmark.code};
+    ${benchmark.code}
 
     const ${TEMPLATE_SOCKET_INSTANCE} = new ${TEMPLATE_SOCKET_CLASS}({ fd: 3, readable: true, writable: true });
     const ${TEMPLATE_BUFFER} = Buffer.alloc(${BUFFER_STARTUP_SIZE});

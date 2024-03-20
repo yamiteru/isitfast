@@ -28,9 +28,9 @@ export const compileMainNode = () => compileFiles("main", async ({
 
     ${body.code}
 
-    ${benchmark.code};
+    ${benchmark.code}
 
-    ${generator.code};
+    ${generator.code}
 
     const ${TEMPLATE_SOCKET_INSTANCE} = new ${TEMPLATE_SOCKET_CLASS}({ fd: 3, readable: true, writable: true });
     const ${TEMPLATE_BUFFER} = Buffer.alloc(${BUFFER_MAIN_SIZE});
