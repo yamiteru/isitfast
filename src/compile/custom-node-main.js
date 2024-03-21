@@ -16,7 +16,7 @@ import {
 } from "../constants.js";
 import { compileFiles } from "./utils.js";
 
-export const compileMainNode = () => compileFiles("main", async ({
+export const customCompileMainNode = () => compileFiles("main", async ({
   body,
   generator,
   benchmark,

@@ -3,36 +3,63 @@ import {
   ISITFAST_PATH,
   ISITFAST_COMPILE_PATH,
   ISITFAST_RESULTS_PATH,
+  ISITFAST_BASELINE_PATH,
   COMPILED_FILES,
   NODE_STARTUP_COLUMNS,
   NODE_MAIN_COLUMNS,
 } from "./constants.js";
-import { compileMainNode, compileStartupNode } from "./compile/index.js";
+import {
+  customCompileMainNode,
+  customCompileStartupNode,
+  baselineCompileMainNode,
+  baselineCompileStartupNode
+} from "./compile/index.js";
 import { runMainNode, runStartupNode } from "./run/index.js";
 import { getResultBenchmarkPath, header } from "./run/utils.js";
 
 (async () => {
   try {
-    console.log("REMOVE .isitfast");
-    await rm(ISITFAST_PATH, { recursive: true, force: true });
+    console.log("REMOVE .isitfast/compile");
+    await rm(ISITFAST_COMPILE_PATH, { recursive: true, force: true });
   } catch {
     // ..
   }
 
-  console.log("CREATE .isitfast");
-  await mkdir(ISITFAST_PATH);
+  try {
+    console.log("REMOVE .isitfast/compile");
+    await rm(ISITFAST_RESULTS_PATH, { recursive: true, force: true });
+  } catch {
+    // ..
+  }
+
+  try {
+    console.log("REMOVE .isitfast/baseline");
+    await rm(ISITFAST_BASELINE_PATH, { recursive: true, force: true });
+  } catch {
+    // ..
+  }
+
+  try {
+    console.log("CREATE .isitfast");
+    await mkdir(ISITFAST_PATH);
+  } catch {
+    // ..
+  }
 
   console.log("CREATE .isitfast/compile");
   console.log("CREATE .isitfast/results");
   await Promise.all([
     mkdir(ISITFAST_COMPILE_PATH),
     mkdir(ISITFAST_RESULTS_PATH),
+    mkdir(ISITFAST_BASELINE_PATH),
   ]);
 
   console.log("COMPILE START");
   await Promise.all([
-    compileMainNode(),
-    compileStartupNode(),
+    customCompileMainNode(),
+    customCompileStartupNode(),
+    // baselineCompileMainNode(),
+    // baselineCompileStartupNode(),
   ]);
   console.log("COMPILE END");
 
