@@ -1,16 +1,11 @@
 {
   "compilerOptions": {
-    "strict": true,
+    "allowJs": true,
+    "checkJs": true,
     "module": "NodeNext",
     "target": "ESNext",
     "moduleResolution": "nodenext",
-    "esModuleInterop": true,
-    "declaration": true,
-    "noImplicitAny": true,
-    "rootDir": "src",
-    "baseUrl": ".",
-    "outDir": "dist",
-    "declarationDir": "dist"
+    "esModuleInterop": true
   },
   "include": ["src"],
   "exclude": ["node_modules"]

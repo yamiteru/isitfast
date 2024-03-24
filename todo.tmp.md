@@ -1,9 +1,0 @@
-- [x] CPU and RAM
-  - [x] Compile
-  - [x] Run
-- [x] Parse time
-  - [x] Compile
-  - [x] Run
-- [x] Simple benchmark
-  - Before other benchmarks
-  - Determine baseline values

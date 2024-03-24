@@ -16,11 +16,11 @@ export const variableDeclarator = (name, ast) => {
   };
 };
 
-export const variableDeclaration = (declarations) => {
+export const variableDeclaration = (declarations, kind = "const") => {
   return {
     type: 'VariableDeclaration',
     span,
-    kind: 'const',
+    kind,
     declare: false,
     declarations
   };

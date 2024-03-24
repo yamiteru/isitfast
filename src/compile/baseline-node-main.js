@@ -15,7 +15,8 @@ import {
   TEMPLATE_BENCHMARK,
   TEMPLATE_GENERATOR,
   TEMPLATE_TMP,
-  TEMPLATE_BLACKBOX
+  TEMPLATE_BLACKBOX,
+  BENCHMARKS
 } from "../constants.js";
 import { writeCompiledContent } from "./utils.js";
 
@@ -33,10 +34,10 @@ export const baselineCompileMainNode = async () => {
         return Math.round(Math.random() * 10);
       };
 
+      let ${TEMPLATE_TMP} = 0;
+
       const ${TEMPLATE_SOCKET_INSTANCE} = new ${TEMPLATE_SOCKET_CLASS}({ fd: 3, readable: true, writable: true });
       const ${TEMPLATE_BUFFER} = Buffer.alloc(${BUFFER_MAIN_SIZE});
-
-      let ${TEMPLATE_TMP} = 0;
 
       const ${TEMPLATE_BLACKBOX} = (v) => {
         ${TEMPLATE_TMP} = v;

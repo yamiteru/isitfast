@@ -7,6 +7,7 @@ const zod_user = object({
 });
 
 export const $zod = {
+  $default: 0 || 0,
   $generator: function() {
     return {
       name: "Yamiteru",

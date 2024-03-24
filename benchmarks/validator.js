@@ -28,6 +28,7 @@ const validator_user = object({
 });
 
 export const $validator = {
+  $default: 0 || 0,
   $generator: function() {
     return {
       name: "Yamiteru",

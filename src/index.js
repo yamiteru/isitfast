@@ -1,21 +1,18 @@
-import { mkdir, rm, writeFile } from "node:fs/promises"
+import { mkdir, rm } from "node:fs/promises"
 import {
   ISITFAST_PATH,
   ISITFAST_COMPILE_PATH,
   ISITFAST_RESULTS_PATH,
   ISITFAST_BASELINE_PATH,
-  COMPILED_FILES,
-  NODE_STARTUP_COLUMNS,
-  NODE_MAIN_COLUMNS,
+  BENCHMARKS,
 } from "./constants.js";
 import {
+  // baselineCompileMainNode,
+  // baselineCompileStartupNode,
   customCompileMainNode,
   customCompileStartupNode,
-  baselineCompileMainNode,
-  baselineCompileStartupNode
 } from "./compile/index.js";
-import { runMainNode, runStartupNode } from "./run/index.js";
-import { getResultBenchmarkPath, header } from "./run/utils.js";
+import { init, next } from "./balancer.js";
 
 (async () => {
   try {
@@ -56,30 +53,17 @@ import { getResultBenchmarkPath, header } from "./run/utils.js";
 
   console.log("COMPILE START");
   await Promise.all([
-    customCompileMainNode(),
-    customCompileStartupNode(),
     // baselineCompileMainNode(),
     // baselineCompileStartupNode(),
+    customCompileMainNode(),
+    customCompileStartupNode(),
   ]);
   console.log("COMPILE END");
 
-  console.log(COMPILED_FILES);
+  console.log(BENCHMARKS);
 
-  console.log("RUN START");
-  for(let [key, value] of COMPILED_FILES) {
-    const resultBenchmarkPath = getResultBenchmarkPath(key);
-
-    console.log("RUN START - ", key, value.type);
-    if(value.type === "main") {
-      await writeFile(resultBenchmarkPath, header(NODE_MAIN_COLUMNS));
-      await runMainNode(key);
-    } else {
-      await writeFile(resultBenchmarkPath, header(NODE_STARTUP_COLUMNS));
-      await runStartupNode(key);
-    }
-    console.log("RUN END - ", key, value.type);
-  }
-  console.log("RUN END");
+  init();
+  next();
 
   console.log("DONE");
 })();

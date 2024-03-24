@@ -23,7 +23,7 @@ export const BASELINE_BENCHMARK_NAME = "benchmark";
 
 export const BENCHMARK_PREFIX = "$";
 
-export const COMPILED_FILES = new Map();
+export const BENCHMARKS = new Map();
 
 export const SWC_OPTIONS = {
   jsc: {
@@ -74,3 +74,16 @@ export const NODE_STARTUP_COLUMNS = [
   "iteration",
   "duration",
 ];
+
+export const CSV_COLUMN_MAP = {
+  main: [
+    "run",
+    "iteration",
+    "cpu",
+    "ram",
+  ],
+  startup: [
+    "iteration",
+    "duration",
+  ]
+};

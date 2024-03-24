@@ -7,6 +7,7 @@ const valibot_user = object({
 });
 
 export const $valibot = {
+  $default: 0 || 0,
   $generator: function() {
     return {
       name: "Yamiteru",

@@ -18,6 +18,7 @@ import { compileFiles } from "./utils.js";
 
 export const customCompileMainNode = () => compileFiles("main", async ({
   body,
+  defaultValue,
   generator,
   benchmark,
 }) => {
@@ -32,10 +33,10 @@ export const customCompileMainNode = () => compileFiles("main", async ({
 
     ${generator.code}
 
+    ${defaultValue.code}
+
     const ${TEMPLATE_SOCKET_INSTANCE} = new ${TEMPLATE_SOCKET_CLASS}({ fd: 3, readable: true, writable: true });
     const ${TEMPLATE_BUFFER} = Buffer.alloc(${BUFFER_MAIN_SIZE});
-
-    let ${TEMPLATE_TMP} = 0;
 
     const ${TEMPLATE_BLACKBOX} = (v) => {
       ${TEMPLATE_TMP} = v;

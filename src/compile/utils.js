@@ -2,7 +2,7 @@ import { readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parseFile, transform } from "@swc/core";
 import { minify } from "terser";
-import { CONTEXT_PATH, ISITFAST_COMPILE_PATH, BENCHMARK_PREFIX, COMPILED_FILES, SWC_OPTIONS, TEMPLATE_GENERATOR, TEMPLATE_BENCHMARK } from "../constants.js";
+import { CONTEXT_PATH, ISITFAST_COMPILE_PATH, BENCHMARK_PREFIX, BENCHMARKS, SWC_OPTIONS, TEMPLATE_GENERATOR, TEMPLATE_BENCHMARK, ISITFAST_RESULTS_PATH, TEMPLATE_TMP } from "../constants.js";
 import { module, variableDeclaration, variableDeclarator } from "../ast.js";
 
 export const assert = (predicate, message) => {
@@ -26,6 +26,7 @@ export const writeCompiledContent = async (benchmarkPath, content) => {
     module: true,
     toplevel: true
   });
+
   await writeFile(benchmarkPath, code);
 
   console.log("WRITE END - ", benchmarkPath);
@@ -42,11 +43,6 @@ export const isBenchmarkFile = (file) => {
     // TODO: support typescript files
     file.name.split(".").at(-1) === "js"
   );
-};
-
-// TODO: take into account file.path
-export const getCompiledBenchmarkPath = (type, file, benchmarkName) => {
-  return `${join(ISITFAST_COMPILE_PATH, file.name)}-${benchmarkName}-${type}.mjs`;
 };
 
 export const compileFiles = async (type, custom) => {
@@ -78,14 +74,12 @@ export const compileFiles = async (type, custom) => {
       }
 
       for (const node of benchmarkNodes) {
-        const benchmarkName = node.declaration.declarations[0].id.value;
-        const benchmarkPath = getCompiledBenchmarkPath(type, file, benchmarkName);
-        const benchmarkObject = node.declaration.declarations[0].init;
+        const variable = node.declaration.declarations[0].id.value;
+        const definition = node.declaration.declarations[0].init;
 
-        // TODO: add default value ast
-        let generator_ast, benchmark_ast;
+        let generator_ast, benchmark_ast, default_ast;
 
-        for (const prop of benchmarkObject.properties) {
+        for (const prop of definition.properties) {
           assert(prop.key.type !== "Identifier", "Property key has to be an Identifier");
 
           const propertyKey = prop.key.value;
@@ -102,14 +96,18 @@ export const compileFiles = async (type, custom) => {
             assert(prop.value.generator, "$function should not be a generator");
 
             benchmark_ast = prop.value;
+          } else if (propertyKey === "$default") {
+            default_ast = prop.value;
           }
         }
 
         assert(!generator_ast, "No $generator provided");
         assert(!benchmark_ast, "No $function provided");
+        assert(!default_ast, "No $default provided");
 
         const [
           body,
+          defaultValue,
           benchmark,
           generator
         ] = await Promise.all([
@@ -123,25 +121,61 @@ export const compileFiles = async (type, custom) => {
           ]), SWC_OPTIONS),
           transform(module([
             variableDeclaration([
+              variableDeclarator(TEMPLATE_TMP, default_ast)
+            ], "let")
+          ]), SWC_OPTIONS),
+          transform(module([
+            variableDeclaration([
               variableDeclarator(TEMPLATE_GENERATOR, generator_ast)
             ])
           ]), SWC_OPTIONS)
         ]);
 
+        const compileName = `${file.name}-${variable}-${type}.mjs`;
+        const compileDirectory = ISITFAST_COMPILE_PATH;
+
+        const compile = {
+          name: compileName,
+          directory: compileDirectory,
+          path: join(compileDirectory, compileName)
+        };
+
         promises.push(writeCompiledContent(
-          benchmarkPath,
+          compile.path,
           (await custom({
             body,
+            defaultValue,
             generator,
             benchmark
           }))
         ));
 
-        COMPILED_FILES.set(benchmarkPath, {
+        const resultName = `${file.name}-${variable}-${type}.csv`;
+        const resultDirectory = ISITFAST_RESULTS_PATH;
+
+        const benchmarkName = `${file.name}-${variable}-${type}`;
+
+        BENCHMARKS.set(benchmarkName, {
           type,
-          variableName: benchmarkName,
-          fileName: file.name,
-          filePath: file.path
+          name: benchmarkName,
+          meta: {
+            variable: variable,
+            // TODO: add id, name, description
+          },
+          source: {
+            name: file.name,
+            directory: file.path,
+            path: join(file.path, file.name)
+          },
+          compile,
+          result: {
+            created: false,
+            run: 0,
+            iteration: 0,
+            name: resultName,
+            directory: resultDirectory,
+            path: join(resultDirectory, resultName)
+          },
         });
       }
     }
