@@ -44,19 +44,6 @@ If value of `benchmark` is an object we don't treat it as a benchmark but rather
 
 Each benchmark is run with each set of data.
 
-### Triple-slash
-
-Maybe we could mark benchmarks this way instead of searching by prefixes like `$`.
-
-But if we build TS -> JS we might lose the comment meaning no benchmarks would be found.
-
-```ts
-/// [benchmark]
-const $for = {
-  // ..
-};
-```
-
 ### Single benchmark
 
 

@@ -4,11 +4,18 @@ import { spawn } from "node:child_process";
 import { header, row } from "./csv.js";
 import { randomItem } from "./utils.js";
 
-export let now = process.hrtime.bigint();
-export let activeItem;
-export let activeProcess;
-export let activeStream;
-export let remaining = [];
+let now = process.hrtime.bigint();
+let activeItem;
+let activeProcess;
+let activeStream;
+let remaining = [];
+
+let resultsCpu = [];
+let resultsRam = [];
+
+const RESULT_BUFFER = 1000;
+const RESULT_STEP = 100;
+const RESULT_STABLE = 500;
 
 async function runMain(buffer) {
   const { name, result } = activeItem;
@@ -19,6 +26,9 @@ async function runMain(buffer) {
     const ram = buffer.readUInt32LE(BUFFER_RAM_AFTER_INDEX) - buffer.readUInt32LE(BUFFER_RAM_BEFORE_INDEX);
 
     if(cpu >= 0 && ram >= 0) {
+      resultsCpu.push(cpu);
+      resultsRam.push(ram);
+
       await appendFile(result.path, row([
         result.run,
         result.iteration,
@@ -26,7 +36,11 @@ async function runMain(buffer) {
         ram,
       ]));
 
-      if(++result.iteration === MAIN_SAMPLES) {
+      ++result.iteration;
+
+      if(result.iteration >= RESULT_BUFFER && result.iteration % RESULT_STEP === 0) {
+        // const slice = resultsCpu.slice(RESULT_STABLE);
+
         activeProcess.kill();
 
         if(++result.run >= RUNS) {
@@ -77,6 +91,8 @@ export const next = () => {
   if(remaining.length === 0) return;
 
   activeItem = BENCHMARKS.get(randomItem(activeItem, remaining));
+  resultsCpu = [];
+  resultsRam = [];
 
   console.log("RUN - ", activeItem);
 

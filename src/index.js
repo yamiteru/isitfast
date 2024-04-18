@@ -10,7 +10,7 @@ import {
   // baselineCompileMainNode,
   // baselineCompileStartupNode,
   customCompileMainNode,
-  customCompileStartupNode,
+  // customCompileStartupNode,
 } from "./compile/index.js";
 import { init, next } from "./balancer.js";
 
@@ -56,7 +56,7 @@ import { init, next } from "./balancer.js";
     // baselineCompileMainNode(),
     // baselineCompileStartupNode(),
     customCompileMainNode(),
-    customCompileStartupNode(),
+    // customCompileStartupNode(),
   ]);
   console.log("COMPILE END");
 
