@@ -5,8 +5,8 @@ import { spawn } from "node:child_process";
 const HERE = process.cwd();
 const BENCHMARK = process.env.BENCHMARK;
 const FILE = process.env.FILE;
-const SAMPLES = 5_000;
-const RUNS = 20;
+const SAMPLES = 2_000;
+const RUNS = 10;
 const BUFFER = Buffer.alloc(1);
 const STATS_FILE_NAME = join(HERE, "results", "newer", `${FILE}-$${BENCHMARK}.csv`);
 

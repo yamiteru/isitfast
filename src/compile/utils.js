@@ -20,14 +20,14 @@ export const getFileList = () => readdir(
 export const writeCompiledContent = async (benchmarkPath, content) => {
   console.log("WRITE START - ", benchmarkPath);
 
-  const { code } = await minify(content, {
-    compress: false,
-    ecma: 2020,
-    module: true,
-    toplevel: true
-  });
+  // const { code } = await minify(content, {
+  //   compress: false,
+  //   ecma: 2020,
+  //   module: true,
+  //   toplevel: true
+  // });
 
-  await writeFile(benchmarkPath, code);
+  await writeFile(benchmarkPath, content);
 
   console.log("WRITE END - ", benchmarkPath);
 };
@@ -140,14 +140,16 @@ export const compileFiles = async (type, custom) => {
           path: join(compileDirectory, compileName)
         };
 
+        const customResult = await custom({
+          body,
+          defaultValue,
+          generator,
+          benchmark
+        });
+
         promises.push(writeCompiledContent(
           compile.path,
-          (await custom({
-            body,
-            defaultValue,
-            generator,
-            benchmark
-          }))
+          customResult
         ));
 
         const resultName = `${file.name}-${variable}-${type}.csv`;
@@ -180,6 +182,8 @@ export const compileFiles = async (type, custom) => {
       }
     }
   }
+
+  console.log(BENCHMARKS);
 
   await Promise.all(promises);
 

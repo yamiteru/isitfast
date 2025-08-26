@@ -7,10 +7,7 @@ import {
   BENCHMARKS,
 } from "./constants.js";
 import {
-  // baselineCompileMainNode,
-  // baselineCompileStartupNode,
   customCompileMainNode,
-  // customCompileStartupNode,
 } from "./compile/index.js";
 import { init, next } from "./balancer.js";
 

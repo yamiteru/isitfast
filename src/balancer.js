@@ -1,5 +1,17 @@
 import { appendFile, writeFile } from "node:fs/promises";
-import { CSV_COLUMN_MAP, BENCHMARKS, BUFFER_TYPE_INDEX, BUFFER_CPU_AFTER_INDEX, BUFFER_CPU_BEFORE_INDEX, BUFFER_RAM_AFTER_INDEX, BUFFER_RAM_BEFORE_INDEX, BUFFER, MAIN_SAMPLES, RUNS, BUFFER_DURATION_INDEX, STARTUP_SAMPLES } from "./constants.js";
+import {
+  BENCHMARKS,
+  BUFFER,
+  BUFFER_CPU_AFTER_INDEX,
+  BUFFER_CPU_BEFORE_INDEX,
+  BUFFER_DURATION_INDEX,
+  BUFFER_RAM_AFTER_INDEX,
+  BUFFER_RAM_BEFORE_INDEX,
+  BUFFER_TYPE_INDEX,
+  CSV_COLUMN_MAP,
+  RUNS,
+  STARTUP_SAMPLES
+} from "./constants.js";
 import { spawn } from "node:child_process";
 import { header, row } from "./csv.js";
 import { randomItem } from "./utils.js";
@@ -13,7 +25,7 @@ let remaining = [];
 let resultsCpu = [];
 let resultsRam = [];
 
-const RESULT_BUFFER = 1000;
+const RESULT_BUFFER = 5000;
 const RESULT_STEP = 100;
 const RESULT_STABLE = 500;
 
@@ -21,11 +33,11 @@ async function runMain(buffer) {
   const { name, result } = activeItem;
   const type = buffer.readUInt32LE(BUFFER_TYPE_INDEX);
 
-  if(type === 1) {
+  if (type === 1) {
     const cpu = Number(buffer.readBigInt64LE(BUFFER_CPU_AFTER_INDEX) - buffer.readBigInt64LE(BUFFER_CPU_BEFORE_INDEX));
     const ram = buffer.readUInt32LE(BUFFER_RAM_AFTER_INDEX) - buffer.readUInt32LE(BUFFER_RAM_BEFORE_INDEX);
 
-    if(cpu >= 0 && ram >= 0) {
+    if (cpu >= 0 && ram >= 0) {
       resultsCpu.push(cpu);
       resultsRam.push(ram);
 
@@ -33,17 +45,17 @@ async function runMain(buffer) {
         result.run,
         result.iteration,
         cpu,
-        ram,
+        ram
       ]));
 
       ++result.iteration;
 
-      if(result.iteration >= RESULT_BUFFER && result.iteration % RESULT_STEP === 0) {
+      if (result.iteration >= RESULT_BUFFER && result.iteration % RESULT_STEP === 0) {
         // const slice = resultsCpu.slice(RESULT_STABLE);
 
         activeProcess.kill();
 
-        if(++result.run >= RUNS) {
+        if (++result.run >= RUNS) {
           remaining = remaining.filter((v) => v !== name);
         }
 
@@ -66,12 +78,12 @@ async function runStartup(buffer) {
 
   await appendFile(result.path, row([
     result.iteration,
-    duration,
+    duration
   ]));
 
   activeProcess.kill();
 
-  if(++result.iteration === STARTUP_SAMPLES) {
+  if (++result.iteration === STARTUP_SAMPLES) {
     remaining = remaining.filter((v) => v !== name);
   }
 
@@ -88,13 +100,13 @@ export const init = () => {
 };
 
 export const next = () => {
-  if(remaining.length === 0) return;
+  if (remaining.length === 0) return;
 
   activeItem = BENCHMARKS.get(randomItem(activeItem, remaining));
   resultsCpu = [];
   resultsRam = [];
 
-  console.log("RUN - ", activeItem);
+  // console.log("RUN - ", activeItem);
 
   (async () => {
     const {
@@ -103,7 +115,7 @@ export const next = () => {
       result
     } = activeItem;
 
-    if(!result.created) {
+    if (!result.created) {
       await writeFile(
         result.path,
         header(CSV_COLUMN_MAP[type])
@@ -116,7 +128,10 @@ export const next = () => {
     activeProcess = spawn(
       "node",
       [compile.path],
-      { stdio: ["inherit", "inherit", "inherit", "pipe"] }
+      {
+        stdio: ["inherit", "inherit", "inherit", "pipe"],
+        cwd: process.cwd()
+      }
     );
 
     activeStream = activeProcess.stdio[3];

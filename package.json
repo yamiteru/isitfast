@@ -5,25 +5,20 @@
   "main": "dist/index.js",
   "bin": "./dist/index.js",
   "scripts": {
-    "benchmark:validate:validator": "FILE=validate.js BENCHMARK=validator node newer/index.js",
-    "benchmark:validate:zod": "FILE=validate.js BENCHMARK=zod node newer/index.js",
-    "benchmark:validate:valibot": "FILE=validate.js BENCHMARK=valibot node newer/index.js",
-    "compile": "node newer/compile.js",
-    "ast:template": "FILE=newer/template.js node ast.js > template.json",
-    "start": "node src/index.js benchmarks"
+    "start": "node src/index.js"
   },
   "devDependencies": {
-    "@types/node": "20.9.0",
+    "@types/node": "20.12.7",
     "husky": "8.0.3",
-    "npm-run-all": "4.1.5",
-    "typescript": "5.2.2"
+    "typescript": "5.4.5"
   },
   "packageManager": "yarn@4.0.2",
   "dependencies": {
     "@paralleldrive/cuid2": "2.2.2",
-    "@swc/core": "1.4.8",
-    "terser": "^5.29.2",
+    "@swc/core": "1.4.16",
+    "@the-minimal/validator": "0.2.1",
+    "terser": "5.29.2",
     "valibot": "0.30.0",
-    "zod": "3.22.4"
+    "zod": "3.23.0"
   }
 }
